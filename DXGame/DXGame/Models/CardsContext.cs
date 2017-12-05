@@ -17,6 +17,7 @@ namespace DXGame.Models
     
         public CardsContext() : base("name=CardsContext")
         {
+            Database.CreateIfNotExists();
         }
 
         public System.Data.Entity.DbSet<DXGame.Models.Entities.Card> Cards { get; set; }

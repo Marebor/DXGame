@@ -19,21 +19,24 @@ namespace DXGame.Controllers
     public class CardsController : ApiController
     {
         private readonly string acceptedExtensions = "jpg, jpeg, png, bmp, gif";
-        private readonly string rootFolder = System.Web.Hosting.HostingEnvironment.MapPath(@"~/Content/Cards");
-        private CardsContext db = new CardsContext();
         
-        public IQueryable<Card> GetCards()
+        private ICardsRepository cardsRepository;
+        
+        public CardsController(ICardsRepository repository)
         {
-            return db.Cards;
+            cardsRepository = repository;
+        }
+
+        public IEnumerable<Card> GetCards()
+        {
+            return cardsRepository.Cards;
         }
         
         public async Task<IHttpActionResult> GetCard(int id)
         {
-            Card card = await db.Cards.FindAsync(id);
+            var card = await cardsRepository.FindAsync(id);
             if (card == null)
-            {
                 return NotFound();
-            }
 
             return Redirect(card.URL);
         }
@@ -42,45 +45,19 @@ namespace DXGame.Controllers
         {
             var filename = HttpContext.Current.Request.Files.AllKeys.FirstOrDefault();
             if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
-            {
                 return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
-            }
-            
-            var card = new Card();
-            db.Cards.Add(card);
 
-            var id_formatter = $"D{int.MaxValue.ToString().Length}";
-            var name = $"Card_ID-{card.ID.ToString(id_formatter)}.{Path.GetExtension(filename)}";
-            HttpContext.Current.Request.Files[filename].SaveAs(Path.Combine(rootFolder, name));
-
-            card.URL = $"Content/Cards/{name}";
-            await db.SaveChangesAsync();
+            var card = await cardsRepository.AddAsync(HttpContext.Current.Request.Files[filename]);
 
             return CreatedAtRoute("DefaultApi", new { id = card.ID }, card);
+            //return Created(card.URL, card);
         }
         
         public async Task<IHttpActionResult> DeleteCard(int id)
         {
-            Card card = await db.Cards.FindAsync(id);
-            if (card == null)
-            {
-                return NotFound();
-            }
+            var card = await cardsRepository.DeleteAsync(id);
 
-            File.Delete(Path.Combine(rootFolder, Path.GetFileName(card.URL)));
-            db.Cards.Remove(card);
-            await db.SaveChangesAsync();
-
-            return Ok(card);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
+            return card != null ? (IHttpActionResult)Ok(card) : NotFound();
         }
     }
 }

@@ -24,16 +24,23 @@ namespace DXGame.Models
             baseURL = directory;
         }
 
-        public async Task<Card> AddAsync(HttpPostedFile file)
+        public async Task<Card> AddAsync(string filename, Stream content)
         {
+            if (content == null || content.Length == 0) return null;
+
             var card = new Card();
             db.Cards.Add(card);
 
             var id_formatter = $"D{int.MaxValue.ToString().Length}";
-            var name = $"Card_ID-{card.ID.ToString(id_formatter)}.{Path.GetExtension(file.FileName)}";
-            file.SaveAs(Path.Combine(rootFolder, baseURL, name));
+            var name = $"Card_ID-{card.ID.ToString(id_formatter)}.{Path.GetExtension(filename)}";
+            var fullname = Path.Combine(rootFolder, name);
 
-            card.URL = Path.Combine(baseURL, card.ID.ToString());
+            using (var fs = new FileStream(fullname, FileMode.CreateNew))
+            {
+                await content.CopyToAsync(fs);
+            }
+            
+            card.URL = Path.Combine(baseURL, name);
             await db.SaveChangesAsync();
 
             return card;

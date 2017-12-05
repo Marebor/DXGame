@@ -79,7 +79,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Models\FolderCardsRepositoryTests.cs" />
+    <Compile Include="Controllers\CardsControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

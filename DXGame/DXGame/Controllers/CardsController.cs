@@ -38,7 +38,7 @@ namespace DXGame.Controllers
             if (card == null)
                 return NotFound();
 
-            return Redirect(card.URL);
+            return Ok(card.URL);
         }
         
         public async Task<IHttpActionResult> PostCard()
@@ -47,10 +47,10 @@ namespace DXGame.Controllers
             if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
                 return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
 
-            var card = await cardsRepository.AddAsync(HttpContext.Current.Request.Files[filename]);
-
-            return CreatedAtRoute("DefaultApi", new { id = card.ID }, card);
-            //return Created(card.URL, card);
+            var file = HttpContext.Current.Request.Files[filename];
+            var card = await cardsRepository.AddAsync(file.FileName, file.InputStream);
+            
+            return Created(card.URL, card);
         }
         
         public async Task<IHttpActionResult> DeleteCard(int id)

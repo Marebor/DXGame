@@ -5,6 +5,7 @@ using System.Web.Http;
 
 using Unity;
 using Unity.Lifetime;
+using Unity.Registration;
 using DXGame.Models;
 
 namespace DXGame
@@ -16,8 +17,8 @@ namespace DXGame
             // Konfiguracja i usługi składnika Web API
             var container = new UnityContainer();
             var cardsFolder = new FolderCardsRepository("Content/Cards");
-            container.RegisterInstance<ICardsRepository>(cardsFolder, new HierarchicalLifetimeManager());
-            container.RegisterType<ICardsRepository, FolderCardsRepository>(new HierarchicalLifetimeManager());
+            container.RegisterInstance<ICardsRepository>(cardsFolder);
+            //container.RegisterType<ICardsRepository, FolderCardsRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
 
             // Trasy składnika Web API

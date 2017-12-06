@@ -153,6 +153,10 @@
     <Compile Include="Migrations\201712042142317_Initial.Designer.cs">
       <DependentUpon>201712042142317_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712061013101_TestSeed.cs" />
+    <Compile Include="Migrations\201712061013101_TestSeed.Designer.cs">
+      <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\CardsContext.cs" />
     <Compile Include="Models\Entities\Card.cs" />
@@ -178,6 +182,9 @@
     <EmbeddedResource Include="Migrations\201712042142317_Initial.resx">
       <DependentUpon>201712042142317_Initial.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712061013101_TestSeed.resx">
+      <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -194,7 +201,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>63221</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:63221/</IISUrl>
+          <IISUrl>http://localhost:65432/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

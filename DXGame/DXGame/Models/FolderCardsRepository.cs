@@ -30,17 +30,18 @@ namespace DXGame.Models
 
             var card = new Card();
             db.Cards.Add(card);
+            await db.SaveChangesAsync();
 
             var id_formatter = $"D{int.MaxValue.ToString().Length}";
-            var name = $"Card_ID-{card.ID.ToString(id_formatter)}.{Path.GetExtension(filename)}";
-            var fullname = Path.Combine(rootFolder, name);
+            var name = $"Card_ID-{card.ID.ToString(id_formatter)}{Path.GetExtension(filename)}";
+            //var fullname = Path.Combine(rootFolder, name);
 
-            using (var fs = new FileStream(fullname, FileMode.CreateNew))
-            {
-                await content.CopyToAsync(fs);
-            }
-            
-            card.URL = Path.Combine(baseURL, name);
+            //using (var fs = new FileStream(fullname, FileMode.CreateNew))
+            //{
+            //    await content.CopyToAsync(fs);
+            //}
+
+            card.URL = baseURL + "/" + name;
             await db.SaveChangesAsync();
 
             return card;

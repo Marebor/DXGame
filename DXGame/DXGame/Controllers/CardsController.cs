@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using DXGame.Models;
 using DXGame.Models.Entities;
@@ -27,11 +28,13 @@ namespace DXGame.Controllers
             cardsRepository = repository;
         }
 
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public IEnumerable<Card> GetCards()
         {
             return cardsRepository.Cards;
         }
-        
+
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<IHttpActionResult> GetCard(int id)
         {
             var card = await cardsRepository.FindAsync(id);
@@ -49,6 +52,7 @@ namespace DXGame.Controllers
 
             var file = HttpContext.Current.Request.Files[filename];
             var card = await cardsRepository.AddAsync(file.FileName, file.InputStream);
+            file.SaveAs(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath(@"~/"), card.URL));
             
             return Created(card.URL, card);
         }

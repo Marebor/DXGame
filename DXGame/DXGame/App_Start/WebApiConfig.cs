@@ -18,8 +18,9 @@ namespace DXGame
             var container = new UnityContainer();
             var cardsFolder = new FolderCardsRepository("Content/Cards");
             container.RegisterInstance<ICardsRepository>(cardsFolder);
-            //container.RegisterType<ICardsRepository, FolderCardsRepository>(new HierarchicalLifetimeManager());
             config.DependencyResolver = new UnityResolver(container);
+
+            config.EnableCors();
 
             // Trasy składnika Web API
             config.MapHttpAttributeRoutes();

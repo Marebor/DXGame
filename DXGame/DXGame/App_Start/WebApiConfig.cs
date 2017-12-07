@@ -7,6 +7,7 @@ using Unity;
 using Unity.Lifetime;
 using Unity.Registration;
 using DXGame.Models;
+using DXGame.Services;
 
 namespace DXGame
 {
@@ -17,7 +18,9 @@ namespace DXGame
             // Konfiguracja i usługi składnika Web API
             var container = new UnityContainer();
             var cardsFolder = new FolderCardsRepository("Content/Cards");
+            var requestFilesService = new HttpContextRequestFileService();
             container.RegisterInstance<ICardsRepository>(cardsFolder);
+            container.RegisterInstance<IRequestFileService>(requestFilesService);
             config.DependencyResolver = new UnityResolver(container);
 
             config.EnableCors();

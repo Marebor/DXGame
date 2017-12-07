@@ -14,6 +14,7 @@ using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using DXGame.Models;
 using DXGame.Models.Entities;
+using DXGame.Services;
 
 namespace DXGame.Controllers
 {
@@ -22,10 +23,12 @@ namespace DXGame.Controllers
         private readonly string acceptedExtensions = "jpg, jpeg, png, bmp, gif";
         
         private ICardsRepository cardsRepository;
-        
-        public CardsController(ICardsRepository repository)
+        private IRequestFileService requestFileService;
+
+        public CardsController(ICardsRepository repository, IRequestFileService reqFileService)
         {
             cardsRepository = repository;
+            requestFileService = reqFileService;
         }
 
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -41,20 +44,25 @@ namespace DXGame.Controllers
             if (card == null)
                 return NotFound();
 
-            return Ok(card.URL);
+            return Ok(card);
         }
         
         public async Task<IHttpActionResult> PostCard()
         {
-            var filename = HttpContext.Current.Request.Files.AllKeys.FirstOrDefault();
-            if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
-                return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
+            if (HttpContext.Current == null)
+            {
+                return BadRequest("No context :(");
+            }
+            var filename = requestFileService.GetFiles().AllKeys.FirstOrDefault();
+            return Created("", new Card());
+            //if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
+            //    return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
 
-            var file = HttpContext.Current.Request.Files[filename];
-            var card = await cardsRepository.AddAsync(file.FileName, file.InputStream);
-            file.SaveAs(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath(@"~/"), card.URL));
+            //var file = HttpContext.Current.Request.Files[filename];
+            //var card = await cardsRepository.AddAsync(file.FileName, file.InputStream);
+            //file.SaveAs(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath(@"~/"), card.URL));
             
-            return Created(card.URL, card);
+            //return Created(card.URL, card);
         }
         
         public async Task<IHttpActionResult> DeleteCard(int id)

@@ -20,7 +20,7 @@ namespace DXGame.Models
 
         public FolderCardsRepository(string directory)
         {
-            Directory.CreateDirectory(Path.Combine(rootFolder, directory));
+            Directory.CreateDirectory(Path.Combine(rootFolder ?? Directory.GetCurrentDirectory(), directory));
             baseURL = directory;
         }
 
@@ -32,8 +32,6 @@ namespace DXGame.Models
             db.Cards.Add(card);
             await db.SaveChangesAsync();
 
-            var id_formatter = $"D{int.MaxValue.ToString().Length}";
-            var name = $"Card_ID-{card.ID.ToString(id_formatter)}{Path.GetExtension(filename)}";
             //var fullname = Path.Combine(rootFolder, name);
 
             //using (var fs = new FileStream(fullname, FileMode.CreateNew))
@@ -41,7 +39,7 @@ namespace DXGame.Models
             //    await content.CopyToAsync(fs);
             //}
 
-            card.URL = baseURL + "/" + name;
+            card.URL = baseURL + "/" + GenerateFilename(card.ID, Path.GetExtension(filename));
             await db.SaveChangesAsync();
 
             return card;
@@ -64,6 +62,12 @@ namespace DXGame.Models
         public async Task<Card> FindAsync(int id)
         {
             return await db.Cards.FindAsync(id);
+        }
+
+        public static string GenerateFilename(int id, string extension)
+        {
+            var id_formatter = $"D{int.MaxValue.ToString().Length}";
+            return $"Card_ID-{id.ToString(id_formatter)}{extension}";
         }
     }
 }

@@ -25,10 +25,10 @@ namespace DXGame.Controllers
         private ICardsRepository cardsRepository;
         private IRequestFileService requestFileService;
 
-        public CardsController(ICardsRepository repository, IRequestFileService reqFileService)
+        public CardsController(ICardsRepository repository)
         {
             cardsRepository = repository;
-            requestFileService = reqFileService;
+            //requestFileService = reqFileService;
         }
 
         [EnableCors(origins: "*", headers: "*", methods: "*")]
@@ -49,20 +49,30 @@ namespace DXGame.Controllers
         
         public async Task<IHttpActionResult> PostCard()
         {
-            if (HttpContext.Current == null)
-            {
-                return BadRequest("No context :(");
-            }
-            var filename = requestFileService.GetFiles().AllKeys.FirstOrDefault();
-            return Created("", new Card());
+            //var filename = HttpContext.Current.Request.Files.AllKeys.FirstOrDefault();
             //if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
             //    return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
 
             //var file = HttpContext.Current.Request.Files[filename];
-            //var card = await cardsRepository.AddAsync(file.FileName, file.InputStream);
+
+            if (!Request.Content.IsMimeMultipartContent())
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            //string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            //var provider = new MultipartFormDataStreamProvider(root);
+
+            //return Created("", new Card());
+            var multipart = await Request.Content.ReadAsMultipartAsync();
+            var info = multipart.Contents[0].Headers;
+            var type = info.ContentType;
+            var stream = await multipart.Contents[0].ReadAsStreamAsync();
+
+            var card = await cardsRepository.AddAsync("lolo.jpg", stream);
             //file.SaveAs(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath(@"~/"), card.URL));
-            
-            //return Created(card.URL, card);
+
+            return Created(card.URL, card);
         }
         
         public async Task<IHttpActionResult> DeleteCard(int id)

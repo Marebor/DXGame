@@ -43,7 +43,9 @@ namespace DXGame.Controllers.Tests
 
             var container = new UnityContainer();
             var mockRepo = CreateMockRepository();
+            //var mockReqFileServie = CreateMockRequestFileService();
             container.RegisterInstance(mockRepo.Object);
+            //container.RegisterInstance(mockReqFileServie.Object);
             config.DependencyResolver = new UnityResolver(container);
 
             var server = new HttpServer(config);
@@ -89,7 +91,7 @@ namespace DXGame.Controllers.Tests
             file.Write(new byte[100], 0, 100);
 
             var form = new MultipartFormDataContent();
-            form.Add(new StreamContent(file), "testImage.jpg");
+            form.Add(new StreamContent(file), "image", "testImage.jpg");
 
             var response = _client.PostAsync("http://test/api/cards", form).Result;
             var content = response.Content.ReadAsStringAsync().Result;
@@ -114,7 +116,7 @@ namespace DXGame.Controllers.Tests
                 var maxID = mock.Object.Cards.Max(c => c.ID);
                 maxID++;
 
-                return new Card() { ID = maxID, URL = FolderCardsRepository.GenerateFilename(maxID, ".jpg") };
+                return new Card() { ID = maxID, URL = "Content/Cards/" + FolderCardsRepository.GenerateFilename(maxID, ".jpg") };
             });
             mock.Setup(m => m.FindAsync(It.IsAny<int>())).Returns(async (int id) => {
                 await Task.Yield();
@@ -135,13 +137,21 @@ namespace DXGame.Controllers.Tests
             return mock;
         }
 
-        private Mock<IRequestFileService> CreateMockRequestFileService()
-        {
-            var mock = new Mock<HttpContext>();
-            mock.Setup(m => m.Request).Returns(() =>
-            {
-                
-            });
-        }
+        //private Mock<IRequestFileService> CreateMockRequestFileService()
+        //{
+        //    var mock = new Mock<IRequestFileService>();
+        //    mock.Setup(m => m.GetFiles()).Returns(() =>
+        //    {
+        //        var content = new MemoryStream();
+        //        content.Write(new byte[] { 1, 2, 3 }, 0, 3);
+
+        //        return (content, "testFile.jpg");
+        //    });
+
+        //    var test = new Mock<HttpPostedFile>();
+        //    test.Setup(m => m.SaveAs(It.IsAny<string>())).Verifiable();
+
+        //    return mock;
+        //}
     }
 }

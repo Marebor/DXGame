@@ -32,13 +32,6 @@ namespace DXGame.Models
             db.Cards.Add(card);
             await db.SaveChangesAsync();
 
-            //var fullname = Path.Combine(rootFolder, name);
-
-            //using (var fs = new FileStream(fullname, FileMode.CreateNew))
-            //{
-            //    await content.CopyToAsync(fs);
-            //}
-
             card.URL = baseURL + "/" + GenerateFilename(card.ID, Path.GetExtension(filename));
             await db.SaveChangesAsync();
 

@@ -13,7 +13,7 @@ namespace DXGame.Models
     public interface ICardsRepository
     {
         IEnumerable<Card> Cards { get; }
-        Task<Card> AddAsync(string filename, Stream content);
+        Task<Card> AddAsync(string url);
         Task<Card> DeleteAsync(int id);
         Task<Card> FindAsync(int id);
     }

@@ -164,6 +164,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Providers\CardMultipartFormDataStreamProvider.cs" />
+    <Compile Include="Providers\FilenameProvider.cs" />
+    <Compile Include="Providers\IFilenameProvider.cs" />
+    <Compile Include="Providers\INewIDProvider.cs" />
+    <Compile Include="Providers\IRootPathProvider.cs" />
     <Compile Include="Migrations\201712042142317_Initial.cs" />
     <Compile Include="Migrations\201712042142317_Initial.Designer.cs">
       <DependentUpon>201712042142317_Initial.cs</DependentUpon>
@@ -175,11 +180,13 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\CardsContext.cs" />
     <Compile Include="Models\Entities\Card.cs" />
-    <Compile Include="Models\FolderCardsRepository.cs" />
+    <Compile Include="Models\CardsRepository.cs" />
     <Compile Include="Models\ICardsRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\HttpContextRequestFileService.cs" />
-    <Compile Include="Services\IRequestFileService.cs" />
+    <Compile Include="Providers\NewIDProvider.cs" />
+    <Compile Include="Providers\ServerPathProvider.cs" />
+    <Compile Include="Services\IFileService.cs" />
+    <Compile Include="Services\ServerFileService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\web.config" />

@@ -14,7 +14,7 @@ using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using DXGame.Models;
 using DXGame.Models.Entities;
-using DXGame.Services;
+using DXGame.Providers;
 
 namespace DXGame.Controllers
 {
@@ -22,25 +22,25 @@ namespace DXGame.Controllers
     {
         private readonly string acceptedExtensions = "jpg, jpeg, png, bmp, gif";
         
-        private ICardsRepository cardsRepository;
-        private IRequestFileService requestFileService;
+        private ICardsRepository _cardsRepository;
+        private IRootPathProvider _rootPathProvider;
 
-        public CardsController(ICardsRepository repository)
+        public CardsController(ICardsRepository repository, IRootPathProvider pathProvider)
         {
-            cardsRepository = repository;
-            //requestFileService = reqFileService;
+            _cardsRepository = repository;
+            _rootPathProvider = pathProvider;
         }
 
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         public IEnumerable<Card> GetCards()
         {
-            return cardsRepository.Cards;
+            return _cardsRepository.Cards;
         }
 
         [EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<IHttpActionResult> GetCard(int id)
         {
-            var card = await cardsRepository.FindAsync(id);
+            var card = await _cardsRepository.FindAsync(id);
             if (card == null)
                 return NotFound();
 
@@ -49,35 +49,33 @@ namespace DXGame.Controllers
         
         public async Task<IHttpActionResult> PostCard()
         {
-            //var filename = HttpContext.Current.Request.Files.AllKeys.FirstOrDefault();
-            //if (!acceptedExtensions.Contains(Path.GetExtension(filename)))
-            //    return BadRequest($"Invalid file format. Acceptable extensions: {acceptedExtensions}");
-
-            //var file = HttpContext.Current.Request.Files[filename];
-
             if (!Request.Content.IsMimeMultipartContent())
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
+            var storagePath = Path.Combine(_rootPathProvider.GetRoot(), "Content", "Cards");
+            var injector = Configuration.DependencyResolver;
+            var provider = new CardMultipartFormDataStreamProvider(
+                storagePath, 
+                injector.GetService(typeof(INewIDProvider)) as INewIDProvider, 
+                injector.GetService(typeof(IFilenameProvider)) as IFilenameProvider
+                );
+            
+            provider = await Request.Content.ReadAsMultipartAsync(provider);
 
-            //string root = HttpContext.Current.Server.MapPath("~/App_Data");
-            //var provider = new MultipartFormDataStreamProvider(root);
+            var cards = new List<Card>();
+            foreach (var file in provider.FileData)
+            {
+                var card = await _cardsRepository.AddAsync("Content/Cards/" + file.LocalFileName);
+                cards.Add(card);
+            }
 
-            //return Created("", new Card());
-            var multipart = await Request.Content.ReadAsMultipartAsync();
-            var info = multipart.Contents[0].Headers;
-            var type = info.ContentType;
-            var stream = await multipart.Contents[0].ReadAsStreamAsync();
-
-            var card = await cardsRepository.AddAsync("lolo.jpg", stream);
-            //file.SaveAs(Path.Combine(System.Web.Hosting.HostingEnvironment.MapPath(@"~/"), card.URL));
-
-            return Created(card.URL, card);
+            return Created("Content/Cards/", cards);
         }
         
         public async Task<IHttpActionResult> DeleteCard(int id)
         {
-            var card = await cardsRepository.DeleteAsync(id);
+            var card = await _cardsRepository.DeleteAsync(id);
 
             return card != null ? (IHttpActionResult)Ok(card) : NotFound();
         }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 using System.Web;
 using System.Web.Http;
@@ -17,7 +18,7 @@ using Moq.Protected;
 using Unity;
 using DXGame.Models;
 using DXGame.Models.Entities;
-using DXGame.Services;
+using DXGame.Providers;
 
 using Newtonsoft.Json;
 
@@ -43,9 +44,11 @@ namespace DXGame.Controllers.Tests
 
             var container = new UnityContainer();
             var mockRepo = CreateMockRepository();
-            //var mockReqFileServie = CreateMockRequestFileService();
+            var mockPathProvider = CreateMockPathProvider();
             container.RegisterInstance(mockRepo.Object);
-            //container.RegisterInstance(mockReqFileServie.Object);
+            container.RegisterInstance(mockPathProvider.Object);
+            container.RegisterType<IFilenameProvider, FilenameProvider>();
+            container.RegisterType<INewIDProvider, NewIDProvider>();
             config.DependencyResolver = new UnityResolver(container);
 
             var server = new HttpServer(config);
@@ -85,8 +88,9 @@ namespace DXGame.Controllers.Tests
         }
 
         [TestMethod()]
-        public void AddNewCardTest_NonEmptyFile()
+        public void AddNewCardTest_OneFile()
         {
+            System.Diagnostics.Trace.WriteLine("ELO ELO");
             var file = new MemoryStream();
             file.Write(new byte[100], 0, 100);
 
@@ -95,28 +99,51 @@ namespace DXGame.Controllers.Tests
 
             var response = _client.PostAsync("http://test/api/cards", form).Result;
             var content = response.Content.ReadAsStringAsync().Result;
-            var obj = JsonConvert.DeserializeObject(content, typeof(Card));
+            var createdCards = JsonConvert.DeserializeObject(content, typeof(List<Card>)) as List<Card>;
+            
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            Assert.AreEqual(1, createdCards.Count);
+            Assert.AreEqual(4, createdCards.First().ID);
+            StringAssert.Matches(createdCards.First().URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
+        }
 
-            Assert.AreEqual(response.StatusCode, HttpStatusCode.Created);
-            Assert.AreEqual(4, (obj as Card).ID);
-            Assert.AreEqual("Content/Cards/Card_ID-0000000004.jpg", (obj as Card).URL);
+        [TestMethod()]
+        public void AddNewCardTest_MultipleFiles()
+        {
+            var form = new MultipartFormDataContent();
+            form.Add(new StreamContent(GetTestJPG()), "image1", "testImage1.jpg");
+            form.Add(new StreamContent(GetTestJPG()), "image2", "testImage2.jpg");
+            form.Add(new StreamContent(GetTestJPG()), "image3", "testImage3.jpg");
+
+            var response = _client.PostAsync("http://test/api/cards", form).Result;
+            var content = response.Content.ReadAsStringAsync().Result;
+            var createdCards = JsonConvert.DeserializeObject(content, typeof(List<Card>)) as List<Card>;
+
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+            Assert.AreEqual(3, createdCards.Count);
+            Assert.AreEqual(4, createdCards.First().ID);
+            Assert.AreEqual(6, createdCards.Last().ID);
+            StringAssert.Matches(createdCards.First().URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
+            StringAssert.Matches(createdCards.Last().URL, new Regex("Content/Cards/Card_ID-0000000006.jpg"));
         }
 
         private Mock<ICardsRepository> CreateMockRepository()
         {
-            var mock = new Mock<ICardsRepository>();
-            mock.Setup(m => m.Cards).Returns(new Card[]
+            var cards = new List<Card>
             {
                     new Card() { ID = 1, URL = "Content/Cards/Card_ID-0000000001.jpg" },
                     new Card() { ID = 2, URL = "Content/Cards/Card_ID-0000000002.jpg" },
                     new Card() { ID = 3, URL = "Content/Cards/Card_ID-0000000003.jpg" },
-            });
-            mock.Setup(m => m.AddAsync(It.IsAny<string>(), It.IsAny<Stream>())).Returns(async (string filename, Stream content) => {
+            };
+            var mock = new Mock<ICardsRepository>();
+            mock.Setup(m => m.Cards).Returns(cards);
+            mock.Setup(m => m.AddAsync(It.IsAny<string>())).Returns(async (string url) => {
                 await Task.Yield();
                 var maxID = mock.Object.Cards.Max(c => c.ID);
-                maxID++;
+                var card = new Card() { ID = maxID + 1, URL = "Content/Cards/" + new FilenameProvider().GenerateFilename(maxID + 1, ".jpg") };
+                (mock.Object.Cards as List<Card>).Add(card);
 
-                return new Card() { ID = maxID, URL = "Content/Cards/" + FolderCardsRepository.GenerateFilename(maxID, ".jpg") };
+                return card;
             });
             mock.Setup(m => m.FindAsync(It.IsAny<int>())).Returns(async (int id) => {
                 await Task.Yield();
@@ -137,21 +164,20 @@ namespace DXGame.Controllers.Tests
             return mock;
         }
 
-        //private Mock<IRequestFileService> CreateMockRequestFileService()
-        //{
-        //    var mock = new Mock<IRequestFileService>();
-        //    mock.Setup(m => m.GetFiles()).Returns(() =>
-        //    {
-        //        var content = new MemoryStream();
-        //        content.Write(new byte[] { 1, 2, 3 }, 0, 3);
+        private Mock<IRootPathProvider> CreateMockPathProvider()
+        {
+            var mock = new Mock<IRootPathProvider>();
+            mock.Setup(m => m.GetRoot()).Returns(() => Directory.GetCurrentDirectory());
 
-        //        return (content, "testFile.jpg");
-        //    });
+            return mock;
+        }
 
-        //    var test = new Mock<HttpPostedFile>();
-        //    test.Setup(m => m.SaveAs(It.IsAny<string>())).Verifiable();
+        private Stream GetTestJPG()
+        {
+            var file = new MemoryStream();
+            file.Write(new byte[100], 0, 100);
 
-        //    return mock;
-        //}
+            return file;
+        }
     }
 }

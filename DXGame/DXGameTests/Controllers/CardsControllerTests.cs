@@ -48,7 +48,6 @@ namespace DXGame.Controllers.Tests
             container.RegisterInstance(mockRepo.Object);
             container.RegisterInstance(mockPathProvider.Object);
             container.RegisterType<IFilenameProvider, FilenameProvider>();
-            container.RegisterType<INewIDProvider, NewIDProvider>();
             config.DependencyResolver = new UnityResolver(container);
 
             var server = new HttpServer(config);
@@ -90,21 +89,17 @@ namespace DXGame.Controllers.Tests
         [TestMethod()]
         public void AddNewCardTest_OneFile()
         {
-            System.Diagnostics.Trace.WriteLine("ELO ELO");
-            var file = new MemoryStream();
-            file.Write(new byte[100], 0, 100);
-
             var form = new MultipartFormDataContent();
-            form.Add(new StreamContent(file), "image", "testImage.jpg");
+            form.Add(new StreamContent(GetTestJPG()), "image", "testImage.jpg");
 
             var response = _client.PostAsync("http://test/api/cards", form).Result;
             var content = response.Content.ReadAsStringAsync().Result;
-            var createdCards = JsonConvert.DeserializeObject(content, typeof(List<Card>)) as List<Card>;
-            
+
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-            Assert.AreEqual(1, createdCards.Count);
-            Assert.AreEqual(4, createdCards.First().ID);
-            StringAssert.Matches(createdCards.First().URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
+            var createdCards = JsonConvert.DeserializeObject(content, typeof(Card[])) as Card[];            
+            Assert.AreEqual(1, createdCards.Length);
+            Assert.AreEqual(4, createdCards[0].ID);
+            StringAssert.Matches(createdCards[0].URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
         }
 
         [TestMethod()]
@@ -117,17 +112,28 @@ namespace DXGame.Controllers.Tests
 
             var response = _client.PostAsync("http://test/api/cards", form).Result;
             var content = response.Content.ReadAsStringAsync().Result;
-            var createdCards = JsonConvert.DeserializeObject(content, typeof(List<Card>)) as List<Card>;
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-            Assert.AreEqual(3, createdCards.Count);
-            Assert.AreEqual(4, createdCards.First().ID);
-            Assert.AreEqual(6, createdCards.Last().ID);
-            StringAssert.Matches(createdCards.First().URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
-            StringAssert.Matches(createdCards.Last().URL, new Regex("Content/Cards/Card_ID-0000000006.jpg"));
+            var createdCards = JsonConvert.DeserializeObject<Card[]>(content);
+            Assert.AreEqual(3, createdCards.Length);
+            Assert.AreEqual(4, createdCards[0].ID);
+            Assert.AreEqual(6, createdCards[2].ID);
+            StringAssert.Matches(createdCards[0].URL, new Regex("Content/Cards/Card_ID-0000000004.jpg"));
+            StringAssert.Matches(createdCards[2].URL, new Regex("Content/Cards/Card_ID-0000000006.jpg"));
         }
 
-        private Mock<ICardsRepository> CreateMockRepository()
+        [TestMethod()]
+        public void DeleteCard_Existing()
+        {
+            var response = _client.DeleteAsync("http://test/api/cards/1").Result;
+            var content = response.Content.ReadAsStringAsync().Result;
+            var deletedCard = JsonConvert.DeserializeObject<Card>(content);
+
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(1, deletedCard.ID);
+        }
+
+            private Mock<ICardsRepository> CreateMockRepository()
         {
             var cards = new List<Card>
             {
@@ -137,10 +143,10 @@ namespace DXGame.Controllers.Tests
             };
             var mock = new Mock<ICardsRepository>();
             mock.Setup(m => m.Cards).Returns(cards);
-            mock.Setup(m => m.AddAsync(It.IsAny<string>())).Returns(async (string url) => {
+            mock.Setup(m => m.AddAsync(It.IsAny<Card>())).Returns(async (Card card) => {
                 await Task.Yield();
                 var maxID = mock.Object.Cards.Max(c => c.ID);
-                var card = new Card() { ID = maxID + 1, URL = "Content/Cards/" + new FilenameProvider().GenerateFilename(maxID + 1, ".jpg") };
+                card.ID = maxID + 1;
                 (mock.Object.Cards as List<Card>).Add(card);
 
                 return card;
@@ -159,6 +165,15 @@ namespace DXGame.Controllers.Tests
                 }
 
                 return card;
+            });
+            mock.Setup(m => m.UpdateAsync(It.IsAny<Card>())).Returns(async (Card card) =>
+            {
+                var entity = await mock.Object.FindAsync(card.ID);
+                if (entity != null)
+                {
+                    entity.URL = card.URL;
+                }
+                return entity;
             });
 
             return mock;

@@ -17,14 +17,11 @@ namespace DXGame.Models
         {
             get { return db.Cards; }
         }
-        
-        public async Task<Card> AddAsync(string url)
-        {
-            var card = new Card();
-            db.Cards.Add(card);
-            await db.SaveChangesAsync();
 
-            card.URL = url;
+        public async Task<Card> AddAsync(Card card)
+        {
+            if (card == null || await FindAsync(card.ID) != null) return null;
+            db.Cards.Add(card);
             await db.SaveChangesAsync();
 
             return card;
@@ -46,6 +43,17 @@ namespace DXGame.Models
         public async Task<Card> FindAsync(int id)
         {
             return await db.Cards.FindAsync(id);
+        }
+
+        public async Task<Card> UpdateAsync(Card card)
+        {
+            var entity = await FindAsync(card.ID);
+            if (entity != null)
+            {
+                entity.URL = card.URL;
+                db.SaveChanges();
+            }
+            return entity;
         }
     }
 }

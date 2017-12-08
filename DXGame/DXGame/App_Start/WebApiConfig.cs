@@ -20,7 +20,6 @@ namespace DXGame
             container.RegisterType<ICardsRepository, CardsRepository>();
             container.RegisterType<IRootPathProvider, ServerPathProvider>();
             container.RegisterType<IFilenameProvider, FilenameProvider>();
-            container.RegisterType<INewIDProvider, NewIDProvider>();
             config.DependencyResolver = new UnityResolver(container);
 
             config.EnableCors();

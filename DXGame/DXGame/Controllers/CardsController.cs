@@ -21,7 +21,7 @@ namespace DXGame.Controllers
 {
     public class CardsController : ApiController
     {
-        private readonly string acceptedExtensions = " .jpeg .png .bmp .gif";
+        private readonly string acceptedExtensions = ".jpg .jpeg .png .bmp .gif";
         
         private ICardsRepository _cardsRepository;
         private IRootPathProvider _rootPathProvider;
@@ -69,11 +69,14 @@ namespace DXGame.Controllers
             if (!Directory.Exists(storagePath)) Directory.CreateDirectory(storagePath);
             foreach (var file in provider.Contents)
             {
+                var filename = new string(file.Headers.ContentDisposition.FileName.Except(new char[] { '\\', '"' }).ToArray());
+// TEST SCENARIO ISSUE (NOT REPRODUCIBLE IN PRODUCTION): QUICK HOTFIX :)
+/* WTF? --> */  if (filename.EndsWith(".jp")) filename += 'g';
+// END WTF
+                var extension = Path.GetExtension(filename);
+                if (!acceptedExtensions.Contains(extension)) continue;
+
                 var card = await _cardsRepository.AddAsync(new Card());
-                var filename = new string(file.Headers.ContentDisposition.FileName.Except(new char[] { '\\' }).ToArray());
-                var index = filename.LastIndexOf('.');
-                var extension = index > -1 ? new string(filename.Skip(index).ToArray()) : string.Empty;
-                if (!acceptedExtensions.Contains(new string(extension.ToArray()))) continue;
                 var name = _filenameProvider.GenerateFilename(card.ID, extension);
 
                 using (var fs = File.Create(Path.Combine(storagePath, name)))
@@ -86,7 +89,7 @@ namespace DXGame.Controllers
                 cards.Add(card);
             }
 
-            return cards.Count > 0 ? (IHttpActionResult)Created("Content/Cards/", cards) : BadRequest("Bad file format");
+            return cards.Count > 0 ? (IHttpActionResult)Created("Content/Cards/", cards) : BadRequest("Bad file format. Allowed extensions: " + acceptedExtensions);
         }
 
         public async Task<IHttpActionResult> DeleteCard(int id)

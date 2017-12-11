@@ -133,7 +133,15 @@ namespace DXGame.Controllers.Tests
             Assert.AreEqual(1, deletedCard.ID);
         }
 
-            private Mock<ICardsRepository> CreateMockRepository()
+        [TestMethod()]
+        public void DeleteCard_NotExisting()
+        {
+            var response = _client.DeleteAsync("http://test/api/cards/100").Result;
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        private Mock<ICardsRepository> CreateMockRepository()
         {
             var cards = new List<Card>
             {

@@ -190,6 +190,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Abstract\IBroadcastPlayroom.cs" />
+    <Compile Include="Models\Abstract\IPlayroomsRepository.cs" />
     <Compile Include="Models\BroadcastCommon.cs" />
     <Compile Include="Models\Entities\Player.cs" />
     <Compile Include="Models\Entities\Playroom.cs" />

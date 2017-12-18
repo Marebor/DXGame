@@ -12,7 +12,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
-using DXGame.Models;
+using DXGame.Models.Abstract;
 using DXGame.Models.Entities;
 using DXGame.Providers;
 using DXGame.Extensions;
@@ -23,9 +23,9 @@ namespace DXGame.Controllers
     {
         private readonly string acceptedExtensions = ".jpg .jpeg .png .bmp .gif";
         
-        private ICardsRepository _cardsRepository;
-        private IRootPathProvider _rootPathProvider;
-        private IFilenameProvider _filenameProvider;
+        private readonly ICardsRepository _cardsRepository;
+        private readonly IRootPathProvider _rootPathProvider;
+        private readonly IFilenameProvider _filenameProvider;
 
         public CardsController(
             ICardsRepository repository, 

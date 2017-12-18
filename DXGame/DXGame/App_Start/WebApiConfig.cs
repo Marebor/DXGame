@@ -7,6 +7,7 @@ using Unity;
 using Unity.Lifetime;
 using Unity.Registration;
 using DXGame.Models;
+using DXGame.Models.Abstract;
 using DXGame.Providers;
 
 namespace DXGame

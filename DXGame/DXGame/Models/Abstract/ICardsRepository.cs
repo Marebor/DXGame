@@ -8,7 +8,7 @@ using System.Web;
 
 using DXGame.Models.Entities;
 
-namespace DXGame.Models
+namespace DXGame.Models.Abstract
 {
     public interface ICardsRepository
     {

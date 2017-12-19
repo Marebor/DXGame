@@ -27,7 +27,7 @@ namespace DXGame
 
             // Trasy składnika Web API
             config.MapHttpAttributeRoutes();
-
+            
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",

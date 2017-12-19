@@ -190,6 +190,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Abstract\IBroadcastPlayroom.cs" />
+    <Compile Include="Models\Abstract\IPlayersRepository.cs" />
     <Compile Include="Models\Abstract\IPlayroomsRepository.cs" />
     <Compile Include="Models\BroadcastCommon.cs" />
     <Compile Include="Models\Entities\Player.cs" />
@@ -198,6 +199,7 @@
     <Compile Include="Models\Realtime\GameHub.cs" />
     <Compile Include="Providers\FilenameProvider.cs" />
     <Compile Include="Providers\IFilenameProvider.cs" />
+    <Compile Include="Providers\IRequestPlayernameProvider.cs" />
     <Compile Include="Providers\IRootPathProvider.cs" />
     <Compile Include="Migrations\201712042142317_Initial.cs" />
     <Compile Include="Migrations\201712042142317_Initial.Designer.cs">
@@ -213,6 +215,7 @@
     <Compile Include="Models\CardsRepository.cs" />
     <Compile Include="Models\Abstract\ICardsRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Providers\RequestPlayernameProvider.cs" />
     <Compile Include="Providers\ServerPathProvider.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -7,22 +7,22 @@ using DXGame.Providers.Abstract;
 
 namespace DXGame.Providers
 {
-    public class RequestPlayernameProvider : IRequestPlayernameProvider
+    public class RequestPlayroomNameProvider : IRequestPlayroomNameProvider
     {
-        private const string HEADER_KEY = "DXGame-Player";
-        public string GetPlayername()
+        private const string HEADER_KEY = "DXGame-Playroom";
+        public string GetPlayroomName()
         {
             if (HttpContext.Current == null) return null;
 
-            string playername = null;
+            string name = null;
             var headers = HttpContext.Current.Request.Headers;
 
             if (headers.AllKeys.Contains(HEADER_KEY))
             {
-                playername = headers.GetValues(HEADER_KEY).First();
+                name = headers.GetValues(HEADER_KEY).First();
             }
 
-            return playername;
+            return name;
         }
     }
 }

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DXGame.Models.Abstract
+namespace DXGame.Providers.Abstract
 {
-    public interface IBroadcastPlayroom
+    public interface IRequestPlayroomNameProvider
     {
-
+        string GetPlayroomName();
     }
 }

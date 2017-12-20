@@ -16,9 +16,10 @@ using System.Net.Http;
 using Moq;
 using Moq.Protected;
 using Unity;
-using DXGame.Models;
+using DXGame.Models.Abstract;
 using DXGame.Models.Entities;
 using DXGame.Providers;
+using DXGame.Providers.Abstract;
 
 using Newtonsoft.Json;
 

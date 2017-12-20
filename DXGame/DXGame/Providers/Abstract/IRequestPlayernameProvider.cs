@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DXGame.Providers
+namespace DXGame.Providers.Abstract
 {
     public interface IRequestPlayernameProvider
     {

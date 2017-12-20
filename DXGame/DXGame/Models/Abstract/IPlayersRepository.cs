@@ -11,7 +11,7 @@ namespace DXGame.Models.Abstract
     public interface IPlayersRepository
     {
         IEnumerable<Player> Players { get; }
-        Task<Player> AddAsync(string name);
+        Task<Player> AddAsync(Player player);
         Task<Player> DeleteAsync(string name);
         Task<Player> FindAsync(string name);
         Task<Player> UpdateAsync(Player player);

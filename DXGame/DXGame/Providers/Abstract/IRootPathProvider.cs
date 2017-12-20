@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DXGame.Providers
+namespace DXGame.Providers.Abstract
 {
-    public interface IFilenameProvider
+    public interface IRootPathProvider
     {
-        string GenerateFilename(int id, string extension);
+        string GetRoot();
     }
 }

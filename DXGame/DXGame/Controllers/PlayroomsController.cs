@@ -23,15 +23,13 @@ namespace DXGame.Controllers
         private readonly IEventsRepository _eventsRepository;
         private readonly IBroadcast _broadcast;
         private readonly IRequestPlayernameProvider _requestPlayernameProvider;
-        private readonly IRequestPlayroomNameProvider _requestPlayroomNameProvider;
 
         public PlayroomsController(
             IPlayroomsRepository playroomsRepository, 
             IPlayersRepository playersRepository,
             IEventsRepository eventsRepository,
             IBroadcast broadcast,
-            IRequestPlayernameProvider requestPlayernameProvider,
-            IRequestPlayroomNameProvider requestPlayroomNameProvider
+            IRequestPlayernameProvider requestPlayernameProvider
             )
         {
             _playroomsRepository = playroomsRepository;
@@ -39,7 +37,6 @@ namespace DXGame.Controllers
             _eventsRepository = eventsRepository;
             _broadcast = broadcast;
             _requestPlayernameProvider = requestPlayernameProvider;
-            _requestPlayroomNameProvider = requestPlayroomNameProvider;
         }
 
         public IEnumerable<Playroom> Get()
@@ -55,11 +52,9 @@ namespace DXGame.Controllers
 
         public async Task<IHttpActionResult> Post(string id)
         {
-            var playername = _requestPlayernameProvider.GetPlayername();
-            if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername)) return BadRequest("Wrong playername. Only existing player can create a new playroom.");
-            var player = await _playersRepository.FindAsync(playername);
-            if (player == null) return BadRequest($"Player with name {playername} doesn't exist. Only existing player can create a new playroom.");
-            var playroom = await _playroomsRepository.AddAsync(new Playroom() { Name = id });
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, false);
+            if (errorResponse != null) return errorResponse;
+
             if (playroom != null)
             {
                 var dxEvent = CreateDXEvent(new PlayroomCreatedEvent() { PlayroomName = playroom.Name, PerformedBy = player.Name, DatePerformed = DateTime.Now });
@@ -83,11 +78,9 @@ namespace DXGame.Controllers
 
         public async Task<IHttpActionResult> Delete(string id)
         {
-            var playername = _requestPlayernameProvider.GetPlayername();
-            if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername)) return BadRequest("Wrong playername. Only existing player can delete playroom.");
-            var player = await _playersRepository.FindAsync(playername);
-            if (player == null) return BadRequest($"Player with name {playername} doesn't exist. Only existing player can create a new playroom.");
-            var playroom = await _playroomsRepository.DeleteAsync(id);
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, true);
+            if (errorResponse != null) return errorResponse;
+
             if (playroom != null)
             {
                 var dxEvent = CreateDXEvent(new PlayroomDeletedEvent() { PlayroomName = playroom.Name, PerformedBy = player.Name, DatePerformed = DateTime.Now });
@@ -113,14 +106,10 @@ namespace DXGame.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> Join(string id)
         {
-            var playername = _requestPlayernameProvider.GetPlayername();
-            if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername)) return BadRequest("Wrong playername. Name has to contain even one non-whitespace sign");
-            var playroom = await _playroomsRepository.FindAsync(id);
-            if (playroom == null) return NotFound();
-            var player = await _playersRepository.FindAsync(playername);
-            if (player == null) return BadRequest($"Player with name {playername} doesn't exist");
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, true);
+            if (errorResponse != null) return errorResponse;
 
-            if (playroom.Players.FirstOrDefault(p => p.Name == playername) == null)
+            if (playroom.Players.FirstOrDefault(p => p.Name == player.Name) == null)
             {
                 playroom = await _playroomsRepository.AddPlayerToPlayroomAsync(player, playroom.Name);
                 if (playroom != null)
@@ -153,14 +142,10 @@ namespace DXGame.Controllers
         [HttpPut]
         public async Task<IHttpActionResult> Leave(string id)
         {
-            var playername = _requestPlayernameProvider.GetPlayername();
-            if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername)) return BadRequest("Wrong playername");
-            var playroom = await _playroomsRepository.FindAsync(id);
-            if (playroom == null) return NotFound();
-            var player = await _playersRepository.FindAsync(playername);
-            if (player == null) return BadRequest($"Player with name {playername} doesn't exist");
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, true);
+            if (errorResponse != null) return errorResponse;
 
-            if (playroom.Players.FirstOrDefault(p => p.Name == playername) != null)
+            if (playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null)
             {
                 playroom = await _playroomsRepository.RemovePlayerFromPlayroomAsync(player.Name, playroom.Name);
                 if (playroom != null)
@@ -185,8 +170,65 @@ namespace DXGame.Controllers
             }
             else
             {
-                return BadRequest($"Playroom {playroom.Name} does not contain player {playername}");
+                return BadRequest($"Playroom {playroom.Name} does not contain player {player.Name}");
             }
+        }
+
+        [Route("api/playrooms/{id}/events")]
+        [HttpGet]
+        public IEnumerable<string> GetEvents(string id)
+        {
+            return _eventsRepository.Events.Where(e => e.PlayroomName == id).OrderBy(e => e.DatePerformed).Select(e => e.Content);
+        }
+
+        [Route("api/playrooms/{id}/events")]
+        [HttpPost]
+        public async Task<IHttpActionResult> PostEvent(string id)
+        {
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, true);
+            if (errorResponse != null) return errorResponse;
+
+            var message = await Request.Content.ReadAsStringAsync();
+
+            if (!string.IsNullOrEmpty(message) && playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null)
+            {
+                var dxEvent = new DXEvent() { PerformedBy = player.Name, DatePerformed = DateTime.Now, PlayroomName = playroom.Name, Content = message };
+                dxEvent = await _eventsRepository.AddAsync(dxEvent);
+                if (dxEvent != null)
+                {
+                    _broadcast.BroadcastGroup(dxEvent.Content, dxEvent.PlayroomName);
+                    return Ok();
+                }
+                else
+                {
+                    return InternalServerError();
+                }                
+            }
+            else
+            {
+                return BadRequest();
+            }
+        } 
+
+        private async Task<(IHttpActionResult, Player, Playroom)> CheckRequestValidityAsync(string playroomName, bool playroomShouldExist)
+        {
+            IHttpActionResult result = null;
+            Player player = null;
+            Playroom playroom = null;
+
+            var playername = _requestPlayernameProvider.GetPlayername();
+            if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername))
+                result = BadRequest("Wrong playername. Name has to contain even one non-whitespace sign");
+
+            player = await _playersRepository.FindAsync(playername);
+            if (player == null)
+                result = BadRequest($"Player with name {playername} doesn't exist");
+
+            playroom = await _playroomsRepository.FindAsync(playroomName);
+            if (playroom == null && playroomShouldExist)
+                result = NotFound();
+
+            return (result, player, playroom);
         }
 
         private DXEvent CreateDXEvent(EventContentBase content)

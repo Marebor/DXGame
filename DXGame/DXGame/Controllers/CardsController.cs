@@ -14,7 +14,7 @@ using System.Web.Http.Cors;
 using System.Web.Http.Description;
 using DXGame.Models.Abstract;
 using DXGame.Models.Entities;
-using DXGame.Providers;
+using DXGame.Providers.Abstract;
 using DXGame.Extensions;
 
 namespace DXGame.Controllers

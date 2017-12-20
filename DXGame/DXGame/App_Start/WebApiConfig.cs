@@ -9,6 +9,7 @@ using Unity.Registration;
 using DXGame.Models;
 using DXGame.Models.Abstract;
 using DXGame.Providers;
+using DXGame.Providers.Abstract;
 
 namespace DXGame
 {
@@ -19,8 +20,13 @@ namespace DXGame
             // Konfiguracja i usługi składnika Web API
             var container = new UnityContainer();
             container.RegisterType<ICardsRepository, CardsRepository>();
+            container.RegisterType<IPlayroomsRepository, GameRepository>();
+            container.RegisterType<IPlayersRepository, GameRepository>();
+            container.RegisterType<IEventsRepository, GameRepository>();
             container.RegisterType<IRootPathProvider, ServerPathProvider>();
             container.RegisterType<IFilenameProvider, FilenameProvider>();
+            container.RegisterType<IBroadcast, SignalRBroadcast>();
+            container.RegisterType<IRequestPlayernameProvider, RequestPlayernameProvider>();
             config.DependencyResolver = new UnityResolver(container);
 
             config.EnableCors();

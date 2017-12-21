@@ -14,6 +14,5 @@ namespace DXGame.Models.Abstract
         Task<Player> AddAsync(Player player);
         Task<Player> DeleteAsync(string name);
         Task<Player> FindAsync(string name);
-        Task<Player> UpdateAsync(Player player);
     }
 }

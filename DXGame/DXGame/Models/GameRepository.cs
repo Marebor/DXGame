@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 
@@ -13,70 +14,97 @@ namespace DXGame.Models
     {
         private GameContext db = new GameContext();
 
-        IEnumerable<Playroom> IPlayroomsRepository.Playrooms { get { return db.Playrooms; } }
+        public IEnumerable<Playroom> Playrooms { get { return db.Playrooms.Include(p => p.Players); } }
 
-        IEnumerable<Player> IPlayersRepository.Players { get { return db.Players; } }
+        public IEnumerable<Player> Players { get { return db.Players.Include(p => p.Playrooms); } }
 
-        IEnumerable<DXEvent> IEventsRepository.Events { get { return db.Events; } }
+        public IEnumerable<DXEvent> Events { get { return db.Events; } }
 
-        public async Task<Playroom> IPlayroomsRepository.AddAsync(Playroom playroom)
+        async Task<Playroom> IPlayroomsRepository.AddAsync(Playroom playroom)
         {
+            if (playroom == null || await (this as IPlayroomsRepository).FindAsync(playroom.Name) != null) return null;
+            var entity = db.Playrooms.Add(playroom);
+            await db.SaveChangesAsync();
 
+            return entity;
         }
 
-        public async Task<Player> IPlayersRepository.AddAsync(Player player)
+        async Task<Player> IPlayersRepository.AddAsync(Player player)
         {
+            if (player == null || await (this as IPlayersRepository).FindAsync(player.Name) != null) return null;
+            var entity = db.Players.Add(player);
+            await db.SaveChangesAsync();
 
+            return entity;
         }
 
-        public async Task<DXEvent> IEventsRepository.AddAsync(DXEvent dxEvent)
+        async Task<DXEvent> IEventsRepository.AddAsync(DXEvent dxEvent)
         {
+            if (dxEvent.ID != 0 && db.Events.FirstOrDefault(e => e.ID == dxEvent.ID) != null) return null;
+            var entity =  db.Events.Add(dxEvent);
+            await db.SaveChangesAsync();
 
+            return entity;
         }
 
-        public async Task<Playroom> IPlayroomsRepository.AddPlayerToPlayroomAsync(Player player, string playroomName)
+        async Task<Playroom> IPlayroomsRepository.AddPlayerToPlayroomAsync(Player player, string playroomName)
         {
+            var playroom = await (this as IPlayroomsRepository).FindAsync(playroomName);
+            if (player == null || playroom == null || playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null) return null;
 
+            playroom.Players.Add(player);
+            await db.SaveChangesAsync();
+
+            return playroom;
         }
 
-        public async Task<Playroom> IPlayroomsRepository.DeleteAsync(string name)
+        async Task<Playroom> IPlayroomsRepository.DeleteAsync(string name)
         {
+            var playroom = await (this as IPlayroomsRepository).FindAsync(name);
+            if (playroom != null)
+            {
+                var entity = db.Playrooms.Remove(playroom);
+                await db.SaveChangesAsync();
+            }
 
+            return playroom;
         }
 
-        public async Task<Player> IPlayersRepository.DeleteAsync(string name)
+        async Task<Player> IPlayersRepository.DeleteAsync(string name)
         {
+            var player = await (this as IPlayersRepository).FindAsync(name);
+            if (player != null)
+            {
+                var entity = db.Players.Remove(player);
+                await db.SaveChangesAsync();
+            }
 
+            return player;
         }
 
-        public async Task<DXEvent> IEventsRepository.DeleteAsync(string name)
+        async Task<Playroom> IPlayroomsRepository.FindAsync(string name)
         {
-
+            await Task.Yield();
+            return Playrooms.FirstOrDefault(p => p.Name == name);
         }
 
-        public async Task<Playroom> IPlayroomsRepository.FindAsync(string name)
+        async Task<Player> IPlayersRepository.FindAsync(string name)
         {
-
+            await Task.Yield();
+            return Players.FirstOrDefault(p => p.Name == name);
         }
 
-        public async Task<Player> IPlayersRepository.FindAsync(string name)
+        async Task<Playroom> IPlayroomsRepository.RemovePlayerFromPlayroomAsync(string playerName, string playroomName)
         {
+            var playroom = await (this as IPlayroomsRepository).FindAsync(playroomName);
+            if (playroom == null) return null;
+            var player = playroom.Players.FirstOrDefault(p => p.Name == playerName);
+            if (player == null) return null;
 
-        }
+            playroom.Players.Remove(player);
+            await db.SaveChangesAsync();
 
-        public async Task<Playroom> IPlayroomsRepository.RemovePlayerFromPlayroomAsync(string playerName, string playroomName)
-        {
-
-        }
-
-        public async Task<Playroom> IPlayroomsRepository.UpdateAsync(Playroom playroom)
-        {
-
-        }
-
-        public async Task<Player> IPlayersRepository.UpdateAsync(Player player)
-        {
-
+            return playroom;
         }
     }
 }

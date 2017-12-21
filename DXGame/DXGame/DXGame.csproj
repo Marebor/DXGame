@@ -190,6 +190,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712210834247_InitialGameDB.cs" />
+    <Compile Include="Migrations\201712210834247_InitialGameDB.Designer.cs">
+      <DependentUpon>201712210834247_InitialGameDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration_GameDB.cs" />
     <Compile Include="Models\Abstract\IEventsRepository.cs" />
     <Compile Include="Models\Abstract\IPlayersRepository.cs" />
     <Compile Include="Models\Abstract\IPlayroomsRepository.cs" />
@@ -218,7 +223,7 @@
     <Compile Include="Migrations\201712061013101_TestSeed.Designer.cs">
       <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\Configuration_CardsDB.cs" />
     <Compile Include="Models\CardsContext.cs" />
     <Compile Include="Models\Entities\Card.cs" />
     <Compile Include="Models\CardsRepository.cs" />
@@ -247,6 +252,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712061013101_TestSeed.resx">
       <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712210834247_InitialGameDB.resx">
+      <DependentUpon>201712210834247_InitialGameDB.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

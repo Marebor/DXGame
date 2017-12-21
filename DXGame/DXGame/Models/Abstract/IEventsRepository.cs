@@ -12,6 +12,5 @@ namespace DXGame.Models.Abstract
     {
         IEnumerable<DXEvent> Events { get; }
         Task<DXEvent> AddAsync(DXEvent dxEvent);
-        Task<DXEvent> DeleteAsync(string name);
     }
 }

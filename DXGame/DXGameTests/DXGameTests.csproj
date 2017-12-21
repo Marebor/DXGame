@@ -112,7 +112,8 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="Controllers\CardsControllerTests.cs" />
+    <Compile Include="UnitTests\PlayroomsControllerTests.cs" />
+    <Compile Include="IntegrationTests\CardsControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

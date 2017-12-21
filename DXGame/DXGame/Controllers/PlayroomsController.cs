@@ -210,7 +210,7 @@ namespace DXGame.Controllers
             }
         } 
 
-        private async Task<(IHttpActionResult, Player, Playroom)> CheckRequestValidityAsync(string playroomName, bool playroomShouldExist)
+        private async Task<(IHttpActionResult errorResult, Player player, Playroom playroom)> CheckRequestValidityAsync(string playroomName, bool playroomShouldExist)
         {
             IHttpActionResult result = null;
             Player player = null;
@@ -218,7 +218,7 @@ namespace DXGame.Controllers
 
             var playername = _requestPlayernameProvider.GetPlayername();
             if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername))
-                result = BadRequest("Wrong playername. Name has to contain even one non-whitespace sign");
+                result = BadRequest("Wrong playername. Name has to contain even one non-whitespace sign.");
 
             player = await _playersRepository.FindAsync(playername);
             if (player == null)

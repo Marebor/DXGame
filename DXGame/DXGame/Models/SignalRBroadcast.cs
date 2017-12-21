@@ -15,26 +15,6 @@ namespace DXGame.Models
     {
         private readonly static IHubContext _context = GlobalHost.ConnectionManager.GetHubContext<GameHub>();
 
-        //public void PlayroomCreated(string name)
-        //{
-        //    _context.Clients.All.playroomCreated(name);
-        //}
-
-        //public void PlayroomDeleted(string name)
-        //{
-        //    _context.Clients.All.playroomDeleted(name);
-        //}
-
-        //public void PlayerJoined(string playername, string playroom)
-        //{
-        //    _context.Clients.All.playerJoined(playername, playroom);
-        //}
-
-        //public void PlayerLeft(string playername, string playroom)
-        //{
-        //    _context.Clients.All.playerLeft(playername, playroom);
-        //}
-
         public void Broadcast(string message)
         {
             _context.Clients.All.onDXCommonEvent(message);

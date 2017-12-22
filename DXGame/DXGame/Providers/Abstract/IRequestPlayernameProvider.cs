@@ -8,6 +8,7 @@ namespace DXGame.Providers.Abstract
 {
     public interface IRequestPlayernameProvider
     {
+        string CannotRetrievePlayernameErrorMessage { get; }
         string GetPlayername();
     }
 }

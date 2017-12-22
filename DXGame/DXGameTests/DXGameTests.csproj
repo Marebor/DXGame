@@ -112,6 +112,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="MyMocks.cs" />
     <Compile Include="UnitTests\PlayroomsControllerTests.cs" />
     <Compile Include="IntegrationTests\CardsControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -125,6 +126,7 @@
       <Name>DXGame</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

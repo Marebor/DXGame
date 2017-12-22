@@ -55,14 +55,15 @@ namespace DXGame.Controllers
             (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, false);
             if (errorResponse != null) return errorResponse;
 
-            if (playroom != null)
+            if (playroom == null)
             {
+                playroom = new Playroom() { Name = id, Players = new List<Player>() };
                 var dxEvent = CreateDXEvent(new PlayroomCreatedEvent() { PlayroomName = playroom.Name, PerformedBy = player.Name, DatePerformed = DateTime.Now });
                 dxEvent = await _eventsRepository.AddAsync(dxEvent);
                 if (dxEvent != null)
                 {
                     _broadcast.Broadcast(dxEvent.Content);
-                    return Created(Url.Link("DefaultApi", new { controller = ControllerContext.ControllerDescriptor.ControllerName, id = id }), playroom);
+                    return Created($"api/playrooms/{id}", playroom);
                 }
                 else
                 {
@@ -218,15 +219,24 @@ namespace DXGame.Controllers
 
             var playername = _requestPlayernameProvider.GetPlayername();
             if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername))
-                result = BadRequest("Wrong playername. Name has to contain even one non-whitespace sign.");
+            {
+                result = BadRequest(_requestPlayernameProvider.CannotRetrievePlayernameErrorMessage);
+                return (result, player, playroom);
+            }
 
             player = await _playersRepository.FindAsync(playername);
             if (player == null)
+            {
                 result = BadRequest($"Player with name {playername} doesn't exist");
+                return (result, player, playroom);
+            }
 
             playroom = await _playroomsRepository.FindAsync(playroomName);
             if (playroom == null && playroomShouldExist)
+            {
                 result = NotFound();
+                return (result, player, playroom);
+            }                
 
             return (result, player, playroom);
         }

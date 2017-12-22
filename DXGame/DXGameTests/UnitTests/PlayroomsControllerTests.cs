@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Results;
 using System.Net;
 using System.Net.Http;
 
@@ -33,24 +34,17 @@ namespace DXGameTests.UnitTests
         [TestInitialize]
         public void Init()
         {
-            var mockPlayroomsRepo = PreparePlayroomsRepository();
-            var mockPlayersRepo = PreparePlayersRepository();
-            var mockEventsRepo = PrepareEventsRepository();
-            var mockBroadcast = new Mock<IBroadcast>();
-            var mockPlayernameProvider = new Mock<IRequestPlayernameProvider>();
-            mockPlayernameProvider.Setup(m => m.GetPlayername()).Returns("Player1");
-
             _controller = new PlayroomsController(
-                mockPlayroomsRepo.Object, 
-                mockPlayersRepo.Object, 
-                mockEventsRepo.Object, 
-                mockBroadcast.Object, 
-                mockPlayernameProvider.Object
+                MyMocks.PlayroomsRepository.Object,
+                MyMocks.PlayersRepository.Object,
+                MyMocks.EventsRepository.Object,
+                MyMocks.Broadcast.Object, 
+                MyMocks.RequestPlayernameProvider.Object
             );
         }
 
         [TestMethod]
-        public void GetAllPlayrooms()
+        public void CanGetAllPlayrooms()
         {
             var playrooms = _controller.Get();
 
@@ -60,135 +54,123 @@ namespace DXGameTests.UnitTests
         }
 
         [TestMethod]
-        public void GetExistingPlayroom()
+        public void CanGetExistingPlayroom()
         {
-            var playroomJson = _controller.Get("Playroom1").Result.ExecuteAsync(new System.Threading.CancellationToken()).Result.Content.ReadAsStringAsync().Result;
-            var playroom = JsonConvert.DeserializeObject(playroomJson) as Playroom;
+            var result = _controller.Get("Playroom1").Result as OkNegotiatedContentResult<Playroom>;
 
-            Assert.IsNotNull(playroom);
-            StringAssert.Contains(playroom.Name, "Playroom1");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Content);
+            Assert.AreEqual(3, result.Content.Players.Count);
+            StringAssert.Contains(result.Content.Name, "Playroom1");
         }
 
-        Mock<IPlayroomsRepository> PreparePlayroomsRepository()
+        [TestMethod]
+        public void CannotGetNotExistingPlayroom()
         {
-            var players = new List<Player>()
-            {
-                new Player() { Name = "Player1" },
-                new Player() { Name = "Player2" },
-                new Player() { Name = "Player3" },
-            };
-            var playrooms = new List<Playroom>()
-            {
-                new Playroom() { Name = "Playroom1", Players = players },
-                new Playroom() { Name = "Playroom2", Players = new List<Player>() },
-                new Playroom() { Name = "Playroom3", Players = new List<Player>() },
-            };
-            var mock = new Mock<IPlayroomsRepository>();
-            mock.Setup(m => m.Playrooms).Returns(playrooms);
-            mock.Setup(m => m.AddAsync(It.IsAny<Playroom>())).Returns(async (Playroom playroom) => 
-            {
-                if (playroom == null || await mock.Object.FindAsync(playroom.Name) != null) return null;
-                playrooms.Add(playroom);
+            var result = _controller.Get("PlayroomX").Result as NotFoundResult;
 
-                return playroom;
-            });
-            mock.Setup(m => m.DeleteAsync(It.IsAny<string>())).Returns(async (string name) =>
-            {
-                var playroom = await mock.Object.FindAsync(name);
-                if (playroom != null)
-                {
-                    playrooms.Remove(playroom);
-                }
-
-                return playroom;
-            });
-            mock.Setup(m => m.FindAsync(It.IsAny<string>())).Returns(async (string name) =>
-            {
-                await Task.Yield();
-                return mock.Object.Playrooms.FirstOrDefault(p => p.Name == name);
-            });
-            mock.Setup(m => m.AddPlayerToPlayroomAsync(It.IsAny<Player>(), It.IsAny<string>())).Returns(async (Player player, string playroomName) =>
-            {
-                var playroom = await mock.Object.FindAsync(playroomName);
-                if (player == null || playroom == null || playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null) return null;
-
-                playroom.Players.Add(player);
-
-                return playroom;
-            });
-            mock.Setup(m => m.RemovePlayerFromPlayroomAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(async (string playerName, string playroomName) =>
-            {
-                var playroom = await mock.Object.FindAsync(playroomName);
-                if (playroom == null) return null;
-                var player = playroom.Players.FirstOrDefault(p => p.Name == playerName);
-                if (player == null) return null;
-
-                playroom.Players.Remove(player);
-
-                return playroom;
-            });
-
-            return mock;
+            Assert.IsNotNull(result);
         }
 
-        Mock<IPlayersRepository> PreparePlayersRepository()
+        [TestMethod]
+        public void CanCreateNewPlayroom()
         {
-            var playrooms = new List<Playroom>() { new Playroom() { Name = "Playroom1" } };
-            var players = new List<Player>()
-            {
-                new Player() { Name = "Player1", Playrooms = playrooms },
-                new Player() { Name = "Player2", Playrooms = playrooms },
-                new Player() { Name = "Player3", Playrooms = playrooms },
-            };
-            var mock = new Mock<IPlayersRepository>();
-            mock.Setup(m => m.Players).Returns(players);
-            mock.Setup(m => m.AddAsync(It.IsAny<Player>())).Returns(async (Player player) =>
-            {
-                if (player == null || await mock.Object.FindAsync(player.Name) != null) return null;
-                players.Add(player);
+            var result = _controller.Post("NewPlayroom").Result as CreatedNegotiatedContentResult<Playroom>;
 
-                return player;
-            });
-            mock.Setup(m => m.DeleteAsync(It.IsAny<string>())).Returns(async (string name) =>
-            {
-                var player = await mock.Object.FindAsync(name);
-                if (player != null)
-                {
-                    players.Remove(player);
-                }
-
-                return player;
-            });
-            mock.Setup(m => m.FindAsync(It.IsAny<string>())).Returns(async (string name) =>
-            {
-                await Task.Yield();
-                return mock.Object.Players.FirstOrDefault(p => p.Name == name);
-            });
-
-            return mock;
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Content);
+            Assert.AreEqual(0, result.Content.Players.Count);
+            Assert.AreEqual("api/playrooms/NewPlayroom", result.Location.OriginalString);
         }
 
-        Mock<IEventsRepository> PrepareEventsRepository()
+        [TestMethod]
+        public void CannotCreateDuplicatePlayroom()
         {
-            var events = new List<DXEvent>()
-            {
-                new DXEvent() { ID = 1, PerformedBy = "Player1", DatePerformed = DateTime.Now.AddMinutes(-3), PlayroomName = "Playroom1", Content = "Content1" },
-                new DXEvent() { ID = 2, PerformedBy = "Player2", DatePerformed = DateTime.Now.AddMinutes(-2), PlayroomName = "Playroom1", Content = "Content2" },
-                new DXEvent() { ID = 3, PerformedBy = "Player1", DatePerformed = DateTime.Now.AddMinutes(-1), PlayroomName = "Playroom1", Content = "Content3" },
-            };
-            var mock = new Mock<IEventsRepository>();
-            mock.Setup(m => m.Events).Returns(events);
-            mock.Setup(m => m.AddAsync(It.IsAny<DXEvent>())).Returns(async (DXEvent dxEvent) =>
-            {
-                await Task.Yield();
-                if (dxEvent.ID != 0 && events.FirstOrDefault(e => e.ID == dxEvent.ID) != null) return null;
-                if (dxEvent.ID == 0) dxEvent.ID = events.Select(e => e.ID).Max() + 1;
-                events.Add(dxEvent);
+            var result = _controller.Post("Playroom1").Result as ConflictResult;
 
-                return dxEvent;
-            });
+            Assert.IsNotNull(result);
+        }
 
-            return mock;
+        [TestMethod]
+        public void CannotCreatePlayroomAnonymously()
+        {
+            var mockRequestPlayernameProvider = new Mock<IRequestPlayernameProvider>();
+            mockRequestPlayernameProvider.Setup(m => m.GetPlayername()).Returns(() => { return null; });
+            mockRequestPlayernameProvider.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("No playername");
+            var controller = new PlayroomsController(
+                MyMocks.PlayroomsRepository.Object,
+                MyMocks.PlayersRepository.Object,
+                MyMocks.EventsRepository.Object,
+                MyMocks.Broadcast.Object,
+                mockRequestPlayernameProvider.Object
+            );
+
+            var result = controller.Post("NewPlayroom").Result as BadRequestErrorMessageResult;
+            
+            Assert.IsNotNull(result);
+            Assert.AreEqual("No playername", result.Message);
+        }
+
+        [TestMethod]
+        public void CanDeleteExistingPlayroom()
+        {
+            var result = _controller.Delete("Playroom3").Result as OkNegotiatedContentResult<Playroom>;
+
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Content);
+            Assert.AreEqual("Playroom3", result.Content.Name);
+        }
+
+        [TestMethod]
+        public void CannotDeleteNotExistingPlayroom()
+        {
+            var result = _controller.Delete("PlayroomX").Result as NotFoundResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void CannotDeletePlayroomAnonymously()
+        {
+            var mockRequestPlayernameProvider = new Mock<IRequestPlayernameProvider>();
+            mockRequestPlayernameProvider.Setup(m => m.GetPlayername()).Returns(() => { return null; });
+            mockRequestPlayernameProvider.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("No playername");
+            var controller = new PlayroomsController(
+                MyMocks.PlayroomsRepository.Object,
+                MyMocks.PlayersRepository.Object,
+                MyMocks.EventsRepository.Object,
+                MyMocks.Broadcast.Object,
+                mockRequestPlayernameProvider.Object
+            );
+
+            var result = controller.Delete("Playroom1").Result as BadRequestErrorMessageResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("No playername", result.Message);
+        }
+
+        [TestMethod]
+        public void CanJoinEmptyPlayroom()
+        {
+            var result = _controller.Join("Playroom3").Result as OkResult;
+            
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void CanJoinNonEmptyPlayroomWithNewPlayer()
+        {
+            var result = _controller.Join("Playroom2").Result as OkResult;
+
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void CannotJoinPlayroomWithExistingPlayer()
+        {
+            var result = _controller.Join("Playroom1").Result as ConflictResult;
+
+            Assert.IsNotNull(result);
         }
     }
 }

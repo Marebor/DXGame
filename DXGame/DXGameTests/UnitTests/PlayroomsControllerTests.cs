@@ -34,12 +34,38 @@ namespace DXGameTests.UnitTests
         [TestInitialize]
         public void Init()
         {
+            var players = new List<Player>
+            {
+                new Player() { Name = "Player1", Playrooms = new List<Playroom>() },
+                new Player() { Name = "Player2", Playrooms = new List<Playroom>() },
+                new Player() { Name = "Player3", Playrooms = new List<Playroom>() },
+            };
+
+            var playrooms = new List<Playroom>
+            {
+                new Playroom() { Name = "Playroom1_P1P2P3", Players = new List<Player>() },
+                new Playroom() { Name = "Playroom2_P2P3", Players = new List<Player>() },
+                new Playroom() { Name = "Playroom3_Empty", Players = new List<Player>() },
+            };
+
+            players.First(p => p.Name == "Player1").Playrooms.Add(playrooms.First(p => p.Name == "Playroom1_P1P2P3"));
+            players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
+            players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
+            players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
+            players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
+
+            playrooms.First(p => p.Name == "Playroom1_P1P2P3").Players.Add(players.First(p => p.Name == "Player1"));
+            playrooms.First(p => p.Name == "Playroom1_P1P2P3").Players.Add(players.First(p => p.Name == "Player2"));
+            playrooms.First(p => p.Name == "Playroom1_P1P2P3").Players.Add(players.First(p => p.Name == "Player3"));
+            playrooms.First(p => p.Name == "Playroom2_P2P3").Players.Add(players.First(p => p.Name == "Player2"));
+            playrooms.First(p => p.Name == "Playroom2_P2P3").Players.Add(players.First(p => p.Name == "Player3"));
+
             _controller = new PlayroomsController(
-                MyMocks.PlayroomsRepository.Object,
-                MyMocks.PlayersRepository.Object,
-                MyMocks.EventsRepository.Object,
-                MyMocks.Broadcast.Object, 
-                MyMocks.RequestPlayernameProvider.Object
+                MyMocks.GetPlayroomsRepository(playrooms).Object,
+                MyMocks.GetPlayersRepository(players).Object,
+                MyMocks.GetEventsRepository().Object,
+                MyMocks.GetBroadcast().Object, 
+                MyMocks.GetRequestPlayernameProvider("Player1").Object
             );
         }
 
@@ -49,19 +75,19 @@ namespace DXGameTests.UnitTests
             var playrooms = _controller.Get();
 
             Assert.AreEqual(3, playrooms.Count());
-            StringAssert.Contains(playrooms.First().Name, "Playroom1");
-            StringAssert.Contains(playrooms.Last().Name, "Playroom3");
+            Assert.AreEqual(playrooms.First().Name, "Playroom1_P1P2P3");
+            Assert.AreEqual(playrooms.Last().Name, "Playroom3_Empty");
         }
 
         [TestMethod]
         public void CanGetExistingPlayroom()
         {
-            var result = _controller.Get("Playroom1").Result as OkNegotiatedContentResult<Playroom>;
+            var result = _controller.Get("Playroom1_P1P2P3").Result as OkNegotiatedContentResult<Playroom>;
 
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Content);
             Assert.AreEqual(3, result.Content.Players.Count);
-            StringAssert.Contains(result.Content.Name, "Playroom1");
+            StringAssert.Contains(result.Content.Name, "Playroom1_P1P2P3");
         }
 
         [TestMethod]
@@ -86,7 +112,7 @@ namespace DXGameTests.UnitTests
         [TestMethod]
         public void CannotCreateDuplicatePlayroom()
         {
-            var result = _controller.Post("Playroom1").Result as ConflictResult;
+            var result = _controller.Post("Playroom1_P1P2P3").Result as ConflictResult;
 
             Assert.IsNotNull(result);
         }
@@ -94,31 +120,45 @@ namespace DXGameTests.UnitTests
         [TestMethod]
         public void CannotCreatePlayroomAnonymously()
         {
-            var mockRequestPlayernameProvider = new Mock<IRequestPlayernameProvider>();
-            mockRequestPlayernameProvider.Setup(m => m.GetPlayername()).Returns(() => { return null; });
-            mockRequestPlayernameProvider.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("No playername");
             var controller = new PlayroomsController(
-                MyMocks.PlayroomsRepository.Object,
-                MyMocks.PlayersRepository.Object,
-                MyMocks.EventsRepository.Object,
-                MyMocks.Broadcast.Object,
-                mockRequestPlayernameProvider.Object
+                MyMocks.GetPlayroomsRepository().Object,
+                MyMocks.GetPlayersRepository().Object,
+                MyMocks.GetEventsRepository().Object,
+                MyMocks.GetBroadcast().Object,
+                MyMocks.GetRequestPlayernameProvider(null).Object
             );
 
             var result = controller.Post("NewPlayroom").Result as BadRequestErrorMessageResult;
             
             Assert.IsNotNull(result);
-            Assert.AreEqual("No playername", result.Message);
+            Assert.AreEqual("Wrong playername", result.Message);
+        }
+
+        [TestMethod]
+        public void CannotCreatePlayroomWithNotExistingPlayerName()
+        {
+            var controller = new PlayroomsController(
+                MyMocks.GetPlayroomsRepository().Object,
+                MyMocks.GetPlayersRepository().Object,
+                MyMocks.GetEventsRepository().Object,
+                MyMocks.GetBroadcast().Object,
+                MyMocks.GetRequestPlayernameProvider("SomePlayer").Object
+            );
+
+            var result = controller.Post("NewPlayroom").Result as BadRequestErrorMessageResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual("Player with name SomePlayer doesn't exist", result.Message);
         }
 
         [TestMethod]
         public void CanDeleteExistingPlayroom()
         {
-            var result = _controller.Delete("Playroom3").Result as OkNegotiatedContentResult<Playroom>;
+            var result = _controller.Delete("Playroom3_Empty").Result as OkNegotiatedContentResult<Playroom>;
 
             Assert.IsNotNull(result);
             Assert.IsNotNull(result.Content);
-            Assert.AreEqual("Playroom3", result.Content.Name);
+            Assert.AreEqual("Playroom3_Empty", result.Content.Name);
         }
 
         [TestMethod]
@@ -132,27 +172,24 @@ namespace DXGameTests.UnitTests
         [TestMethod]
         public void CannotDeletePlayroomAnonymously()
         {
-            var mockRequestPlayernameProvider = new Mock<IRequestPlayernameProvider>();
-            mockRequestPlayernameProvider.Setup(m => m.GetPlayername()).Returns(() => { return null; });
-            mockRequestPlayernameProvider.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("No playername");
             var controller = new PlayroomsController(
-                MyMocks.PlayroomsRepository.Object,
-                MyMocks.PlayersRepository.Object,
-                MyMocks.EventsRepository.Object,
-                MyMocks.Broadcast.Object,
-                mockRequestPlayernameProvider.Object
+                MyMocks.GetPlayroomsRepository().Object,
+                MyMocks.GetPlayersRepository().Object,
+                MyMocks.GetEventsRepository().Object,
+                MyMocks.GetBroadcast().Object,
+                MyMocks.GetRequestPlayernameProvider(null).Object
             );
 
-            var result = controller.Delete("Playroom1").Result as BadRequestErrorMessageResult;
+            var result = controller.Delete("Playroom3_Empty").Result as BadRequestErrorMessageResult;
 
             Assert.IsNotNull(result);
-            Assert.AreEqual("No playername", result.Message);
+            Assert.AreEqual("Wrong playername", result.Message);
         }
 
         [TestMethod]
         public void CanJoinEmptyPlayroom()
         {
-            var result = _controller.Join("Playroom3").Result as OkResult;
+            var result = _controller.Join("Playroom3_Empty").Result as OkResult;
             
             Assert.IsNotNull(result);
         }
@@ -160,7 +197,7 @@ namespace DXGameTests.UnitTests
         [TestMethod]
         public void CanJoinNonEmptyPlayroomWithNewPlayer()
         {
-            var result = _controller.Join("Playroom2").Result as OkResult;
+            var result = _controller.Join("Playroom2_P2P3").Result as OkResult;
 
             Assert.IsNotNull(result);
         }
@@ -168,7 +205,7 @@ namespace DXGameTests.UnitTests
         [TestMethod]
         public void CannotJoinPlayroomWithExistingPlayer()
         {
-            var result = _controller.Join("Playroom1").Result as ConflictResult;
+            var result = _controller.Join("Playroom1_P1P2P3").Result as ConflictResult;
 
             Assert.IsNotNull(result);
         }

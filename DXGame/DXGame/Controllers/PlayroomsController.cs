@@ -220,14 +220,14 @@ namespace DXGame.Controllers
             var playername = _requestPlayernameProvider.GetPlayername();
             if (string.IsNullOrEmpty(playername) || string.IsNullOrWhiteSpace(playername))
             {
-                result = BadRequest(_requestPlayernameProvider.CannotRetrievePlayernameErrorMessage);
+                result = BadRequest(_requestPlayernameProvider.CannotRetrievePlayernameErrorMessage ?? string.Empty);
                 return (result, player, playroom);
             }
 
             player = await _playersRepository.FindAsync(playername);
             if (player == null)
             {
-                result = BadRequest($"Player with name {playername} doesn't exist");
+                result = BadRequest($"Player with name {playername ?? string.Empty} doesn't exist");
                 return (result, player, playroom);
             }
 

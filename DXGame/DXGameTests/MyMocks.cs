@@ -28,12 +28,16 @@ namespace DXGameTests
 {
     public static class MyMocks
     {
+        static ICollection<Playroom> _defaultPlayrooms = new List<Playroom>();
+        static ICollection<Player> _defaultPlayers = new List<Player>();
+        static ICollection<DXEvent> _defaultEvents = new List<DXEvent>();
+
         static Mock<IPlayroomsRepository> _playroomsRepository;
         static Mock<IPlayersRepository> _playersRepository;
         static Mock<IEventsRepository> _eventsRepository;
         static Mock<IBroadcast> _broadcast;
         static Mock<IRequestPlayernameProvider> _playernameProvider;
-        public static Mock<IPlayroomsRepository> GetPlayroomsRepository(ICollection<Playroom> playrooms = new List<Playroom>)
+        public static Mock<IPlayroomsRepository> GetPlayroomsRepository(ICollection<Playroom> playrooms = null)
         {
             //var players1 = new List<Player>()
             //    {
@@ -52,7 +56,8 @@ namespace DXGameTests
             //        new Playroom() { Name = "Playroom2", Players = players2 },
             //        new Playroom() { Name = "Playroom3", Players = new List<Player>() },
             //    };
-            if (_playroomsRepository != null) return _playroomsRepository;
+            //if (_playroomsRepository != null && playrooms == null) return _playroomsRepository;
+            if (playrooms == null) playrooms = _defaultPlayrooms;
 
             var mock = new Mock<IPlayroomsRepository>();
             mock.Setup(m => m.Playrooms).Returns(playrooms);
@@ -102,7 +107,7 @@ namespace DXGameTests
 
             return mock;
         }
-        public static Mock<IPlayersRepository> GetPlayersRepository(ICollection<Player> players = new List<Player>)
+        public static Mock<IPlayersRepository> GetPlayersRepository(ICollection<Player> players = null)
         {
             //var playrooms = new List<Playroom>() { new Playroom() { Name = "Playroom1" } };
             //var players = new List<Player>()
@@ -111,7 +116,9 @@ namespace DXGameTests
             //        new Player() { Name = "Player2", Playrooms = playrooms },
             //        new Player() { Name = "Player3", Playrooms = playrooms },
             //    };
-            if (_playersRepository != null) return _playersRepository;
+            //if (_playersRepository != null && players == null) return _playersRepository;
+            if (players == null) players = _defaultPlayers;
+
             var mock = new Mock<IPlayersRepository>();
             mock.Setup(m => m.Players).Returns(players);
             mock.Setup(m => m.AddAsync(It.IsAny<Player>())).Returns(async (Player player) =>
@@ -140,7 +147,7 @@ namespace DXGameTests
 
             return mock;
         }
-        public static Mock<IEventsRepository> GetEventsRepository(ICollection<DXEvent> events = new List<DXEvent>)
+        public static Mock<IEventsRepository> GetEventsRepository(ICollection<DXEvent> events = null)
         {
             //var events = new List<DXEvent>()
             //    {
@@ -148,13 +155,16 @@ namespace DXGameTests
             //        new DXEvent() { ID = 2, PerformedBy = "Player2", DatePerformed = DateTime.Now.AddMinutes(-2), PlayroomName = "Playroom1", Content = "Content2" },
             //        new DXEvent() { ID = 3, PerformedBy = "Player1", DatePerformed = DateTime.Now.AddMinutes(-1), PlayroomName = "Playroom1", Content = "Content3" },
             //    };
+            //if (_eventsRepository != null && events == null) return _eventsRepository;
+            if (events == null) events = _defaultEvents;
+
             var mock = new Mock<IEventsRepository>();
             mock.Setup(m => m.Events).Returns(events);
             mock.Setup(m => m.AddAsync(It.IsAny<DXEvent>())).Returns(async (DXEvent dxEvent) =>
             {
                 await Task.Yield();
                 if (dxEvent.ID != 0 && events.FirstOrDefault(e => e.ID == dxEvent.ID) != null) return null;
-                if (dxEvent.ID == 0) dxEvent.ID = events.Select(e => e.ID).Max() + 1;
+                if (dxEvent.ID == 0) dxEvent.ID = events.Count > 0 ? events.Select(e => e.ID).Max() + 1 : 1;
                 events.Add(dxEvent);
 
                 return dxEvent;
@@ -162,22 +172,24 @@ namespace DXGameTests
 
             return mock;
         }
-        public static Mock<IBroadcast> Broadcast
+        public static Mock<IBroadcast> GetBroadcast()
         {
-            get
-            {
-                return new Mock<IBroadcast>();
-            }
-        }
-        public static Mock<IRequestPlayernameProvider> RequestPlayernameProvider
-        {
-            get
-            {
-                var mock = new Mock<IRequestPlayernameProvider>();
-                mock.Setup(m => m.GetPlayername()).Returns("Player3");
+            //if (_broadcast != null) return _broadcast;
+            var mock = new Mock<IBroadcast>();
+            _broadcast = mock;
 
-                return mock;
-            }
+            return mock;
+        }
+        public static Mock<IRequestPlayernameProvider> GetRequestPlayernameProvider(string returningPlayername)
+        {
+            //if (_playernameProvider != null) return _playernameProvider;
+
+            var mock = new Mock<IRequestPlayernameProvider>();
+            mock.Setup(m => m.GetPlayername()).Returns(returningPlayername);
+            mock.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("Wrong playername");
+            _playernameProvider = mock;
+
+            return mock;
         }
     }
 }

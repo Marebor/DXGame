@@ -10,6 +10,7 @@ namespace DXGame.Models.Entities
 {
     public class DXEvent : EventContentBase
     {
+        public int ID { get; set; }
         public string Content { get; set; }
     }
 }

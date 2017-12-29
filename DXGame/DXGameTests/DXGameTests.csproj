@@ -113,6 +113,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="MyMocks.cs" />
+    <Compile Include="UnitTests\DXEventTests.cs" />
     <Compile Include="UnitTests\PlayroomsControllerTests.cs" />
     <Compile Include="IntegrationTests\CardsControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

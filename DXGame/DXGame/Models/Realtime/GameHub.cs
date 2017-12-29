@@ -10,6 +10,14 @@ namespace DXGame.Models.Realtime
 {
     public class GameHub : Hub
     {
+        public void SubscribePlayroom(string name)
+        {
+            Groups.Add(Context.ConnectionId, name);
+        }
 
+        public void UnsubscribePlayroom(string name)
+        {
+            Groups.Remove(Context.ConnectionId, name);
+        }
     }
 }

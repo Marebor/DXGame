@@ -4,12 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 using System.Threading.Tasks;
 
 using DXGame.Models.Entities;
 using DXGame.Models.Abstract;
-using DXGame.Models.Events;
 using DXGame.Providers.Abstract;
 
 using Newtonsoft.Json;
@@ -25,11 +25,11 @@ namespace DXGame.Controllers
         private readonly IRequestPlayernameProvider _requestPlayernameProvider;
 
         public PlayroomsController(
-            IPlayroomsRepository playroomsRepository, 
-            IPlayersRepository playersRepository,
-            IEventsRepository eventsRepository,
-            IBroadcast broadcast,
-            IRequestPlayernameProvider requestPlayernameProvider
+                IPlayroomsRepository playroomsRepository, 
+                IPlayersRepository playersRepository,
+                IEventsRepository eventsRepository,
+                IBroadcast broadcast,
+                IRequestPlayernameProvider requestPlayernameProvider
             )
         {
             _playroomsRepository = playroomsRepository;
@@ -39,11 +39,13 @@ namespace DXGame.Controllers
             _requestPlayernameProvider = requestPlayernameProvider;
         }
 
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public IEnumerable<Playroom> Get()
         {
             return _playroomsRepository.Playrooms;
         }
 
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<IHttpActionResult> Get(string id)
         {
             var playroom = await _playroomsRepository.FindAsync(id);
@@ -57,13 +59,21 @@ namespace DXGame.Controllers
 
             if (playroom == null)
             {
-                playroom = new Playroom() { Name = id, Players = new List<Player>() };
-                var dxEvent = CreateDXEvent(new PlayroomCreatedEvent() { PlayroomName = playroom.Name, PerformedBy = player.Name, DatePerformed = DateTime.Now });
-                dxEvent = await _eventsRepository.AddAsync(dxEvent);
-                if (dxEvent != null)
+                playroom = await _playroomsRepository.AddAsync(new Playroom() { Name = id, Players = new List<Player>() });
+                if (playroom != null)
                 {
+                    var eventContent = new
+                    {
+                        Description = "PlayroomCreated",
+                        PerformedBy = player.Name,
+                        DatePerformed = DateTime.Now,
+                        PlayroomName = playroom.Name,
+                    };
+                    var dxEvent = new DXEvent(eventContent)
+                        { PlayroomName = eventContent.PlayroomName, PerformedBy = eventContent.PerformedBy, DatePerformed = eventContent.DatePerformed };
+                    dxEvent = await _eventsRepository.AddAsync(dxEvent);
                     _broadcast.Broadcast(dxEvent.Content);
-                    return Created($"api/playrooms/{id}", playroom);
+                    return Created($"api/playrooms/{id}".ToLower(), playroom);
                 }
                 else
                 {
@@ -84,10 +94,19 @@ namespace DXGame.Controllers
 
             if (playroom != null)
             {
-                var dxEvent = CreateDXEvent(new PlayroomDeletedEvent() { PlayroomName = playroom.Name, PerformedBy = player.Name, DatePerformed = DateTime.Now });
-                dxEvent = await _eventsRepository.AddAsync(dxEvent);
-                if (dxEvent != null)
+                playroom = await _playroomsRepository.DeleteAsync(playroom.Name);
+                if (playroom != null)
                 {
+                    var eventContent = new
+                    {
+                        Description = "PlayroomDeleted",
+                        PerformedBy = player.Name,
+                        DatePerformed = DateTime.Now,
+                        PlayroomName = playroom.Name,
+                    };
+                    var dxEvent = new DXEvent(eventContent)
+                        { PlayroomName = eventContent.PlayroomName, PerformedBy = eventContent.PerformedBy, DatePerformed = eventContent.DatePerformed };
+                    dxEvent = await _eventsRepository.AddAsync(dxEvent);
                     _broadcast.Broadcast(dxEvent.Content);
                     return Ok(playroom);
                 }
@@ -115,7 +134,15 @@ namespace DXGame.Controllers
                 playroom = await _playroomsRepository.AddPlayerToPlayroomAsync(player, playroom.Name);
                 if (playroom != null)
                 {
-                    var dxEvent = CreateDXEvent(new PlayerJoinedPlayroomEvent() { PerformedBy = player.Name, DatePerformed = DateTime.Now, PlayroomName = playroom.Name });
+                    var eventContent = new
+                    {
+                        Description = "PlayerJoinedPlayroom",
+                        PerformedBy = player.Name,
+                        DatePerformed = DateTime.Now,
+                        PlayroomName = playroom.Name,
+                    };
+                    var dxEvent = new DXEvent(eventContent)
+                        { PlayroomName = eventContent.PlayroomName, PerformedBy = eventContent.PerformedBy, DatePerformed = eventContent.DatePerformed };
                     dxEvent = await _eventsRepository.AddAsync(dxEvent);
                     if (dxEvent != null)
                     {
@@ -151,7 +178,15 @@ namespace DXGame.Controllers
                 playroom = await _playroomsRepository.RemovePlayerFromPlayroomAsync(player.Name, playroom.Name);
                 if (playroom != null)
                 {
-                    var dxEvent = CreateDXEvent(new PlayerLeftPlayroomEvent() { PerformedBy = player.Name, DatePerformed = DateTime.Now, PlayroomName = playroom.Name });
+                    var eventContent = new
+                    {
+                        Description = "PlayerLeftPlayroom",
+                        PerformedBy = player.Name,
+                        DatePerformed = DateTime.Now,
+                        PlayroomName = playroom.Name,
+                    };
+                    var dxEvent = new DXEvent(eventContent)
+                        { PlayroomName = eventContent.PlayroomName, PerformedBy = eventContent.PerformedBy, DatePerformed = eventContent.DatePerformed };
                     dxEvent = await _eventsRepository.AddAsync(dxEvent);
                     if (dxEvent != null)
                     {
@@ -177,23 +212,28 @@ namespace DXGame.Controllers
 
         [Route("api/playrooms/{id}/events")]
         [HttpGet]
-        public IEnumerable<string> GetEvents(string id)
+        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        public async Task<IHttpActionResult> GetEvents(string id)
         {
-            return _eventsRepository.Events.Where(e => e.PlayroomName == id).OrderBy(e => e.DatePerformed).Select(e => e.Content);
+            var playroom = await _playroomsRepository.FindAsync(id);
+            if (playroom == null) return NotFound();
+
+            var events = _eventsRepository.Events.Where(e => e.PlayroomName == id)?.OrderBy(e => e.DatePerformed)?.Select(e => e.Content);
+
+            return Ok(events);
         }
 
         [Route("api/playrooms/{id}/events")]
         [HttpPost]
-        public async Task<IHttpActionResult> PostEvent(string id)
+        public async Task<IHttpActionResult> PostEvent(string id, [FromBody] string eventContent)
         {
             (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, true);
             if (errorResponse != null) return errorResponse;
+            if (!DXEvent.ValidateContent(eventContent)) return BadRequest("Posted event is not an object");
 
-            var message = await Request.Content.ReadAsStringAsync();
-
-            if (!string.IsNullOrEmpty(message) && playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null)
+            if (!string.IsNullOrEmpty(eventContent) && playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null)
             {
-                var dxEvent = new DXEvent() { PerformedBy = player.Name, DatePerformed = DateTime.Now, PlayroomName = playroom.Name, Content = message };
+                var dxEvent = new DXEvent(eventContent) { PerformedBy = player.Name, DatePerformed = DateTime.Now, PlayroomName = playroom.Name };
                 dxEvent = await _eventsRepository.AddAsync(dxEvent);
                 if (dxEvent != null)
                 {
@@ -239,19 +279,6 @@ namespace DXGame.Controllers
             }                
 
             return (result, player, playroom);
-        }
-
-        private DXEvent CreateDXEvent(EventContentBase content)
-        {
-            var dxEvent = new DXEvent()
-            {
-                PerformedBy = content.PerformedBy,
-                DatePerformed = content.DatePerformed,
-                PlayroomName = content.PlayroomName,
-                Content = JsonConvert.SerializeObject(content)
-            };
-
-            return dxEvent;
         }
     }
 }

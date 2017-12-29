@@ -32,31 +32,13 @@ namespace DXGameTests
         static ICollection<Player> _defaultPlayers = new List<Player>();
         static ICollection<DXEvent> _defaultEvents = new List<DXEvent>();
 
-        static Mock<IPlayroomsRepository> _playroomsRepository;
-        static Mock<IPlayersRepository> _playersRepository;
-        static Mock<IEventsRepository> _eventsRepository;
-        static Mock<IBroadcast> _broadcast;
-        static Mock<IRequestPlayernameProvider> _playernameProvider;
-        public static Mock<IPlayroomsRepository> GetPlayroomsRepository(ICollection<Playroom> playrooms = null)
+        public static Mock<IPlayroomsRepository> PlayroomsRepository { get; private set; }
+        public static Mock<IPlayersRepository> PlayersRepository { get; private set; }
+        public static Mock<IEventsRepository> EventsRepository { get; private set; }
+        public static Mock<IBroadcast> Broadcast { get; private set; }
+        public static Mock<IRequestPlayernameProvider> RequestPlayernameProvider { get; private set; }
+        public static Mock<IPlayroomsRepository> PreparePlayroomsRepository(ICollection<Playroom> playrooms = null)
         {
-            //var players1 = new List<Player>()
-            //    {
-            //        new Player() { Name = "Player1" },
-            //        new Player() { Name = "Player2" },
-            //        new Player() { Name = "Player3" },
-            //    };
-            //var players2 = new List<Player>()
-            //    {
-            //        new Player() { Name = "Player1" },
-            //        new Player() { Name = "Player2" },
-            //    };
-            //var playrooms = new List<Playroom>()
-            //    {
-            //        new Playroom() { Name = "Playroom1", Players = players1 },
-            //        new Playroom() { Name = "Playroom2", Players = players2 },
-            //        new Playroom() { Name = "Playroom3", Players = new List<Player>() },
-            //    };
-            //if (_playroomsRepository != null && playrooms == null) return _playroomsRepository;
             if (playrooms == null) playrooms = _defaultPlayrooms;
 
             var mock = new Mock<IPlayroomsRepository>();
@@ -103,11 +85,11 @@ namespace DXGameTests
 
                 return playroom;
             });
-            _playroomsRepository = mock;
+            PlayroomsRepository = mock;
 
             return mock;
         }
-        public static Mock<IPlayersRepository> GetPlayersRepository(ICollection<Player> players = null)
+        public static Mock<IPlayersRepository> PreparePlayersRepository(ICollection<Player> players = null)
         {
             //var playrooms = new List<Playroom>() { new Playroom() { Name = "Playroom1" } };
             //var players = new List<Player>()
@@ -143,11 +125,11 @@ namespace DXGameTests
                 await Task.Yield();
                 return mock.Object.Players.FirstOrDefault(p => p.Name == name);
             });
-            _playersRepository = mock;
+            PlayersRepository = mock;
 
             return mock;
         }
-        public static Mock<IEventsRepository> GetEventsRepository(ICollection<DXEvent> events = null)
+        public static Mock<IEventsRepository> PrepareEventsRepository(ICollection<DXEvent> events = null)
         {
             //var events = new List<DXEvent>()
             //    {
@@ -169,25 +151,26 @@ namespace DXGameTests
 
                 return dxEvent;
             });
+            EventsRepository = mock;
 
             return mock;
         }
-        public static Mock<IBroadcast> GetBroadcast()
+        public static Mock<IBroadcast> PrepareBroadcast()
         {
             //if (_broadcast != null) return _broadcast;
             var mock = new Mock<IBroadcast>();
-            _broadcast = mock;
+            Broadcast = mock;
 
             return mock;
         }
-        public static Mock<IRequestPlayernameProvider> GetRequestPlayernameProvider(string returningPlayername)
+        public static Mock<IRequestPlayernameProvider> PrepareRequestPlayernameProvider(string returningPlayername)
         {
             //if (_playernameProvider != null) return _playernameProvider;
 
             var mock = new Mock<IRequestPlayernameProvider>();
             mock.Setup(m => m.GetPlayername()).Returns(returningPlayername);
             mock.Setup(m => m.CannotRetrievePlayernameErrorMessage).Returns("Wrong playername");
-            _playernameProvider = mock;
+            RequestPlayernameProvider = mock;
 
             return mock;
         }

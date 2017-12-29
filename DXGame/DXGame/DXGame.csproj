@@ -198,11 +198,6 @@
     <Compile Include="Models\Abstract\IEventsRepository.cs" />
     <Compile Include="Models\Abstract\IPlayersRepository.cs" />
     <Compile Include="Models\Abstract\IPlayroomsRepository.cs" />
-    <Compile Include="Models\Events\EventContentBase.cs" />
-    <Compile Include="Models\Events\PlayerJoinedPlayroomEvent.cs" />
-    <Compile Include="Models\Events\PlayerLeftPlayroomEvent.cs" />
-    <Compile Include="Models\Events\PlayroomDeletedEvent.cs" />
-    <Compile Include="Models\Events\PlayroomCreatedEvent.cs" />
     <Compile Include="Models\GameContext.cs" />
     <Compile Include="Models\GameRepository.cs" />
     <Compile Include="Models\SignalRBroadcast.cs" />

@@ -91,14 +91,6 @@ namespace DXGameTests
         }
         public static Mock<IPlayersRepository> PreparePlayersRepository(ICollection<Player> players = null)
         {
-            //var playrooms = new List<Playroom>() { new Playroom() { Name = "Playroom1" } };
-            //var players = new List<Player>()
-            //    {
-            //        new Player() { Name = "Player1", Playrooms = playrooms },
-            //        new Player() { Name = "Player2", Playrooms = playrooms },
-            //        new Player() { Name = "Player3", Playrooms = playrooms },
-            //    };
-            //if (_playersRepository != null && players == null) return _playersRepository;
             if (players == null) players = _defaultPlayers;
 
             var mock = new Mock<IPlayersRepository>();
@@ -131,13 +123,6 @@ namespace DXGameTests
         }
         public static Mock<IEventsRepository> PrepareEventsRepository(ICollection<DXEvent> events = null)
         {
-            //var events = new List<DXEvent>()
-            //    {
-            //        new DXEvent() { ID = 1, PerformedBy = "Player1", DatePerformed = DateTime.Now.AddMinutes(-3), PlayroomName = "Playroom1", Content = "Content1" },
-            //        new DXEvent() { ID = 2, PerformedBy = "Player2", DatePerformed = DateTime.Now.AddMinutes(-2), PlayroomName = "Playroom1", Content = "Content2" },
-            //        new DXEvent() { ID = 3, PerformedBy = "Player1", DatePerformed = DateTime.Now.AddMinutes(-1), PlayroomName = "Playroom1", Content = "Content3" },
-            //    };
-            //if (_eventsRepository != null && events == null) return _eventsRepository;
             if (events == null) events = _defaultEvents;
 
             var mock = new Mock<IEventsRepository>();

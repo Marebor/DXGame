@@ -10,6 +10,5 @@ namespace DXGame.Models.Entities
     {
         [Key]
         public string Name { get; set; }
-        public ICollection<Playroom> Playrooms { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace DXGame.Models
 
         public IEnumerable<Playroom> Playrooms { get { return db.Playrooms.Include(p => p.Players); } }
 
-        public IEnumerable<Player> Players { get { return db.Players.Include(p => p.Playrooms); } }
+        public IEnumerable<Player> Players { get { return db.Players; } }
 
         public IEnumerable<DXEvent> Events { get { return db.Events; } }
 
@@ -50,6 +50,7 @@ namespace DXGame.Models
         async Task<Playroom> IPlayroomsRepository.AddPlayerToPlayroomAsync(Player player, string playroomName)
         {
             var playroom = await (this as IPlayroomsRepository).FindAsync(playroomName);
+            player = await (this as IPlayersRepository).FindAsync(player.Name);
             if (player == null || playroom == null || playroom.Players.FirstOrDefault(p => p.Name == player.Name) != null) return null;
 
             playroom.Players.Add(player);

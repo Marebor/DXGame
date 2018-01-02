@@ -8,6 +8,8 @@ namespace DXGame.Migrations
     using DXGame.Models;
     using DXGame.Models.Entities;
 
+    // -ConfigurationTypeName Configuration_GameDB
+
     internal sealed class Configuration_GameDB : DbMigrationsConfiguration<DXGame.Models.GameContext>
     {
         public Configuration_GameDB()

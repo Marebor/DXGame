@@ -39,27 +39,28 @@ namespace DXGame.Controllers
             _requestPlayernameProvider = requestPlayernameProvider;
         }
 
-        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        //[EnableCors(origins: "*", headers: "*", methods: "*")]
         public IEnumerable<Playroom> Get()
         {
             return _playroomsRepository.Playrooms;
         }
 
-        [EnableCors(origins: "*", headers: "*", methods: "*")]
+        //[EnableCors(origins: "*", headers: "*", methods: "*")]
         public async Task<IHttpActionResult> Get(string id)
         {
             var playroom = await _playroomsRepository.FindAsync(id);
             return playroom != null ? Ok(playroom) as IHttpActionResult : NotFound();
         }
 
-        public async Task<IHttpActionResult> Post(string id)
+        [HttpPost]
+        public async Task<IHttpActionResult> Post([FromBody] string name)
         {
-            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(id, false);
+            (var errorResponse, var player, var playroom) = await CheckRequestValidityAsync(name, false);
             if (errorResponse != null) return errorResponse;
 
             if (playroom == null)
             {
-                playroom = await _playroomsRepository.AddAsync(new Playroom() { Name = id, Players = new List<Player>() });
+                playroom = await _playroomsRepository.AddAsync(new Playroom() { Name = name, Players = new List<Player>() });
                 if (playroom != null)
                 {
                     var eventContent = new
@@ -73,7 +74,7 @@ namespace DXGame.Controllers
                         { PlayroomName = eventContent.PlayroomName, PerformedBy = eventContent.PerformedBy, DatePerformed = eventContent.DatePerformed };
                     dxEvent = await _eventsRepository.AddAsync(dxEvent);
                     _broadcast.Broadcast(dxEvent.Content);
-                    return Created($"api/playrooms/{id}".ToLower(), playroom);
+                    return Created($"api/playrooms/{name}".ToLower(), playroom);
                 }
                 else
                 {

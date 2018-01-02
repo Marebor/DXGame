@@ -36,9 +36,9 @@ namespace DXGameTests.UnitTests
         {
             var players = new List<Player>
             {
-                new Player() { Name = "Player1", Playrooms = new List<Playroom>() },
-                new Player() { Name = "Player2", Playrooms = new List<Playroom>() },
-                new Player() { Name = "Player3", Playrooms = new List<Playroom>() },
+                new Player() { Name = "Player1" },
+                new Player() { Name = "Player2" },
+                new Player() { Name = "Player3" },
             };
 
             var playrooms = new List<Playroom>
@@ -48,11 +48,11 @@ namespace DXGameTests.UnitTests
                 new Playroom() { Name = "Playroom3_Empty", Players = new List<Player>() },
             };        
 
-            players.First(p => p.Name == "Player1").Playrooms.Add(playrooms.First(p => p.Name == "Playroom1_P1P2P3"));
-            players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
-            players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
-            players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
-            players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3"));
+            //players.First(p => p.Name == "Player1").Playrooms.Add(playrooms.First(p => p.Name == "Playroom1_P1P2P3").Name);
+            //players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3").Name);
+            //players.First(p => p.Name == "Player2").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3").Name);
+            //players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3").Name);
+            //players.First(p => p.Name == "Player3").Playrooms.Add(playrooms.First(p => p.Name == "Playroom2_P2P3").Name);
 
             playrooms.First(p => p.Name == "Playroom1_P1P2P3").Players.Add(players.First(p => p.Name == "Player1"));
             playrooms.First(p => p.Name == "Playroom1_P1P2P3").Players.Add(players.First(p => p.Name == "Player2"));

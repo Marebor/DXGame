@@ -185,6 +185,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Configuration\UnityResolver.cs" />
     <Compile Include="Controllers\CardsController.cs" />
+    <Compile Include="Controllers\PlayersController.cs" />
     <Compile Include="Controllers\PlayroomsController.cs" />
     <Compile Include="Extensions\ApiControllerExtensions.cs" />
     <Compile Include="Global.asax.cs">
@@ -193,6 +194,14 @@
     <Compile Include="Migrations\201712210834247_InitialGameDB.cs" />
     <Compile Include="Migrations\201712210834247_InitialGameDB.Designer.cs">
       <DependentUpon>201712210834247_InitialGameDB.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712301632052_SomeChanges.cs" />
+    <Compile Include="Migrations\201712301632052_SomeChanges.Designer.cs">
+      <DependentUpon>201712301632052_SomeChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712301909452_SomeChanges2.cs" />
+    <Compile Include="Migrations\201712301909452_SomeChanges2.Designer.cs">
+      <DependentUpon>201712301909452_SomeChanges2.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration_GameDB.cs" />
     <Compile Include="Models\Abstract\IEventsRepository.cs" />
@@ -213,10 +222,6 @@
     <Compile Include="Migrations\201712042142317_Initial.cs" />
     <Compile Include="Migrations\201712042142317_Initial.Designer.cs">
       <DependentUpon>201712042142317_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712061013101_TestSeed.cs" />
-    <Compile Include="Migrations\201712061013101_TestSeed.Designer.cs">
-      <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration_CardsDB.cs" />
     <Compile Include="Models\CardsContext.cs" />
@@ -245,11 +250,14 @@
     <EmbeddedResource Include="Migrations\201712042142317_Initial.resx">
       <DependentUpon>201712042142317_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712061013101_TestSeed.resx">
-      <DependentUpon>201712061013101_TestSeed.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712210834247_InitialGameDB.resx">
       <DependentUpon>201712210834247_InitialGameDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712301632052_SomeChanges.resx">
+      <DependentUpon>201712301632052_SomeChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712301909452_SomeChanges2.resx">
+      <DependentUpon>201712301909452_SomeChanges2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

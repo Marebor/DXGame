@@ -191,6 +191,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\TaskHandled.cs" />
+    <Compile Include="Helpers\ITaskHandled.cs" />
+    <Compile Include="Helpers\ITaskHandler.cs" />
+    <Compile Include="Helpers\TaskHandler.cs" />
     <Compile Include="Migrations\201712210834247_InitialGameDB.cs" />
     <Compile Include="Migrations\201712210834247_InitialGameDB.Designer.cs">
       <DependentUpon>201712210834247_InitialGameDB.cs</DependentUpon>

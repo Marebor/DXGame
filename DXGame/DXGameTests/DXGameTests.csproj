@@ -112,6 +112,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Helpers\TaskHandlerTests.cs" />
     <Compile Include="MyMocks.cs" />
     <Compile Include="UnitTests\DXEventTests.cs" />
     <Compile Include="UnitTests\PlayroomsControllerTests.cs" />

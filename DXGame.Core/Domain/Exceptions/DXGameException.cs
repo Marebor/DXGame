@@ -6,7 +6,7 @@ namespace DXGame.Core.Domain.Exceptions
     {
         public string ErrorCode { get; protected set; }
 
-        public DXGameException(string errorCode) 
+        public DXGameException(string errorCode, string message) : base(message)
         {
             ErrorCode = errorCode;
         }

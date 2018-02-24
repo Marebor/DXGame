@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DXGame.Core.Domain.Exceptions;
+using DXGame.Common.Exceptions;
 
-namespace DXGame.Core.Domain.Game
+namespace DXGame.Services.Round.Domain.Models
 {
     public class Round
     {
@@ -34,15 +34,17 @@ namespace DXGame.Core.Domain.Game
 
         protected Round() {}
 
-        public Round(Guid id, Guid gameId, int roundNo, IEnumerable<Guid> players, Guid activePlayer) 
+        public static Round Create(Guid id, Guid gameId, int roundNo, IEnumerable<Guid> players, Guid activePlayer) 
         {
-            Id = id;
-            GameId = gameId;
-            RoundNo = roundNo;
-            IsFinished = false;
-            Players = players;
-            ActivePlayer = activePlayer;
-            State = State.CardHanding;
+            return new Round{
+                Id = id,
+                GameId = gameId,
+                RoundNo = roundNo,
+                IsFinished = false,
+                Players = players,
+                ActivePlayer = activePlayer,
+                State = State.CardHanding,
+            };
         }
 
         public void AddPlayer(Guid playerId) 

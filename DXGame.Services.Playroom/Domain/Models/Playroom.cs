@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DXGame.Core.Domain.Exceptions;
+using DXGame.Common.Exceptions;
 
-namespace DXGame.Core.Domain.Game 
+namespace DXGame.Services.Playroom.Domain.Models
 {
     public class Playroom {
         private ISet<Guid> _players { get; set; }
@@ -43,7 +43,7 @@ namespace DXGame.Core.Domain.Game
         public void AddPlayer(Guid id) 
         {
             if (_players.Any(p => p == id))
-                throw new DomainException("playroom_already_contains_specified_player");
+                throw new DXGameException("playroom_already_contains_specified_player");
 
             _players.Add(id);
         }
@@ -51,7 +51,7 @@ namespace DXGame.Core.Domain.Game
         public void RemovePlayer(Guid id) 
         {
             if (!_players.Any(p => p == id))
-                throw new DomainException("playroom_does_not_contain_specified_player");
+                throw new DXGameException("playroom_does_not_contain_specified_player");
 
             _players.Remove(id);
         }
@@ -59,7 +59,7 @@ namespace DXGame.Core.Domain.Game
         public void AddGame(Guid id) 
         {
             if (_games.Any(g => g == id))
-                throw new DomainException("playroom_already_contains_specified_game");
+                throw new DXGameException("playroom_already_contains_specified_game");
 
             _games.Add(id);
         }

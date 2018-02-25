@@ -2,10 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DXGame.Common.Exceptions;
+using DXGame.Common.Messages.Events;
+using DXGame.Common.Messages.Events.Playroom;
+using DXGame.Common.Models;
+using DXGame.Services.Playroom.Events;
 
 namespace DXGame.Services.Playroom.Domain.Models
 {
-    public class Playroom 
+    public class Playroom : IEntity
     {
         private ISet<Guid> _players { get; set; }
         private ISet<Guid> _games { get; set; }
@@ -45,7 +49,7 @@ namespace DXGame.Services.Playroom.Domain.Models
         {
             if (_players.Any(p => p == id))
                 throw new DXGameException("playroom_already_contains_specified_player");
-
+                
             _players.Add(id);
         }
 
@@ -65,24 +69,74 @@ namespace DXGame.Services.Playroom.Domain.Models
             _games.Add(id);
         }
 
-        public void MakePrivate() 
+        public void MakePrivate(string password)
         {
-            IsPrivate = false;
+            IsPrivate = true;
+            Password = password;
         }
 
         public void MakePublic() 
         {
-            IsPrivate = true;
+            IsPrivate = false;
+            Password = null;
         }
 
-        public void SetPassword(string password) 
+        public void ChangePassword(string newPassword) 
         {
-            Password = password;
+            Password = newPassword;
         }
 
         public void ResetPassword() 
         {
             Password = null;
+        }
+
+        public static IEntity Build(IEnumerable<IEvent> events) 
+        {
+            var playroom = new Playroom();
+
+            foreach (var e in events) 
+            {
+                (playroom as dynamic).ApplyEvent(e);
+            }
+
+            return playroom;
+        }
+
+        private void ApplyEvent(Events.PlayroomCreated e) 
+        {
+            Id = e.Playroom.Id;
+            Name = e.Playroom.Name;
+            IsPrivate = e.Playroom.IsPrivate;
+            OwnerPlayerId = e.Playroom.OwnerPlayerId;
+            Password = e.Playroom.Password;
+            Players = e.Playroom.Players;
+            Games = e.Playroom.Games;
+        }
+
+        private void ApplyEvent(PlayerJoined e)
+        {
+            AddPlayer(e.Player);
+        }
+
+        private void ApplyEvent(PlayerLeft e) 
+        {
+            RemovePlayer(e.Player);
+        }
+
+        private void ApplyEvent(GameAdded e) 
+        {
+            AddGame(e.Game);
+        }
+
+        private void ApplyEvent(PrivacyChanged e) 
+        {
+            IsPrivate = e.IsPrivate;
+        }
+
+        private void ApplyEvent(Events.PasswordChanged e) 
+        {
+            Password = e.Password;
         }
     }
 }

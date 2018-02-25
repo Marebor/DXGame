@@ -50,9 +50,9 @@ namespace DXGame.Services.Round.Domain.Models
         public void AddPlayer(Guid playerId) 
         {
             if (_players.Any(p => p == playerId))
-                throw new DomainException("round_already_contains_specified_player");
+                throw new DXGameException("round_already_contains_specified_player");
             if (State == State.Voting)
-                throw new WrongStateException("round_in_voting_state", "Cannot add player in voting state");
+                throw new DXGameException("round_in_voting_state", "Cannot add player in voting state");
 
             _players.Add(playerId);
         }
@@ -60,18 +60,11 @@ namespace DXGame.Services.Round.Domain.Models
         public void RemovePlayer(Guid playerId) 
         {
             if (!_players.Any(p => p == playerId))
-                throw new DomainException("round_does_not_contain_specified_player");
+                throw new DXGameException("round_does_not_contain_specified_player");
             if (State == State.Voting)
-                throw new WrongStateException("round_in_voting_state", "Cannot remove player in voting state");
+                throw new DXGameException("round_in_voting_state", "Cannot remove player in voting state");
 
             _players.Remove(playerId);
-        }
-
-        public class WrongStateException : DomainException
-        {
-            internal WrongStateException(string errorCode, string message) : base(errorCode, message)
-            {
-            }
         }
     }
     public enum State 

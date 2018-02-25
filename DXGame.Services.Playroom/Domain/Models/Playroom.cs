@@ -5,13 +5,14 @@ using DXGame.Common.Exceptions;
 
 namespace DXGame.Services.Playroom.Domain.Models
 {
-    public class Playroom {
+    public class Playroom 
+    {
         private ISet<Guid> _players { get; set; }
         private ISet<Guid> _games { get; set; }
         public Guid Id { get; protected set; }
         public string Name { get; protected set; }
         public bool IsPrivate { get; protected set; }
-        public Guid OwnerUserId { get; protected set; }
+        public Guid OwnerPlayerId { get; protected set; }
         public string Password { get; protected set; }
         public IEnumerable<Guid> Players 
         {
@@ -26,16 +27,16 @@ namespace DXGame.Services.Playroom.Domain.Models
 
         protected Playroom() {}
 
-        public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerUserId, string password) 
+        public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerPlayerId, string password) 
         {
             return new Playroom() 
             {
                 Id = id,
                 Name = name,
                 IsPrivate = isPrivate,
-                OwnerUserId = ownerUserId,
+                OwnerPlayerId = ownerPlayerId,
                 Password = password,
-                Players = new HashSet<Guid>() { ownerUserId },
+                Players = new HashSet<Guid>() { ownerPlayerId },
                 Games = new HashSet<Guid>(),
             };
         }

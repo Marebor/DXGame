@@ -9,11 +9,17 @@ using DXGame.Services.Playroom.Events;
 
 namespace DXGame.Services.Playroom.Domain.Models
 {
-    public class Playroom : IEntity
+    public class Playroom : Aggregate,
+        IApplyEvent<Events.PlayroomCreated>,
+        IApplyEvent<PlayerJoined>,
+        IApplyEvent<PlayerLeft>,
+        IApplyEvent<GameAdded>,
+        IApplyEvent<PrivacyChanged>,
+        IApplyEvent<Events.PasswordChanged>,
+        IApplyEvent<PlayroomDeleted>
     {
         private ISet<Guid> _players { get; set; }
         private ISet<Guid> _games { get; set; }
-        public Guid Id { get; protected set; }
         public string Name { get; protected set; }
         public bool IsPrivate { get; protected set; }
         public Guid OwnerPlayerId { get; protected set; }
@@ -29,7 +35,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             protected set { _games = new HashSet<Guid>(value); }
         }
 
-        protected Playroom() {}
+        public Playroom() {}
 
         public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerPlayerId, string password) 
         {
@@ -50,7 +56,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (_players.Any(p => p == id))
                 throw new DXGameException("playroom_already_contains_specified_player");
                 
-            _players.Add(id);
+            ApplyEvent(new PlayerJoined(this.Id, id));
         }
 
         public void RemovePlayer(Guid id) 
@@ -58,7 +64,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Any(p => p == id))
                 throw new DXGameException("playroom_does_not_contain_specified_player");
 
-            _players.Remove(id);
+            ApplyEvent(new PlayerLeft(this.Id, id));
         }
 
         public void AddGame(Guid id) 
@@ -66,11 +72,12 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (_games.Any(g => g == id))
                 throw new DXGameException("playroom_already_contains_specified_game");
 
-            _games.Add(id);
+            ApplyEvent(new GameAdded(this.Id, id));
         }
 
         public void MakePrivate(string password)
         {
+            if (IsPrivate) return;
             IsPrivate = true;
             Password = password;
         }
@@ -81,29 +88,23 @@ namespace DXGame.Services.Playroom.Domain.Models
             Password = null;
         }
 
-        public void ChangePassword(string newPassword) 
+        public void ChangePassword(string oldPassword, string newPassword) 
         {
-            Password = newPassword;
+            if (oldPassword != Password)
+                throw new DXGameException("invalid_password");
+
+            ApplyEvent(new Events.PasswordChanged(this.Id, newPassword));
         }
 
-        public void ResetPassword() 
+        public void ResetPassword(string oldPassword) 
         {
-            Password = null;
+            if (oldPassword != Password)
+                throw new DXGameException("invalid_password");
+                
+            ApplyEvent(new Events.PasswordChanged(this.Id, null));
         }
 
-        public static IEntity Build(IEnumerable<IEvent> events) 
-        {
-            var playroom = new Playroom();
-
-            foreach (var e in events) 
-            {
-                (playroom as dynamic).ApplyEvent(e);
-            }
-
-            return playroom;
-        }
-
-        private void ApplyEvent(Events.PlayroomCreated e) 
+        public void ApplyEvent(Events.PlayroomCreated e) 
         {
             Id = e.Playroom.Id;
             Name = e.Playroom.Name;
@@ -114,29 +115,34 @@ namespace DXGame.Services.Playroom.Domain.Models
             Games = e.Playroom.Games;
         }
 
-        private void ApplyEvent(PlayerJoined e)
+        public void ApplyEvent(PlayerJoined e)
         {
-            AddPlayer(e.Player);
+            _players.Add(e.Player);
         }
 
-        private void ApplyEvent(PlayerLeft e) 
+        public void ApplyEvent(PlayerLeft e) 
         {
-            RemovePlayer(e.Player);
+            _players.Remove(e.Player);
         }
 
-        private void ApplyEvent(GameAdded e) 
+        public void ApplyEvent(GameAdded e) 
         {
-            AddGame(e.Game);
+            _games.Add(e.Game);
         }
 
-        private void ApplyEvent(PrivacyChanged e) 
+        public void ApplyEvent(PrivacyChanged e) 
         {
             IsPrivate = e.IsPrivate;
         }
 
-        private void ApplyEvent(Events.PasswordChanged e) 
+        public void ApplyEvent(Events.PasswordChanged e) 
         {
             Password = e.Password;
+        }
+
+        public void ApplyEvent(PlayroomDeleted e)
+        {
+            IsDeleted = true;
         }
     }
 }

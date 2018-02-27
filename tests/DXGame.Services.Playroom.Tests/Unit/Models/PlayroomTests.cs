@@ -28,5 +28,18 @@ namespace DXGame.Services.Playroom.Tests
             Assert.AreEqual(2, playroom.Players.Count());
             Assert.AreEqual(0, playroom.RecentlyAppliedEvents.Count());
         }
+
+        [TestMethod]
+        public void Can_Retrieve_Aggregate_Changes() 
+        {
+            var playroom = Domain.Models.Playroom.Create(Guid.NewGuid(), "Test", false, Guid.NewGuid(), null);
+            playroom.MarkRecentlyAppliedEventsAsConfirmed();
+
+            playroom.AddPlayer(Guid.NewGuid(), null);
+            playroom.AddPlayer(Guid.NewGuid(), null);
+            playroom.StartGame(Guid.NewGuid());
+
+            Assert.AreEqual(3, playroom.RecentlyAppliedEvents.Count());
+        }
     }
 }

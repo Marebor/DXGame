@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Common.Exceptions;
 using DXGame.Common.Helpers;
@@ -35,8 +36,8 @@ namespace DXGame.Services.Playroom.Domain.Handlers
             })
             .OnSuccess(async aggregate => 
             {
-                await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents);
-                await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents);
+                await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents.ToArray());
+                await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents.ToArray());
                 aggregate.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex => 

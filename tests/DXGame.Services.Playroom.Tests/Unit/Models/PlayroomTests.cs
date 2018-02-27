@@ -40,6 +40,8 @@ namespace DXGame.Services.Playroom.Tests
             playroom.StartGame(Guid.NewGuid());
 
             Assert.AreEqual(3, playroom.RecentlyAppliedEvents.Count());
+            Assert.AreEqual(typeof(PlayerJoined), playroom.RecentlyAppliedEvents.First().GetType());
+            Assert.AreEqual(typeof(GameStartRequested), playroom.RecentlyAppliedEvents.Last().GetType());
         }
     }
 }

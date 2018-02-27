@@ -12,10 +12,10 @@ namespace DXGame.Common.Helpers
             if (events == null || events.Count() == 0)
                 return null;
                 
-            var aggregate = new T();
+            dynamic aggregate = new T();
             foreach (var e in events) 
             {
-                //(aggregate as dynamic).ApplyEvent(e);
+                aggregate.ApplyEvent(e);
             }
             aggregate.MarkRecentlyAppliedEventsAsConfirmed();
 

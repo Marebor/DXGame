@@ -6,9 +6,12 @@ namespace DXGame.Common.Messages.Events.Playroom
     {
         public Guid Playroom { get; }
 
-        public PasswordChanged(Guid playroom)
+        public string Password { get; }
+
+        public PasswordChanged(Guid playroom, string password)
         {
             this.Playroom = playroom;
+            this.Password = password;
         }
     }
 }

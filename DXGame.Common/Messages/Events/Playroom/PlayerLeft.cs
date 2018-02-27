@@ -9,8 +9,8 @@ namespace DXGame.Common.Messages.Events.Playroom
 
         public PlayerLeft(Guid playroom, Guid player) 
         {
-            Playroom = playroom;
-            Player = player;
+            this.Playroom = playroom;
+            this.Player = player;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using DXGame.Common.Models;
 
 namespace DXGame.Common.Helpers
 {
@@ -20,7 +21,7 @@ namespace DXGame.Common.Helpers
             _tasks.Clear();
         }
 
-        public IHandlerTask Run(Func<Task> func)
+        public IHandlerTask LoadAggregate(Func<Task<Aggregate>> func)
         {
             var task = new HandlerTask(this, func);
             _tasks.Add(task);

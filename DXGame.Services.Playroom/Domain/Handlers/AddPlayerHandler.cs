@@ -18,17 +18,25 @@ namespace DXGame.Services.Playroom.Domain.Handlers
             _handler = handler;
         }
         public async Task HandleAsync(AddPlayer command) => await _handler
-            .Run(async () =>
+            .LoadAggregate(async () =>
             {
                 var playroomEvents = await _eventService.GetAggregateEventsAsync(command.Playroom);
-                var playroom = AggregateBuilder.Build<Models.Playroom>(playroomEvents);
-                playroom.AddPlayer(command.Player);
+                return AggregateBuilder.Build<Models.Playroom>(playroomEvents);
             })
-            .OnSuccess(async () =>
+            .Validate(aggregate =>
             {
-                var @event = new PlayerJoined(command.Playroom, command.Player);
-                await _eventService.SaveEvents(@event);
-                await _eventService.PublishEvents(@event);
+                if (aggregate == null)
+                    throw new DXGameException("aggregate_with_specified_id_does_not_exist");
+            })
+            .Run(aggregate =>
+            {
+                (aggregate as Models.Playroom).AddPlayer(command.Player);
+            })
+            .OnSuccess(async aggregate =>
+            {
+                await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents);
+                await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents);
+                aggregate.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex =>
             {

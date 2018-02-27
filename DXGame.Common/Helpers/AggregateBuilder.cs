@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using DXGame.Common.Messages.Events;
+using DXGame.Messages.Events;
 using DXGame.Common.Models;
 
 namespace DXGame.Common.Helpers

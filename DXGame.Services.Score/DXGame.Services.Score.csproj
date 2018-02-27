@@ -19,5 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="../DXGame.Common/DXGame.Common.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DXGame.Messages/DXGame.Messages.csproj" />
+  </ItemGroup>
 
 </Project>

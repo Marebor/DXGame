@@ -2,9 +2,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Common.Exceptions;
 using DXGame.Common.Helpers;
-using DXGame.Common.Messages.Commands;
-using DXGame.Common.Messages.Commands.Playroom;
-using DXGame.Common.Messages.Events.Playroom;
+using DXGame.Messages.Commands;
+using DXGame.Messages.Commands.Playroom;
+using DXGame.Messages.Events.Playroom;
 using DXGame.Common.Persistence;
 
 namespace DXGame.Services.Playroom.Domain.Handlers.Commands

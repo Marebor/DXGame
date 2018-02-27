@@ -6,15 +6,15 @@ namespace DXGame.Common.Messages.Commands.Playroom
     {
         public Guid PlayroomId { get; }
         public string Name { get; }
-        public Guid OwnerPlayerId { get; }
+        public Guid Owner { get; }
         public bool IsPrivate { get; }
         public string Password { get; }
 
-        public CreatePlayroom(Guid id, string name, Guid ownerPlayerId, bool isPrivate, string password)
+        public CreatePlayroom(Guid id, string name, Guid owner, bool isPrivate, string password)
         {
             this.PlayroomId = id;
             this.Name = name;
-            this.OwnerPlayerId = ownerPlayerId;
+            this.Owner = owner;
             this.IsPrivate = isPrivate;
             this.Password = password;
         }

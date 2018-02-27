@@ -7,15 +7,15 @@ namespace DXGame.Common.Messages.Events.Playroom
         public Guid Id { get; }
         public string Name { get; }
         public bool IsPrivate { get; }
-        public Guid OwnerId { get; }
+        public Guid Owner { get; }
         public string Password { get; }
 
-        public PlayroomCreated(Guid id, string name, bool isPrivate, Guid ownerId, string password)
+        public PlayroomCreated(Guid id, string name, bool isPrivate, Guid owner, string password)
         {
             this.Id = id;
             this.Name = name;
             this.IsPrivate = isPrivate;
-            this.OwnerId = ownerId;
+            this.Owner = owner;
             this.Password = password;
         }
     }

@@ -13,15 +13,18 @@ namespace DXGame.Services.Playroom.Domain.Models
         IApplyEvent<PlayerJoined>,
         IApplyEvent<PlayerLeft>,
         IApplyEvent<GameStartRequested>,
+        IApplyEvent<GameStarted>,
+        IApplyEvent<GameStartFailed>,
         IApplyEvent<PrivacyChanged>,
         IApplyEvent<PasswordChanged>,
+        IApplyEvent<OwnerChanged>,
         IApplyEvent<PlayroomDeleted>
     {
         private ISet<Guid> _players { get; set; }
         private ISet<Guid> _games { get; set; }
         public string Name { get; protected set; }
         public bool IsPrivate { get; protected set; }
-        public Guid OwnerId { get; protected set; }
+        public Guid Owner { get; protected set; }
         public string Password { get; protected set; }
         public IEnumerable<Guid> Players 
         {
@@ -47,16 +50,20 @@ namespace DXGame.Services.Playroom.Domain.Models
             return playroom;
         }
 
-        public void AddPlayer(Guid id) 
+        public void AddPlayer(Guid id, string password) 
         {
+            if (password != Password)
+                throw new DXGameException("invalid_password");
             if (_players.Any(p => p == id))
                 throw new DXGameException("playroom_already_contains_specified_player");
                 
             ApplyEvent(new PlayerJoined(this.Id, id));
         }
 
-        public void RemovePlayer(Guid id) 
+        public void RemovePlayer(Guid id, Guid requester) 
         {
+            if (Owner != default(Guid) && requester != Owner)
+                throw new DXGameException("unathorized_request");
             if (!_players.Any(p => p == id))
                 throw new DXGameException("playroom_does_not_contain_specified_player");
 
@@ -69,37 +76,74 @@ namespace DXGame.Services.Playroom.Domain.Models
                 throw new DXGameException("playroom_already_contains_specified_game");
             if (ActiveGame != default(Guid) && GameStatus != GameStatus.Finished)
                 throw new DXGameException("another_game_is_already_in_progress");
+            if (_players.Count < 3)
+                throw new DXGameException("too_small_amount_of_players");
 
             ApplyEvent(new GameStartRequested(this.Id, id, Players));
         }
 
-        public void MakePrivate(string password)
+        public void OnGameStartRequestAccepted(Guid id)
         {
-            if (IsPrivate) return;
-            IsPrivate = true;
-            Password = password;
+            if (GameStatus != GameStatus.StartRequested)
+                throw new DXGameException("no_active_request_to_start_game");
+            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
+                throw new DXGameException("another_game_requested_to_start");
+
+            ApplyEvent(new GameStarted(Id, id));
         }
 
-        public void MakePublic() 
+        public void OnGameStartRequestRejected(Guid id)
         {
-            IsPrivate = false;
-            Password = null;
+            if (GameStatus != GameStatus.StartRequested)
+                throw new DXGameException("no_active_request_to_start_game");
+            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
+                throw new DXGameException("another_game_requested_to_start");
+
+            ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected"));
         }
 
-        public void ChangePassword(string oldPassword, string newPassword) 
+        public void ChangePrivacy(Guid requester, string password, bool @private)
         {
+            if (Owner != default(Guid) && requester != Owner)
+                throw new DXGameException("unathorized_request");
+            if (password != Password)
+                throw new DXGameException("invalid_password");
+
+            ApplyEvent(new PrivacyChanged(Id, @private));
+        }
+
+        public void ChangePassword(string oldPassword, string newPassword, Guid requester) 
+        {
+            if (Owner != default(Guid) && requester != Owner)
+                throw new DXGameException("unathorized_request");
             if (oldPassword != Password)
                 throw new DXGameException("invalid_password");
+            if (newPassword == oldPassword)
+                throw new DXGameException("new_password_equal_to_current");
 
             ApplyEvent(new PasswordChanged(this.Id, newPassword));
         }
 
-        public void ResetPassword(string oldPassword) 
+        public void ChangeOwner(Guid requester, string password, Guid newOwner)
         {
-            if (oldPassword != Password)
+            if (Owner != default(Guid) && requester != Owner)
+                throw new DXGameException("unathorized_request");
+            if (password != Password)
                 throw new DXGameException("invalid_password");
-                
-            ApplyEvent(new PasswordChanged(this.Id, null));
+            if (!_players.Contains(newOwner))
+                throw new DXGameException("specified_player_is_not_a_member_of_playroom");
+
+            ApplyEvent(new OwnerChanged(Id, newOwner));
+        }
+
+        public void Delete(Guid requester, string password)
+        {
+            if (Owner != default(Guid) && requester != Owner)
+                throw new DXGameException("unathorized_request");
+            if (password != Password)
+                throw new DXGameException("invalid_password");
+
+            ApplyEvent(new PlayroomDeleted(Id));
         }
 
         public void ApplyEvent(PlayroomCreated e) 
@@ -107,9 +151,9 @@ namespace DXGame.Services.Playroom.Domain.Models
             Id = e.Id;
             Name = e.Name;
             IsPrivate = e.IsPrivate;
-            OwnerId = e.OwnerId;
+            Owner = e.Owner;
             Password = e.Password;
-            Players = new HashSet<Guid>() { OwnerId };
+            Players = new HashSet<Guid>() { Owner };
             Games = new HashSet<Guid>();
             ActiveGame = default(Guid);
             GameStatus = GameStatus.None;
@@ -134,8 +178,25 @@ namespace DXGame.Services.Playroom.Domain.Models
         public void ApplyEvent(GameStartRequested e) 
         {
             ActiveGame = e.Game;
-            GameStatus = GameStatus.StartPending;
+            GameStatus = GameStatus.StartRequested;
             
+            AddRecentlyAppliedEvent(e);
+        }
+
+        public void ApplyEvent(GameStarted e)
+        {
+            GameStatus = GameStatus.InProgress;
+            _games.Add(e.Game);
+            
+            AddRecentlyAppliedEvent(e);
+        }
+
+        public void ApplyEvent(GameStartFailed e)
+        {
+            GameStatus = GameStatus.None;
+            _games.Remove(e.Game);
+            ActiveGame = default(Guid);
+
             AddRecentlyAppliedEvent(e);
         }
 
@@ -153,6 +214,13 @@ namespace DXGame.Services.Playroom.Domain.Models
             AddRecentlyAppliedEvent(e);
         }
 
+        public void ApplyEvent(OwnerChanged e)
+        {
+            Owner = e.Owner;
+            
+            AddRecentlyAppliedEvent(e);
+        }
+
         public void ApplyEvent(PlayroomDeleted e)
         {
             IsDeleted = true;
@@ -164,7 +232,7 @@ namespace DXGame.Services.Playroom.Domain.Models
     public enum GameStatus
     {
         None,
-        StartPending,
+        StartRequested,
         InProgress,
         Finished
     }

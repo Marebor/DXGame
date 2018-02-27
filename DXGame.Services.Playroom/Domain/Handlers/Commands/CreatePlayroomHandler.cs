@@ -5,47 +5,50 @@ using DXGame.Common.Helpers;
 using DXGame.Common.Messages.Commands;
 using DXGame.Common.Messages.Commands.Playroom;
 using DXGame.Common.Messages.Events.Playroom;
+using DXGame.Common.Persistence;
 
-namespace DXGame.Services.Playroom.Domain.Handlers
+namespace DXGame.Services.Playroom.Domain.Handlers.Commands
 {
-    public class AddPlayerHandler : ICommandHandler<AddPlayer>
+    public class CreatePlayroomHandler : ICommandHandler<CreatePlayroom>
     {
         private readonly IEventService _eventService;
         private readonly IHandler _handler;
 
-        public AddPlayerHandler(IEventService eventService, IHandler handler)
+        public CreatePlayroomHandler(IEventService eventService, IHandler handler)
         {
             _eventService = eventService;
             _handler = handler;
         }
-        public async Task HandleAsync(AddPlayer command) => await _handler
+
+        public async Task HandleAsync(CreatePlayroom command) => await _handler
             .LoadAggregate(async () =>
             {
-                var playroomEvents = await _eventService.GetAggregateEventsAsync(command.Playroom);
+                var playroomEvents = await _eventService.GetAggregateEventsAsync(command.PlayroomId);
                 return AggregateBuilder.Build<Models.Playroom>(playroomEvents);
             })
             .Validate(aggregate =>
             {
-                if (aggregate == null)
-                    throw new DXGameException("aggregate_with_specified_id_does_not_exist");
+                if (aggregate != null)
+                    throw new DXGameException("specified_id_already_in_use");
             })
-            .Run(aggregate =>
+            .Run(aggregate => 
             {
-                (aggregate as Models.Playroom).AddPlayer(command.Player);
+                aggregate = Models.Playroom.Create(command.PlayroomId, command.Name, 
+                    command.IsPrivate, command.Owner, command.Password);
             })
-            .OnSuccess(async aggregate =>
+            .OnSuccess(async aggregate => 
             {
                 await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents.ToArray());
                 await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents.ToArray());
                 aggregate.MarkRecentlyAppliedEventsAsConfirmed();
             })
-            .OnCustomError<DXGameException>(async ex =>
+            .OnCustomError<DXGameException>(async ex => 
             {
-                await _eventService.PublishEvents(new PlayerAdditionFailed(command.Playroom, command.Player, ex.ErrorCode));
+                await _eventService.PublishEvents(new PlayroomCreationFailed(command.PlayroomId, ex.ErrorCode));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEvents(new PlayerAdditionFailed(command.Playroom, command.Player, ex.GetType().Name));
+                await _eventService.PublishEvents(new PlayroomCreationFailed(command.PlayroomId, ex.GetType().Name));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

@@ -20,7 +20,7 @@ namespace DXGame.Common.Models
         }
         private Dictionary<Type, Action<IEvent>> _eventAppliers =  new Dictionary<Type, Action<IEvent>>();
 
-        public Aggregate() 
+        protected Aggregate() 
         {
             RegisterAppliers();
         }

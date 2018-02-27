@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Common", "DXGame.Common\DXGame.Common.csproj", "{D0DF8919-AEA4-491E-ABB1-AA56A10D8286}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Common", "src\DXGame.Common\DXGame.Common.csproj", "{D0DF8919-AEA4-491E-ABB1-AA56A10D8286}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Messages", "DXGame.Messages\DXGame.Messages.csproj", "{5DE5F908-EC0B-427D-B27E-09F542A2ADF6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Messages", "src\DXGame.Messages\DXGame.Messages.csproj", "{5DE5F908-EC0B-427D-B27E-09F542A2ADF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Card", "DXGame.Services.Card\DXGame.Services.Card.csproj", "{04324B5E-F158-4F1F-B4C4-52F3AA7618AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Card", "src\DXGame.Services.Card\DXGame.Services.Card.csproj", "{04324B5E-F158-4F1F-B4C4-52F3AA7618AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.CardHanding", "DXGame.Services.CardHanding\DXGame.Services.CardHanding.csproj", "{A197B195-AC30-4423-8DD6-BF78103D4426}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.CardHanding", "src\DXGame.Services.CardHanding\DXGame.Services.CardHanding.csproj", "{A197B195-AC30-4423-8DD6-BF78103D4426}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Game", "DXGame.Services.Game\DXGame.Services.Game.csproj", "{5B0B5E2B-17B7-4B80-B23B-B8622E81A3B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Game", "src\DXGame.Services.Game\DXGame.Services.Game.csproj", "{5B0B5E2B-17B7-4B80-B23B-B8622E81A3B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Player", "DXGame.Services.Player\DXGame.Services.Player.csproj", "{B5ADA604-496F-4BCA-B615-4366B61A7B91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Player", "src\DXGame.Services.Player\DXGame.Services.Player.csproj", "{B5ADA604-496F-4BCA-B615-4366B61A7B91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Playroom", "DXGame.Services.Playroom\DXGame.Services.Playroom.csproj", "{4C9AF41D-8F1D-43D7-A13B-C107CA87DEE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Playroom", "src\DXGame.Services.Playroom\DXGame.Services.Playroom.csproj", "{4C9AF41D-8F1D-43D7-A13B-C107CA87DEE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Round", "DXGame.Services.Round\DXGame.Services.Round.csproj", "{ABF1A632-D0EB-423B-9F7F-29CC8495CC25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Round", "src\DXGame.Services.Round\DXGame.Services.Round.csproj", "{ABF1A632-D0EB-423B-9F7F-29CC8495CC25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Score", "DXGame.Services.Score\DXGame.Services.Score.csproj", "{926E7C9C-926F-49AB-9251-67719A4AF82C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Score", "src\DXGame.Services.Score\DXGame.Services.Score.csproj", "{926E7C9C-926F-49AB-9251-67719A4AF82C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Vote", "DXGame.Services.Vote\DXGame.Services.Vote.csproj", "{370E157B-0064-466E-920C-C24F9E37AFE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Vote", "src\DXGame.Services.Vote\DXGame.Services.Vote.csproj", "{370E157B-0064-466E-920C-C24F9E37AFE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

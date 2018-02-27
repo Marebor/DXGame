@@ -146,6 +146,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             ApplyEvent(new PlayroomDeleted(Id));
         }
 
+#region Event Appliers
         public void ApplyEvent(PlayroomCreated e) 
         {
             Id = e.Id;
@@ -227,6 +228,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             
             AddRecentlyAppliedEvent(e);
         }
+#endregion Event Appliers
     }
 
     public enum GameStatus

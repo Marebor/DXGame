@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DXGame.Common.Exceptions;
 using DXGame.Messages.Events;
 
 namespace DXGame.Common.Models
@@ -17,15 +18,52 @@ namespace DXGame.Common.Models
             get { return _recentlyAppliedEvents.ToArray(); }
             protected set { _recentlyAppliedEvents = new HashSet<IEvent>(value); }
         }
+        private Dictionary<Type, Action<IEvent>> _eventAppliers =  new Dictionary<Type, Action<IEvent>>();
+
+        public Aggregate() 
+        {
+            RegisterAppliers();
+        }
+
+        protected abstract void RegisterAppliers();
+
+        protected void RegisterApplier<T>(Action<T> applier) where T : IEvent
+        {
+            _eventAppliers.Add(typeof(T), (x) => applier((T)x));
+        }
 
         public void MarkRecentlyAppliedEventsAsConfirmed()
         {
             _recentlyAppliedEvents.Clear();
         }
 
-        protected void AddRecentlyAppliedEvent(IEvent e) 
+        protected void ApplyEvent(IEvent e)
         {
+            var type = e.GetType();
+            if (!_eventAppliers.ContainsKey(type))
+            {
+                throw new DXGameException("could_not_find_event_applier_for_aggregate");
+            }
+            _eventAppliers[type](e);
             _recentlyAppliedEvents.Add(e);
+        }
+
+        public static class Builder
+        {
+            public static T Build<T>(IEnumerable<IEvent> events) where T : Aggregate, new()
+            {
+                if (events == null || events.Count() == 0)
+                    return null;
+                    
+                var aggregate = new T();
+                foreach (var e in events) 
+                {
+                    aggregate.ApplyEvent(e);
+                }
+                aggregate.MarkRecentlyAppliedEventsAsConfirmed();
+
+                return aggregate;
+            }
         }
     }
 }

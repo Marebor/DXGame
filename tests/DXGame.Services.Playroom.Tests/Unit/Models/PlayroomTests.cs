@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using DXGame.Common.Helpers;
+using DXGame.Common.Models;
+using DXGame.Messages.Events;
+using DXGame.Messages.Events.Playroom;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace DXGame.Services.Playroom.Tests
+{
+    [TestClass]
+    public class PlayroomTests
+    {
+        [TestMethod]
+        public void Can_build_playroom()
+        {
+            var playroomId = Guid.NewGuid();
+            var owner = Guid.NewGuid();
+            var events = new List<IEvent> 
+            {
+                new PlayroomCreated(playroomId, "Test", false, owner, null),
+                new PlayerJoined(playroomId, Guid.NewGuid()),
+            };
+            var playroom = Aggregate.Builder.Build<Domain.Models.Playroom>(events);
+
+            Assert.AreEqual(playroomId, playroom.Id);
+            Assert.AreEqual(2, playroom.Players.Count());
+            Assert.AreEqual(0, playroom.RecentlyAppliedEvents.Count());
+        }
+    }
+}

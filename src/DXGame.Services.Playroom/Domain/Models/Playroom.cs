@@ -8,18 +8,21 @@ using DXGame.Common.Models;
 
 namespace DXGame.Services.Playroom.Domain.Models
 {
-    public class Playroom : Aggregate,
-        IApplyEvent<PlayroomCreated>,
-        IApplyEvent<PlayerJoined>,
-        IApplyEvent<PlayerLeft>,
-        IApplyEvent<GameStartRequested>,
-        IApplyEvent<GameStarted>,
-        IApplyEvent<GameStartFailed>,
-        IApplyEvent<PrivacyChanged>,
-        IApplyEvent<PasswordChanged>,
-        IApplyEvent<OwnerChanged>,
-        IApplyEvent<PlayroomDeleted>
+    public class Playroom : Aggregate
     {
+        protected override void RegisterAppliers()
+        {
+            RegisterApplier<PlayroomCreated>(this.ApplyEvent);
+            RegisterApplier<PlayerJoined>(this.ApplyEvent);
+            RegisterApplier<PlayerLeft>(this.ApplyEvent);
+            RegisterApplier<GameStartRequested>(this.ApplyEvent);
+            RegisterApplier<GameStarted>(this.ApplyEvent);
+            RegisterApplier<GameStartFailed>(this.ApplyEvent);
+            RegisterApplier<PrivacyChanged>(this.ApplyEvent);
+            RegisterApplier<PasswordChanged>(this.ApplyEvent);
+            RegisterApplier<OwnerChanged>(this.ApplyEvent);
+            RegisterApplier<PlayroomDeleted>(this.ApplyEvent);
+        }
         private ISet<Guid> _players { get; set; }
         private ISet<Guid> _games { get; set; }
         public string Name { get; protected set; }
@@ -41,7 +44,6 @@ namespace DXGame.Services.Playroom.Domain.Models
         public GameStatus GameStatus { get; protected set; }
 
         public Playroom() {}
-
         public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerId, string password) 
         {
             var playroom = new Playroom();
@@ -158,77 +160,56 @@ namespace DXGame.Services.Playroom.Domain.Models
             Games = new HashSet<Guid>();
             ActiveGame = default(Guid);
             GameStatus = GameStatus.None;
-
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(PlayerJoined e)
         {
             _players.Add(e.Player);
-
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(PlayerLeft e) 
         {
             _players.Remove(e.Player);
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(GameStartRequested e) 
         {
             ActiveGame = e.Game;
             GameStatus = GameStatus.StartRequested;
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(GameStarted e)
         {
             GameStatus = GameStatus.InProgress;
             _games.Add(e.Game);
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(GameStartFailed e)
         {
             GameStatus = GameStatus.None;
-            _games.Remove(e.Game);
             ActiveGame = default(Guid);
-
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(PrivacyChanged e) 
         {
             IsPrivate = e.IsPrivate;
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(PasswordChanged e) 
         {
             Password = e.Password;
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(OwnerChanged e)
         {
             Owner = e.Owner;
-            
-            AddRecentlyAppliedEvent(e);
         }
 
         public void ApplyEvent(PlayroomDeleted e)
         {
             IsDeleted = true;
-            
-            AddRecentlyAppliedEvent(e);
         }
-#endregion Event Appliers
+        #endregion Event Appliers
     }
 
     public enum GameStatus

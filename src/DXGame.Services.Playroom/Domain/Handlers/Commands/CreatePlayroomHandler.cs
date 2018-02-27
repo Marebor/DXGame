@@ -6,6 +6,7 @@ using DXGame.Messages.Commands;
 using DXGame.Messages.Commands.Playroom;
 using DXGame.Messages.Events.Playroom;
 using DXGame.Common.Persistence;
+using DXGame.Common.Models;
 
 namespace DXGame.Services.Playroom.Domain.Handlers.Commands
 {
@@ -24,7 +25,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             .LoadAggregate(async () =>
             {
                 var playroomEvents = await _eventService.GetAggregateEventsAsync(command.PlayroomId);
-                return AggregateBuilder.Build<Models.Playroom>(playroomEvents);
+                return Aggregate.Builder.Build<Models.Playroom>(playroomEvents);
             })
             .Validate(aggregate =>
             {

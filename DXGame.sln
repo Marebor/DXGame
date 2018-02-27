@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Score", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Vote", "src\DXGame.Services.Vote\DXGame.Services.Vote.csproj", "{370E157B-0064-466E-920C-C24F9E37AFE7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B0990322-7260-432E-9183-E52EA27E2280}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Playroom.Tests", "tests\DXGame.Services.Playroom.Tests\DXGame.Services.Playroom.Tests.csproj", "{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,5 +160,20 @@ Global
 		{370E157B-0064-466E-920C-C24F9E37AFE7}.Release|x64.Build.0 = Release|x64
 		{370E157B-0064-466E-920C-C24F9E37AFE7}.Release|x86.ActiveCfg = Release|x86
 		{370E157B-0064-466E-920C-C24F9E37AFE7}.Release|x86.Build.0 = Release|x86
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|x64.ActiveCfg = Debug|x64
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|x64.Build.0 = Debug|x64
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|x86.ActiveCfg = Debug|x86
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Debug|x86.Build.0 = Debug|x86
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x64.ActiveCfg = Release|x64
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x64.Build.0 = Release|x64
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x86.ActiveCfg = Release|x86
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A} = {B0990322-7260-432E-9183-E52EA27E2280}
 	EndGlobalSection
 EndGlobal

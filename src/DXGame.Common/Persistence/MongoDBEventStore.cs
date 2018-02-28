@@ -39,7 +39,7 @@ namespace DXGame.Common.Persistence
                 .InsertManyAsync(events
                     .Select(e => 
                         new EventEntity(
-                            aggregateId, e.GetType().ToString(), 
+                            aggregateId, e.GetType().FullName, 
                             _timeProvider.GetCurrentTime(), _serializer.Serialize(e)
                         )
                     )

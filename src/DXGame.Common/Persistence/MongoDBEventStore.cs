@@ -14,16 +14,14 @@ namespace DXGame.Common.Persistence
     {
         IMongoDatabase _database;
         ISerializer _serializer;
-        ITimeProvider _timeProvider;
 
         IMongoCollection<EventEntity> Events
             => _database.GetCollection<EventEntity>("Events");
             
-        public MongoDBEventStore(IMongoDatabase database, ISerializer serializer, ITimeProvider timeProvider)
+        public MongoDBEventStore(IMongoDatabase database, ISerializer serializer)
         {
             _database = database;
             _serializer = serializer;
-            _timeProvider = timeProvider;
         }
 
         public async Task<IEnumerable<IEvent>> GetAggregateEventsAsync(Guid aggregateId)
@@ -38,10 +36,7 @@ namespace DXGame.Common.Persistence
             => await Events
                 .InsertManyAsync(events
                     .Select(e => 
-                        new EventEntity(
-                            aggregateId, e.GetType().FullName, 
-                            _timeProvider.GetCurrentTime(), _serializer.Serialize(e)
-                        )
+                        new EventEntity(aggregateId, e.GetType().ToString(), DateTime.UtcNow, _serializer.Serialize(e))
                     )
                 );
     }

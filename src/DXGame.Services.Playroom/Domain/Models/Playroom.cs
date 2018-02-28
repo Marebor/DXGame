@@ -18,6 +18,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             RegisterApplier<GameStartRequested>(this.ApplyEvent);
             RegisterApplier<GameStarted>(this.ApplyEvent);
             RegisterApplier<GameStartFailed>(this.ApplyEvent);
+            RegisterApplier<GameFinishReceived>(this.ApplyEvent);
             RegisterApplier<PrivacyChanged>(this.ApplyEvent);
             RegisterApplier<PasswordChanged>(this.ApplyEvent);
             RegisterApplier<OwnerChanged>(this.ApplyEvent);
@@ -44,6 +45,7 @@ namespace DXGame.Services.Playroom.Domain.Models
         public GameStatus GameStatus { get; protected set; }
 
         public Playroom() {}
+#region Handling Commands
         public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerId, string password) 
         {
             var playroom = new Playroom();
@@ -82,26 +84,6 @@ namespace DXGame.Services.Playroom.Domain.Models
                 throw new DXGameException("too_small_amount_of_players");
 
             ApplyEvent(new GameStartRequested(this.Id, id, Players) as IEvent);
-        }
-
-        public void OnGameStartRequestAccepted(Guid id)
-        {
-            if (GameStatus != GameStatus.StartRequested)
-                throw new DXGameException("no_active_request_to_start_game");
-            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
-                throw new DXGameException("another_game_requested_to_start");
-
-            ApplyEvent(new GameStarted(Id, id) as IEvent);
-        }
-
-        public void OnGameStartRequestRejected(Guid id)
-        {
-            if (GameStatus != GameStatus.StartRequested)
-                throw new DXGameException("no_active_request_to_start_game");
-            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
-                throw new DXGameException("another_game_requested_to_start");
-
-            ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected") as IEvent);
         }
 
         public void ChangePrivacy(Guid requester, string password, bool @private)
@@ -147,6 +129,39 @@ namespace DXGame.Services.Playroom.Domain.Models
 
             ApplyEvent(new PlayroomDeleted(Id) as IEvent);
         }
+#endregion Handling Commands
+
+#region Handling External Events
+        public void OnGameStartRequestAccepted(Guid id)
+        {
+            if (GameStatus != GameStatus.StartRequested)
+                throw new DXGameException("no_active_request_to_start_game");
+            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
+                throw new DXGameException("another_game_requested_to_start");
+
+            ApplyEvent(new GameStarted(Id, id) as IEvent);
+        }
+
+        public void OnGameStartRequestRejected(Guid id)
+        {
+            if (GameStatus != GameStatus.StartRequested)
+                throw new DXGameException("no_active_request_to_start_game");
+            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
+                throw new DXGameException("another_game_requested_to_start");
+
+            ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected") as IEvent);
+        }
+
+        public void OnGameFinished(Guid id)
+        {
+            if (GameStatus != GameStatus.InProgress)
+                throw new DXGameException("no_game_in_progress");
+            if (GameStatus == GameStatus.InProgress && ActiveGame != id)
+                throw new DXGameException("another_game_in_progress");
+
+            ApplyEvent(new GameFinishReceived(Id, id) as IEvent);
+        }
+#endregion Handling External Events
 
 #region Event Appliers
         public void ApplyEvent(PlayroomCreated e) 
@@ -188,6 +203,11 @@ namespace DXGame.Services.Playroom.Domain.Models
         {
             GameStatus = GameStatus.None;
             ActiveGame = default(Guid);
+        }
+
+        public void ApplyEvent(GameFinishReceived e)
+        {
+            GameStatus = GameStatus.Finished;
         }
 
         public void ApplyEvent(PrivacyChanged e) 

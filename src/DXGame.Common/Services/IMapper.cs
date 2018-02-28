@@ -1,4 +1,4 @@
-namespace DXGame.Common.Helpers
+namespace DXGame.Common.Services
 {
     public interface IMapper
     {

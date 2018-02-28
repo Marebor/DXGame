@@ -7,6 +7,7 @@ using DXGame.Messages.Commands.Playroom;
 using DXGame.Messages.Events.Playroom;
 using DXGame.Common.Persistence;
 using DXGame.Common.Models;
+using DXGame.Common.Services;
 
 namespace DXGame.Services.Playroom.Domain.Handlers.Commands
 {
@@ -39,17 +40,17 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .OnSuccess(async aggregate => 
             {
-                await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents.ToArray());
-                await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents.ToArray());
+                await _eventService.StoreEventsAsync(aggregate.Id, aggregate.RecentlyAppliedEvents.ToArray());
+                await _eventService.PublishEventsAsync(aggregate.RecentlyAppliedEvents.ToArray());
                 aggregate.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex => 
             {
-                await _eventService.PublishEvents(new PlayroomCreationFailed(command.PlayroomId, ex.ErrorCode));
+                await _eventService.PublishEventsAsync(new PlayroomCreationFailed(command.PlayroomId, ex.ErrorCode));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEvents(new PlayroomCreationFailed(command.PlayroomId, ex.GetType().Name));
+                await _eventService.PublishEventsAsync(new PlayroomCreationFailed(command.PlayroomId, ex.GetType().Name));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

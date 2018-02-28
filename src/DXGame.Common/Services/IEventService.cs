@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DXGame.Messages.Events;
 
-namespace DXGame.Common.Helpers
+namespace DXGame.Common.Services
 {
     public interface IEventService
     {
-        Task SaveEvents(params IEvent[] events);
-        Task PublishEvents(params IEvent[] events);
+        Task StoreEventsAsync(Guid aggregateId, params IEvent[] events);
+        Task PublishEventsAsync(params IEvent[] events);
         Task<IEnumerable<IEvent>> GetAggregateEventsAsync(Guid aggregateId);
     }
 }

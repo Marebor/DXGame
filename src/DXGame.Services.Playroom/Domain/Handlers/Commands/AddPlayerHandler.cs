@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DXGame.Common.Exceptions;
 using DXGame.Common.Helpers;
 using DXGame.Common.Models;
+using DXGame.Common.Services;
 using DXGame.Messages.Commands;
 using DXGame.Messages.Commands.Playroom;
 using DXGame.Messages.Events.Playroom;
@@ -36,17 +37,17 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .OnSuccess(async aggregate =>
             {
-                await _eventService.SaveEvents(aggregate.RecentlyAppliedEvents.ToArray());
-                await _eventService.PublishEvents(aggregate.RecentlyAppliedEvents.ToArray());
+                await _eventService.StoreEventsAsync(aggregate.Id, aggregate.RecentlyAppliedEvents.ToArray());
+                await _eventService.PublishEventsAsync(aggregate.RecentlyAppliedEvents.ToArray());
                 aggregate.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex =>
             {
-                await _eventService.PublishEvents(new PlayerAdditionFailed(command.Playroom, command.Player, ex.ErrorCode));
+                await _eventService.PublishEventsAsync(new PlayerAdditionFailed(command.Playroom, command.Player, ex.ErrorCode));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEvents(new PlayerAdditionFailed(command.Playroom, command.Player, ex.GetType().Name));
+                await _eventService.PublishEventsAsync(new PlayerAdditionFailed(command.Playroom, command.Player, ex.GetType().Name));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

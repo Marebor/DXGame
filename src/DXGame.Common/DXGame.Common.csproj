@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../DXGame.Messages/DXGame.Messages.csproj" />

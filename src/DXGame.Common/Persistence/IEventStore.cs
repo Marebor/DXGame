@@ -8,6 +8,6 @@ namespace DXGame.Common.Persistence
     public interface IEventStore
     {
          Task<IEnumerable<IEvent>> GetAggregateEventsAsync(Guid aggregateId);
-         Task SaveEventsAsync(IEnumerable<IEvent> events);
+         Task SaveEventsAsync(Guid aggregateId, IEnumerable<IEvent> events);
     }
 }

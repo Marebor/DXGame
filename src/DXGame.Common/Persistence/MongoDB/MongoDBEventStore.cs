@@ -8,7 +8,7 @@ using DXGame.Messages.Events;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-namespace DXGame.Common.Persistence
+namespace DXGame.Common.Persistence.MongoDB
 {
     public class MongoDBEventStore : IEventStore
     {
@@ -32,10 +32,20 @@ namespace DXGame.Common.Persistence
                 .Select(e => _serializer.Deserialize<IEvent>(e.Content))
                 .ToListAsync();
 
+        public async Task<IEnumerable<IEvent>> GetAggregateEventsRangeAsync(Guid aggregateId, DateTime since, DateTime to)
+            => await Events
+                .AsQueryable()
+                .Where(e => e.AggregateId == aggregateId)
+                .Where(e => e.ExecutionTime >= since)
+                .Where(e => e.ExecutionTime <= to)
+                .OrderBy(e => e.ExecutionTime)
+                .Select(e => _serializer.Deserialize<IEvent>(e.Content))
+                .ToListAsync();
+
         public async Task SaveEventsAsync(Guid aggregateId, IEnumerable<IEvent> events)
             => await Events
-                .InsertManyAsync(events
-                    .Select(e => 
+                .InsertManyAsync(
+                    events.Select(e => 
                         new EventEntity(aggregateId, e.GetType().ToString(), DateTime.UtcNow, _serializer.Serialize(e))
                     )
                 );

@@ -68,7 +68,7 @@ namespace DXGame.Common.Communication.RabbitMQ
                 busClient,
                 msgType.IsAssignableTo<ICommand>() ? 
                     CommandHandlerHandleAsyncMethod(handler) as object : EventHandlerHandleAsyncMethod(handler),
-                SubscriptionContext(msgType),
+                SubscriptionContext(msgType, handler.GetType()),
                 default(CancellationToken)
             });
         }
@@ -85,14 +85,14 @@ namespace DXGame.Common.Communication.RabbitMQ
         static Func<IEvent, Task> EventHandlerHandleAsyncMethod(object handler)
             => msg => (handler as IEventHandler<IEvent>).HandleAsync(msg);
 
-        static Action<IPipeContext> SubscriptionContext(Type msgType)
+        static Action<IPipeContext> SubscriptionContext(Type msgType, Type handler)
             => ctx => ctx.UseConsumerConfiguration(
                             cfg => cfg.FromDeclaredQueue(
-                                q => q.WithName(QueueName(msgType))
+                                q => q.WithName(QueueName(msgType, handler))
                             )
                         );
 
-        static string QueueName(Type msgType, string suffix = null)
-            => $"{Assembly.GetEntryAssembly().GetName()}/{msgType.Name}" + suffix != null ? "_{suffix}" : string.Empty;
+        static string QueueName(Type msgType, Type handler)
+            => $"{Assembly.GetEntryAssembly().GetName()}/{msgType.Name}/{handler.FullName}";
     }
 }

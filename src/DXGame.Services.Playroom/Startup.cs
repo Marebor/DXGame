@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DXGame.Common.Communication.RabbitMQ;
+using DXGame.Common.DependencyInjection;
+using DXGame.Common.Persistence.MongoDB;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +27,9 @@ namespace DXGame.Services.Playroom
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddDeclaredMessageHandlers();
+            services.AddRabbitMQ(Configuration);
+            services.AddMongoDB(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

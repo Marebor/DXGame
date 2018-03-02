@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using DXGame.Common.Helpers;
 using DXGame.Messages.Commands;
 using DXGame.Messages.Events;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +19,6 @@ namespace DXGame.Common.Communication.RabbitMQ
 {
     public static class Extensions
     {
-
         public static void AddRabbitMQ(this IServiceCollection services, IConfiguration configuration)
         {
             var settings = new RabbitMQSettings();
@@ -33,31 +33,14 @@ namespace DXGame.Common.Communication.RabbitMQ
 
         public static void AddSubscriptionsForMessageHandlers(this IBusClient busClient, IServiceProvider serviceProvider)
         {
-            var assembly = Assembly.GetCallingAssembly();
-            var handlers = assembly
-                .GetTypes()
-                .Where(t => t
-                    .GetInterfaces()
-                    .Any(i => 
-                        i.IsClosedTypeOf(typeof(ICommandHandler<>)) ||
-                        i.IsClosedTypeOf(typeof(IEventHandler<>))
-                    )
-                );
-
-            foreach (var handlerType in handlers)
-            {
-                var handlerInterface = handlerType
-                    .GetInterfaces()
-                    .First(i => 
-                        i.IsClosedTypeOf(typeof(ICommandHandler<>)) ||
-                        i.IsClosedTypeOf(typeof(IEventHandler<>))                        
-                    );
-                var msgType = handlerInterface
-                    .GetGenericArguments()
-                    .First();
-                var handler = serviceProvider.GetService(handlerInterface);
-                busClient.SubscribeToMessage(msgType, handler);
-            }
+            ForEachMessageHandlerInAssembly.Execute(
+                (handlerType, handlerInterface, messageType) =>
+                {
+                    var handler = serviceProvider.GetService(handlerInterface);
+                    busClient.SubscribeToMessage(messageType, handler);
+                },
+                Assembly.GetCallingAssembly()
+            );
         }
 
         static void SubscribeToMessage(this IBusClient busClient, Type msgType, object handler)

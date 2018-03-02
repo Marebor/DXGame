@@ -31,8 +31,7 @@ namespace DXGame.Common.Tests
             busClient.Object.AddSubscriptionsForMessageHandlers(webHost.Services);
 
             busClient.Verify(bus 
-                => SubscribeMessageExtension.SubscribeAsync(
-                        It.IsAny<IBusClient>(),
+                => bus.SubscribeAsync(
                         It.IsAny<Func<StartGame, Task>>(), 
                         It.IsAny<Action<IPipeContext>>(),
                         default(CancellationToken)

@@ -1,80 +1,98 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using DXGame.Messages.Commands;
 using DXGame.Messages.Events;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RawRabbit;
-using RawRabbit.Context;
+using RawRabbit.Instantiation;
+using RawRabbit.Pipe;
 
 namespace DXGame.Common.Communication.RabbitMQ
 {
     public static class Extensions
     {
-        public static void AddRegisteredMessageHandlers(this IBusClient busClient, IServiceProvider serviceProvider)
+
+        public static void AddRabbitMQ(this IServiceCollection services, IConfiguration configuration)
         {
-            var assembly = Assembly.GetCallingAssembly();
-            
-            AddHandlers(assembly, typeof(IEventHandler<>), busClient, serviceProvider);
-            AddHandlers(assembly, typeof(ICommandHandler<>), busClient, serviceProvider);
+            var settings = new RabbitMQSettings();
+            var section = configuration.GetSection("rabbitmq");
+            section.Bind(settings);
+            var client = RawRabbitFactory.CreateSingleton(new RawRabbitOptions
+            {
+                ClientConfiguration = settings
+            });
+            services.AddSingleton<IBusClient>(_ => client);
         }
 
-        static void AddHandlers(Assembly assembly, Type type, IBusClient busClient, IServiceProvider serviceProvider)
+        public static void AddSubscriptionsForMessageHandlers(this IBusClient busClient, IServiceProvider serviceProvider)
         {
-            var handlerName = type.Name;
+            var assembly = Assembly.GetCallingAssembly();
             var handlers = assembly
                 .GetTypes()
-                .Where(t => t.GetInterfaces().Any(i => i.Name.Contains(handlerName)));
-
-            foreach (var handler in handlers)
-            {
-                var handlerInterface = handler
+                .Where(t => t
                     .GetInterfaces()
-                    .First(i => i.Name.Contains(handlerName));
+                    .Any(i => 
+                        i.IsClosedTypeOf(typeof(ICommandHandler<>)) ||
+                        i.IsClosedTypeOf(typeof(IEventHandler<>))
+                    )
+                );
+
+            foreach (var handlerType in handlers)
+            {
+                var handlerInterface = handlerType
+                    .GetInterfaces()
+                    .First(i => 
+                        i.IsClosedTypeOf(typeof(ICommandHandler<>)) ||
+                        i.IsClosedTypeOf(typeof(IEventHandler<>))                        
+                    );
                 var msgType = handlerInterface
                     .GetGenericArguments()
                     .First();
-                var subscribeMethod = typeof(IBusClient)
-                    .GetInterfaces()
-                    .Single(i => i.GetMethods()
-                        .Any(m => m.Name
-                            .Contains("SubscribeAsync") && m.IsGenericMethod
-                        )
-                    )
-                    .GetMethods()
-                    .First(m => m.Name.Contains("SubscribeAsync"))
-                    .MakeGenericMethod(msgType);
-                var instance = serviceProvider.GetService(handlerInterface);
-
-                if (type.Name.Contains(typeof(ICommandHandler<>).Name)) 
-                    SubscribeToCommand(subscribeMethod, busClient, instance);
-                if (type.Name.Contains(typeof(IEventHandler<>).Name)) 
-                    SubscribeToEvent(subscribeMethod, busClient, instance);
+                var handler = serviceProvider.GetService(handlerInterface);
+                busClient.SubscribeToMessage(msgType, handler);
             }
         }
 
-        static void SubscribeToCommand(MethodInfo subscribeMethod, IBusClient busClient, object handler)
+        static void SubscribeToMessage(this IBusClient busClient, Type msgType, object handler)
         {
-            subscribeMethod.Invoke(busClient, new object[] 
+            var subscribeMethod = BusClientSubscriptionMethod(msgType);
+            subscribeMethod.Invoke(null, new object[] 
             {
-                new Func<ICommand, MessageContext, Task>((msg, ctx) 
-                    => (handler as ICommandHandler<ICommand>).HandleAsync(msg)),
-                null
+                busClient,
+                msgType.IsAssignableTo<ICommand>() ? 
+                    CommandHandlerHandleAsyncMethod(handler) as object : EventHandlerHandleAsyncMethod(handler),
+                SubscriptionContext(msgType),
+                default(CancellationToken)
             });
         }
 
-        static void SubscribeToEvent(MethodInfo subscribeMethod, IBusClient busClient, object handler)
-        {
-            subscribeMethod.Invoke(busClient, new object[] 
-            {
-                new Func<IEvent, MessageContext, Task>((msg, ctx) 
-                    => (handler as IEventHandler<IEvent>).HandleAsync(msg)),
-                null
-            });
-        }
+        static MethodInfo BusClientSubscriptionMethod(Type genericType)
+            => typeof(SubscribeMessageExtension)
+                .GetMethods()
+                .First(m => m.Name.Contains("SubscribeAsync"))
+                .MakeGenericMethod(genericType);
+
+        static Func<ICommand, Task> CommandHandlerHandleAsyncMethod(object handler)
+            => msg => (handler as ICommandHandler<ICommand>).HandleAsync(msg);
+        
+        static Func<IEvent, Task> EventHandlerHandleAsyncMethod(object handler)
+            => msg => (handler as IEventHandler<IEvent>).HandleAsync(msg);
+
+        static Action<IPipeContext> SubscriptionContext(Type msgType)
+            => ctx => ctx.UseConsumerConfiguration(
+                            cfg => cfg.FromDeclaredQueue(
+                                q => q.WithName(QueueName(msgType))
+                            )
+                        );
+
+        static string QueueName(Type msgType, string suffix = null)
+            => $"{Assembly.GetEntryAssembly().GetName()}/{msgType.Name}" + suffix != null ? "_{suffix}" : string.Empty;
     }
 }

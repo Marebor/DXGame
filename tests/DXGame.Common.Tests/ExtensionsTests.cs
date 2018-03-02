@@ -7,9 +7,10 @@ using RawRabbit;
 using Moq;
 using DXGame.Common.Communication.RabbitMQ;
 using DXGame.Messages.Commands.Playroom;
-using RawRabbit.Context;
 using System.Threading.Tasks;
 using DXGame.Messages.Commands;
+using RawRabbit.Pipe;
+using System.Threading;
 
 namespace DXGame.Common.Tests
 {
@@ -27,10 +28,15 @@ namespace DXGame.Common.Tests
             var webHost = BuildWebHost(new string[] {} );
             var busClient = new Mock<IBusClient>();
 
-            busClient.Object.AddRegisteredMessageHandlers(webHost.Services);
+            busClient.Object.AddSubscriptionsForMessageHandlers(webHost.Services);
 
             busClient.Verify(bus 
-                => bus.SubscribeAsync(It.IsAny<Func<StartGame, MessageContext, Task>>(), null)
+                => SubscribeMessageExtension.SubscribeAsync(
+                        It.IsAny<IBusClient>(),
+                        It.IsAny<Func<StartGame, Task>>(), 
+                        It.IsAny<Action<IPipeContext>>(),
+                        default(CancellationToken)
+                    )
             );
         }
     }

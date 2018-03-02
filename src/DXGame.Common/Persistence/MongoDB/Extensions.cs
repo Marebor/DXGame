@@ -13,15 +13,15 @@ namespace DXGame.Common.Persistence.MongoDB
         public static void AddMongoDB(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<MongoDBSettings>(configuration.GetSection("mongo"));
-            services.AddSingleton<MongoClient>(c =>
+            services.AddSingleton<MongoClient>(p =>
             {
-                var settings = c.GetService<IOptions<MongoDBSettings>>();
+                var settings = p.GetService<IOptions<MongoDBSettings>>();
                 return new MongoClient(settings.Value.ConnectionString);
             });
-            services.AddScoped<IMongoDatabase>(c =>
+            services.AddScoped<IMongoDatabase>(p =>
             {
-                var settings = c.GetService<IOptions<MongoDBSettings>>();
-                var client = c.GetService<MongoClient>();
+                var settings = p.GetService<IOptions<MongoDBSettings>>();
+                var client = p.GetService<MongoClient>();
                 return client.GetDatabase(settings.Value.Database);
             });
             ConventionRegistry.Register("DXGameConventions", new DXGameConventions(), _ => true);

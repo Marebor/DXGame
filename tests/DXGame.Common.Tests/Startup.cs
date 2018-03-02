@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DXGame.Messages.Commands;
+using DXGame.Messages.Commands.Playroom;
+using DXGame.Services.Playroom.Domain.Handlers.Commands;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
+using RawRabbit.Configuration;
 
-namespace DXGame.Services.Playroom
+namespace DXGame.Common.Tests
 {
     public class Startup
     {
@@ -24,6 +27,7 @@ namespace DXGame.Services.Playroom
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<ICommandHandler<StartGame>, TestHandler>();
             services.AddMvc();
         }
 

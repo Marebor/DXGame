@@ -10,8 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
+    <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
     <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+    <PackageReference Include="RawRabbit" Version="1.10.4" />
   </ItemGroup>
   
   <ItemGroup>
@@ -19,6 +21,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../src/DXGame.Common/DXGame.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/DXGame.Services.Playroom/DXGame.Services.Playroom.csproj" />
   </ItemGroup>
   
 </Project>

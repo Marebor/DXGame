@@ -17,7 +17,7 @@ namespace DXGame.Common.Communication.RabbitMQ
     {
         public static void AddRegisteredMessageHandlers(this IBusClient busClient, IServiceProvider serviceProvider)
         {
-            var assembly = Assembly.GetEntryAssembly();
+            var assembly = Assembly.GetCallingAssembly();
             
             AddHandlers(assembly, typeof(IEventHandler<>), busClient, serviceProvider);
             AddHandlers(assembly, typeof(ICommandHandler<>), busClient, serviceProvider);
@@ -32,20 +32,27 @@ namespace DXGame.Common.Communication.RabbitMQ
 
             foreach (var handler in handlers)
             {
-                var msgType = handler
-                    .GetGenericArguments()
-                    .First();
-                var subscribeMethod = typeof(IBusClient)
-                    .GetMethod(nameof(IBusClient.SubscribeAsync))
-                    .MakeGenericMethod(msgType);
                 var handlerInterface = handler
                     .GetInterfaces()
                     .First(i => i.Name.Contains(handlerName));
+                var msgType = handlerInterface
+                    .GetGenericArguments()
+                    .First();
+                var subscribeMethod = typeof(IBusClient)
+                    .GetInterfaces()
+                    .Single(i => i.GetMethods()
+                        .Any(m => m.Name
+                            .Contains("SubscribeAsync") && m.IsGenericMethod
+                        )
+                    )
+                    .GetMethods()
+                    .First(m => m.Name.Contains("SubscribeAsync"))
+                    .MakeGenericMethod(msgType);
                 var instance = serviceProvider.GetService(handlerInterface);
 
-                if (type.Name.Contains("Command")) 
+                if (type.Name.Contains(typeof(ICommandHandler<>).Name)) 
                     SubscribeToCommand(subscribeMethod, busClient, instance);
-                if (type.Name.Contains("Event")) 
+                if (type.Name.Contains(typeof(IEventHandler<>).Name)) 
                     SubscribeToEvent(subscribeMethod, busClient, instance);
             }
         }
@@ -55,7 +62,8 @@ namespace DXGame.Common.Communication.RabbitMQ
             subscribeMethod.Invoke(busClient, new object[] 
             {
                 new Func<ICommand, MessageContext, Task>((msg, ctx) 
-                    => (handler as ICommandHandler<ICommand>).HandleAsync(msg))
+                    => (handler as ICommandHandler<ICommand>).HandleAsync(msg)),
+                null
             });
         }
 
@@ -64,7 +72,8 @@ namespace DXGame.Common.Communication.RabbitMQ
             subscribeMethod.Invoke(busClient, new object[] 
             {
                 new Func<IEvent, MessageContext, Task>((msg, ctx) 
-                    => (handler as IEventHandler<IEvent>).HandleAsync(msg))
+                    => (handler as IEventHandler<IEvent>).HandleAsync(msg)),
+                null
             });
         }
     }

@@ -13,7 +13,7 @@ namespace DXGame.Common.DependencyInjection
 {
     public static class Extensions
     {
-        public static void AddDXGameDefaultDependencies(this IServiceCollection services, IConfiguration configuration)
+        public static void AddDefaultDXGameDependencies(this IServiceCollection services, IConfiguration configuration)
         {
             var assembly = Assembly.GetCallingAssembly();
             services.AddAssemblyMessageHandlers(assembly);
@@ -22,6 +22,7 @@ namespace DXGame.Common.DependencyInjection
             services.AddScoped<IMessageBus, RabbitMQMessageBus>();
             services.AddScoped<IEventStore, MongoDBEventStore>();
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IHandler, Handler>();
         }
 
         public static void AddAssemblyMessageHandlers(this IServiceCollection services, Assembly assembly = null)

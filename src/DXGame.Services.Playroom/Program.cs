@@ -16,15 +16,10 @@ namespace DXGame.Services.Playroom
         public static void Main(string[] args)
         {
             ServiceHost.Create<Startup>(args)
-                .UseRabbitMq()
+                .UseMessageBus()
                 .AddAssemblySubscriptions()
                 .Build()
                 .Run();
         }
-
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .Build();
     }
 }

@@ -27,7 +27,7 @@ namespace DXGame.Services.Playroom
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddDXGameDefaultDependencies(Configuration);
+            services.AddDefaultDXGameDependencies(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

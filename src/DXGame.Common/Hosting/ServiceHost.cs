@@ -49,7 +49,7 @@ namespace DXGame.Common.Hosting
                 _webHost = webHost;
             }
 
-            public BusBuilder UseRabbitMq()
+            public BusBuilder UseMessageBus()
             {
                 _bus = (IMessageBus)_webHost.Services.GetService(typeof(IMessageBus));
 

@@ -25,7 +25,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             RegisterApplier<PlayroomDeleted>(this.ApplyEvent);
         }
         private ISet<Guid> _players { get; set; }
-        private ISet<Guid> _games { get; set; }
+        private ISet<Game> _completedGames { get; set; }
         public string Name { get; protected set; }
         public bool IsPrivate { get; protected set; }
         public Guid Owner { get; protected set; }
@@ -35,14 +35,13 @@ namespace DXGame.Services.Playroom.Domain.Models
             get { return _players; }
             protected set { _players = new HashSet<Guid>(value); }
         }
-        public IEnumerable<Guid> Games 
+        public IEnumerable<Game> CompletedGames 
         {
-            get { return _games; }
-            protected set { _games = new HashSet<Guid>(value); }
+            get { return _completedGames; }
+            protected set { _completedGames = new HashSet<Game>(value); }
         }
 
-        public Guid ActiveGame { get; protected set; }
-        public GameStatus GameStatus { get; protected set; }
+        public Game ActiveGame { get; protected set; }
 
         public Playroom() {}
 #region Handling Commands
@@ -74,11 +73,11 @@ namespace DXGame.Services.Playroom.Domain.Models
             ApplyEvent(new PlayerLeft(this.Id, id) as IEvent);
         }
 
-        public void StartGame(Guid id) 
+        public void NewGame(Guid id) 
         {
-            if (_games.Any(g => g == id))
-                throw new DXGameException("playroom_already_contains_specified_game");
-            if (ActiveGame != default(Guid) && GameStatus != GameStatus.Finished)
+            if (CompletedGames.Any(g => g.Id == id) || ActiveGame.Id == id)
+                throw new DXGameException("game_already_started");
+            if (ActiveGame.State != GameState.Finished)
                 throw new DXGameException("another_game_is_already_in_progress");
             if (_players.Count < 3)
                 throw new DXGameException("too_small_amount_of_players");
@@ -134,30 +133,30 @@ namespace DXGame.Services.Playroom.Domain.Models
 #region Handling External Events
         public void OnGameStartRequestAccepted(Guid id)
         {
-            if (GameStatus != GameStatus.StartRequested)
+            if (ActiveGame.State != GameState.StartRequested)
                 throw new DXGameException("no_active_request_to_start_game");
-            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
-                throw new DXGameException("another_game_requested_to_start");
+            if (ActiveGame.Id != id)
+                throw new DXGameException("another_game_is_requested_to_start");
 
             ApplyEvent(new GameStarted(Id, id) as IEvent);
         }
 
         public void OnGameStartRequestRejected(Guid id)
         {
-            if (GameStatus != GameStatus.StartRequested)
+            if (ActiveGame.State != GameState.StartRequested)
                 throw new DXGameException("no_active_request_to_start_game");
-            if (GameStatus == GameStatus.StartRequested && ActiveGame != id)
-                throw new DXGameException("another_game_requested_to_start");
+            if (ActiveGame.Id != id)
+                throw new DXGameException("another_game_is_requested_to_start");
 
             ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected") as IEvent);
         }
 
         public void OnGameFinished(Guid id)
         {
-            if (GameStatus != GameStatus.InProgress)
+            if (ActiveGame.State != GameState.InProgress)
                 throw new DXGameException("no_game_in_progress");
-            if (GameStatus == GameStatus.InProgress && ActiveGame != id)
-                throw new DXGameException("another_game_in_progress");
+            if (ActiveGame.Id != id)
+                throw new DXGameException("another_game_is_currently_active");
 
             ApplyEvent(new GameFinishReceived(Id, id) as IEvent);
         }
@@ -172,9 +171,8 @@ namespace DXGame.Services.Playroom.Domain.Models
             Owner = e.Owner;
             Password = e.Password;
             Players = new HashSet<Guid>() { Owner };
-            Games = new HashSet<Guid>();
-            ActiveGame = default(Guid);
-            GameStatus = GameStatus.None;
+            CompletedGames = new HashSet<Game>();
+            ActiveGame = null;
         }
 
         public void ApplyEvent(PlayerJoined e)
@@ -189,25 +187,23 @@ namespace DXGame.Services.Playroom.Domain.Models
 
         public void ApplyEvent(GameStartRequested e) 
         {
-            ActiveGame = e.Game;
-            GameStatus = GameStatus.StartRequested;
+            ActiveGame = new Game(e.Game, GameState.StartRequested);
         }
 
         public void ApplyEvent(GameStarted e)
         {
-            GameStatus = GameStatus.InProgress;
-            _games.Add(e.Game);
+            ActiveGame.State = GameState.InProgress;
         }
 
         public void ApplyEvent(GameStartFailed e)
         {
-            GameStatus = GameStatus.None;
-            ActiveGame = default(Guid);
+            ActiveGame = null;
         }
 
         public void ApplyEvent(GameFinishReceived e)
         {
-            GameStatus = GameStatus.Finished;
+            _completedGames.Add(ActiveGame);
+            ActiveGame = null;
         }
 
         public void ApplyEvent(PrivacyChanged e) 
@@ -230,13 +226,5 @@ namespace DXGame.Services.Playroom.Domain.Models
             IsDeleted = true;
         }
         #endregion Event Appliers
-    }
-
-    public enum GameStatus
-    {
-        None,
-        StartRequested,
-        InProgress,
-        Finished
     }
 }

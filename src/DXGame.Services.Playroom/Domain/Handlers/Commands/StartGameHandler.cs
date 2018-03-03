@@ -34,7 +34,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .Run(aggregate => 
             {
-                (aggregate as Models.Playroom).StartGame(command.Game);
+                (aggregate as Models.Playroom).NewGame(command.Game);
             })
             .OnSuccess(async aggregate => 
             {

@@ -37,7 +37,7 @@ namespace DXGame.Services.Playroom.Tests
 
             playroom.AddPlayer(Guid.NewGuid(), null);
             playroom.AddPlayer(Guid.NewGuid(), null);
-            playroom.StartGame(Guid.NewGuid());
+            playroom.NewGame(Guid.NewGuid());
 
             Assert.AreEqual(3, playroom.RecentlyAppliedEvents.Count());
             Assert.AreEqual(typeof(PlayerJoined), playroom.RecentlyAppliedEvents.First().GetType());

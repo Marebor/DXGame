@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace DXGame.Messages.Commands
+namespace DXGame.Common.Communication
 {
     public interface ICommandHandler<T> where T : ICommand 
     {

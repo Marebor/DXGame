@@ -3,13 +3,11 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore;
-using RawRabbit;
 using Moq;
-using DXGame.Common.Communication.RabbitMQ;
+using DXGame.Common.Communication;
+using DXGame.Common.Communication.Extensions;
 using DXGame.Messages.Commands.Playroom;
 using System.Threading.Tasks;
-using DXGame.Messages.Commands;
-using RawRabbit.Pipe;
 using System.Threading;
 
 namespace DXGame.Common.Tests
@@ -26,16 +24,12 @@ namespace DXGame.Common.Tests
         public void RabbitMQExtensions()
         {
             var webHost = BuildWebHost(new string[] {} );
-            var busClient = new Mock<IBusClient>();
+            var bus = new Mock<IMessageBus>();
 
-            busClient.Object.AddSubscriptionsForMessageHandlers(webHost.Services);
+            bus.Object.AddAssemblySubscribtions(webHost.Services);
 
-            busClient.Verify(bus 
-                => bus.SubscribeAsync(
-                        It.IsAny<Func<StartGame, Task>>(), 
-                        It.IsAny<Action<IPipeContext>>(),
-                        default(CancellationToken)
-                    )
+            bus.Verify(b 
+                => b.SubscribeAsync(It.IsAny<Func<StartGame, Task>>())
             );
         }
     }

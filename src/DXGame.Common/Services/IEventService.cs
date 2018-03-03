@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DXGame.Messages.Events;
+using DXGame.Common.Communication;
 
 namespace DXGame.Common.Services
 {

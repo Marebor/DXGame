@@ -1,4 +1,5 @@
 using System;
+using DXGame.Common.Communication;
 
 namespace DXGame.Common.Persistence
 {
@@ -7,9 +8,9 @@ namespace DXGame.Common.Persistence
         public Guid AggregateId { get; }
         public string Type { get; }
         public DateTime ExecutionTime { get; }
-        public string Content { get; }
+        public IEvent Content { get; }
 
-        public EventEntity(Guid aggregateId, string type, DateTime executionTime, string content)
+        public EventEntity(Guid aggregateId, string type, DateTime executionTime, IEvent content)
         {
             this.AggregateId = aggregateId;
             this.Type = type;

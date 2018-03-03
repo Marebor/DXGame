@@ -2,8 +2,10 @@ using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using RawRabbit;
 using DXGame.Common.Communication.RabbitMQ;
+using DXGame.Common.Communication;
+using DXGame.Common.Communication.Extensions;
+using System.Reflection;
 
 namespace DXGame.Common.Hosting
 {
@@ -40,7 +42,7 @@ namespace DXGame.Common.Hosting
         public class HostBuilder : BuilderBase
         {
             private readonly IWebHost _webHost;
-            private IBusClient _bus;
+            private IMessageBus _bus;
 
             public HostBuilder(IWebHost webHost)
             {
@@ -49,7 +51,7 @@ namespace DXGame.Common.Hosting
 
             public BusBuilder UseRabbitMq()
             {
-                _bus = (IBusClient)_webHost.Services.GetService(typeof(IBusClient));
+                _bus = (IMessageBus)_webHost.Services.GetService(typeof(IMessageBus));
 
                 return new BusBuilder(_webHost, _bus);
             }
@@ -63,17 +65,17 @@ namespace DXGame.Common.Hosting
         public class BusBuilder : BuilderBase
         {
             private readonly IWebHost _webHost;
-            private IBusClient _bus; 
+            private IMessageBus _bus; 
 
-            public BusBuilder(IWebHost webHost, IBusClient bus)
+            public BusBuilder(IWebHost webHost, IMessageBus bus)
             {
                 _webHost = webHost;
                 _bus = bus;
             }
 
-            public BusBuilder SubscribeToMessages() 
+            public BusBuilder AddAssemblySubscriptions() 
             {
-                _bus.AddSubscriptionsForMessageHandlers(_webHost.Services);
+                _bus.AddAssemblySubscribtions(_webHost.Services, Assembly.GetCallingAssembly());
 
                 return this;
             }

@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DXGame.Common.Communication;
 using DXGame.Common.Exceptions;
-using DXGame.Messages.Events;
-using DXGame.Messages.Events.Playroom;
 using DXGame.Common.Models;
+using DXGame.Messages.Events.Playroom;
 
 namespace DXGame.Services.Playroom.Domain.Models
 {

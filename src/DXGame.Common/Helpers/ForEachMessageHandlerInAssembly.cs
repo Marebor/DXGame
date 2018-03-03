@@ -2,8 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Autofac;
-using DXGame.Messages.Commands;
-using DXGame.Messages.Events;
+using DXGame.Common.Communication;
 
 namespace DXGame.Common.Helpers
 {

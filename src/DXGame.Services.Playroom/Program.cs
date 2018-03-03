@@ -17,7 +17,7 @@ namespace DXGame.Services.Playroom
         {
             ServiceHost.Create<Startup>(args)
                 .UseRabbitMq()
-                .SubscribeToMessages()
+                .AddAssemblySubscriptions()
                 .Build()
                 .Run();
         }

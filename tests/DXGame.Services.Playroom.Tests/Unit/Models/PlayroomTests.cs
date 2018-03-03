@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Common.Models;
-using DXGame.Messages.Events;
 using DXGame.Messages.Events.Playroom;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

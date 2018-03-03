@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace DXGame.Messages.Events
+namespace DXGame.Common.Communication
 {
     public interface IEventHandler<T> where T : IEvent
     {

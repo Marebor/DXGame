@@ -1,4 +1,5 @@
 using System;
+using DXGame.Common.Communication;
 
 namespace DXGame.Messages.Commands.Playroom
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DXGame.Messages.Commands;
+using DXGame.Common.Communication;
 using DXGame.Messages.Commands.Playroom;
 using DXGame.Services.Playroom.Domain.Handlers.Commands;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RawRabbit.Configuration;
 
 namespace DXGame.Common.Tests
 {

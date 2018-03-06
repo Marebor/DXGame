@@ -48,7 +48,7 @@ namespace DXGame.Services.Playroom.Domain.Models
         public static Playroom Create(Guid id, string name, bool isPrivate, Guid ownerId, string password) 
         {
             var playroom = new Playroom();
-            playroom.ApplyEvent(new PlayroomCreated(id, name, isPrivate, ownerId, password) as IEvent);
+            playroom.ApplyEvent(new PlayroomCreated(id, name, isPrivate, ownerId, password, playroom.Version) as IEvent);
 
             return playroom;
         }
@@ -60,7 +60,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (_players.Any(p => p == id))
                 throw new DXGameException("playroom_already_contains_specified_player");
                 
-            ApplyEvent(new PlayerJoined(this.Id, id) as IEvent);
+            ApplyEvent(new PlayerJoined(this.Id, id, Version) as IEvent);
         }
 
         public void RemovePlayer(Guid id, Guid requester) 
@@ -70,19 +70,19 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Any(p => p == id))
                 throw new DXGameException("playroom_does_not_contain_specified_player");
 
-            ApplyEvent(new PlayerLeft(this.Id, id) as IEvent);
+            ApplyEvent(new PlayerLeft(this.Id, id, Version) as IEvent);
         }
 
         public void NewGame(Guid id) 
         {
-            if (CompletedGames.Any(g => g.Id == id) || ActiveGame.Id == id)
+            if (CompletedGames.Any(g => g.Id == id) || ActiveGame?.Id == id)
                 throw new DXGameException("game_already_started");
-            if (ActiveGame.State != GameState.Finished)
+            if (ActiveGame != null && ActiveGame.State != GameState.Finished && ActiveGame.State != GameState.None)
                 throw new DXGameException("another_game_is_already_in_progress");
             if (_players.Count < 3)
                 throw new DXGameException("too_small_amount_of_players");
 
-            ApplyEvent(new GameStartRequested(this.Id, id, Players) as IEvent);
+            ApplyEvent(new GameStartRequested(this.Id, id, Version) as IEvent);
         }
 
         public void ChangePrivacy(Guid requester, string password, bool @private)
@@ -92,7 +92,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (password != Password)
                 throw new DXGameException("invalid_password");
 
-            ApplyEvent(new PrivacyChanged(Id, @private) as IEvent);
+            ApplyEvent(new PrivacyChanged(Id, @private, Version) as IEvent);
         }
 
         public void ChangePassword(string oldPassword, string newPassword, Guid requester) 
@@ -104,7 +104,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (newPassword == oldPassword)
                 throw new DXGameException("new_password_equal_to_current");
 
-            ApplyEvent(new PasswordChanged(this.Id, newPassword) as IEvent);
+            ApplyEvent(new PasswordChanged(this.Id, newPassword, Version) as IEvent);
         }
 
         public void ChangeOwner(Guid requester, string password, Guid newOwner)
@@ -116,7 +116,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Contains(newOwner))
                 throw new DXGameException("specified_player_is_not_a_member_of_playroom");
 
-            ApplyEvent(new OwnerChanged(Id, newOwner) as IEvent);
+            ApplyEvent(new OwnerChanged(Id, newOwner, Version) as IEvent);
         }
 
         public void Delete(Guid requester, string password)
@@ -126,7 +126,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (password != Password)
                 throw new DXGameException("invalid_password");
 
-            ApplyEvent(new PlayroomDeleted(Id) as IEvent);
+            ApplyEvent(new PlayroomDeleted(Id, Version) as IEvent);
         }
 #endregion Handling Commands
 
@@ -138,7 +138,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != id)
                 throw new DXGameException("another_game_is_requested_to_start");
 
-            ApplyEvent(new GameStarted(Id, id) as IEvent);
+            ApplyEvent(new GameStarted(Id, id, Version) as IEvent);
         }
 
         public void OnGameStartRequestRejected(Guid id)
@@ -148,7 +148,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != id)
                 throw new DXGameException("another_game_is_requested_to_start");
 
-            ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected") as IEvent);
+            ApplyEvent(new GameStartFailed(Id, id, "start_request_rejected", Version) as IEvent);
         }
 
         public void OnGameFinished(Guid id)
@@ -158,7 +158,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != id)
                 throw new DXGameException("another_game_is_currently_active");
 
-            ApplyEvent(new GameFinishReceived(Id, id) as IEvent);
+            ApplyEvent(new GameFinishReceived(Id, id, Version) as IEvent);
         }
 #endregion Handling External Events
 

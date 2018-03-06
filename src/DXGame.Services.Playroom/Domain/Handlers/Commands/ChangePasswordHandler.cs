@@ -44,11 +44,11 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .OnCustomError<DXGameException>(async ex =>
             {
-                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.ErrorCode));
+                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.ErrorCode, null));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.GetType().Name));
+                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.GetType().Name, null));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

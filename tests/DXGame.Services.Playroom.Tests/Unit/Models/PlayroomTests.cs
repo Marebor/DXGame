@@ -19,14 +19,15 @@ namespace DXGame.Services.Playroom.Tests
             var owner = Guid.NewGuid();
             var events = new List<IEvent> 
             {
-                new PlayroomCreated(playroomId, "Test", false, owner, null),
-                new PlayerJoined(playroomId, Guid.NewGuid()),
+                new PlayroomCreated(playroomId, "Test", false, owner, null, 0),
+                new PlayerJoined(playroomId, Guid.NewGuid(), 1),
             };
             var playroom = Aggregate.Builder.Build<Domain.Models.Playroom>(events);
 
             Assert.AreEqual(playroomId, playroom.Id);
             Assert.AreEqual(2, playroom.Players.Count());
             Assert.AreEqual(0, playroom.RecentlyAppliedEvents.Count());
+            Assert.AreEqual(2, playroom.Version);
         }
 
         [TestMethod]

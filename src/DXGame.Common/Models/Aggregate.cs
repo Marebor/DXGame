@@ -12,6 +12,8 @@ namespace DXGame.Common.Models
 
         public bool IsDeleted { get; protected set; }
 
+        public int Version { get; protected set; }
+
         private ISet<IEvent> _recentlyAppliedEvents = new HashSet<IEvent>();
         public IEnumerable<IEvent> RecentlyAppliedEvents 
         { 
@@ -46,6 +48,7 @@ namespace DXGame.Common.Models
             }
             _eventAppliers[type](e);
             _recentlyAppliedEvents.Add(e);
+            Version++;
         }
 
         public static class Builder

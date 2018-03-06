@@ -44,11 +44,11 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
             })
             .OnCustomError<DXGameException>(async ex =>
             {
-                await _eventService.PublishEventsAsync(new GameFinishFailed(@event.Playroom, @event.Game, ex.ErrorCode));
+                await _eventService.PublishEventsAsync(new GameFinishFailed(@event.Playroom, @event.Game, ex.ErrorCode, null));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEventsAsync(new GameFinishFailed(@event.Playroom, @event.Game, ex.GetType().Name));
+                await _eventService.PublishEventsAsync(new GameFinishFailed(@event.Playroom, @event.Game, ex.GetType().Name, null));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

@@ -9,12 +9,13 @@ namespace DXGame.Messages.Events.Playroom
         public Guid Playroom { get; }
         public Guid Game { get; }
         public IEnumerable<Guid> Players { get; }
+        public int? AppliedOnAggregateVersion { get; }
 
-        public GameStartRequested(Guid playroom, Guid game, IEnumerable<Guid> players) 
+        public GameStartRequested(Guid playroom, Guid game, int? appliedOnAggregateVersion)
         {
             this.Playroom = playroom;
             this.Game = game;
-            this.Players = players;
+            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
         }
     }
 }

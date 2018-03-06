@@ -27,6 +27,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B0990322
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Services.Playroom.Tests", "tests\DXGame.Services.Playroom.Tests\DXGame.Services.Playroom.Tests.csproj", "{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B5BD2FCF-BBB5-4E76-8628-405D8FBED5C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DXGame.Api", "src\DXGame.Api\DXGame.Api.csproj", "{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -172,8 +176,21 @@ Global
 		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x64.Build.0 = Release|x64
 		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x86.ActiveCfg = Release|x86
 		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A}.Release|x86.Build.0 = Release|x86
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|x64.ActiveCfg = Debug|x64
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|x64.Build.0 = Debug|x64
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|x86.ActiveCfg = Debug|x86
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Debug|x86.Build.0 = Debug|x86
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|x64.ActiveCfg = Release|x64
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|x64.Build.0 = Release|x64
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|x86.ActiveCfg = Release|x86
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{88B899CC-D6A6-4D00-86D7-A6F637ACDC5A} = {B0990322-7260-432E-9183-E52EA27E2280}
+		{2893AAFD-4B8E-4DE5-8E5B-E25CD24712CB} = {B5BD2FCF-BBB5-4E76-8628-405D8FBED5C7}
 	EndGlobalSection
 EndGlobal

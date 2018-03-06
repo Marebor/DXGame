@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Common.Communication;
+using DXGame.Common.Exceptions;
 using DXGame.Common.Helpers;
 using DXGame.Common.Services;
 using MongoDB.Driver;
@@ -29,22 +30,47 @@ namespace DXGame.Common.Persistence.MongoDB
                 .Select(e => e.Content)
                 .ToListAsync();
 
-        public async Task<IEnumerable<IEvent>> GetAggregateEventsRangeAsync(Guid aggregateId, DateTime since, DateTime to)
+        public async Task<IEnumerable<IEvent>> GetAggregateEventsTimeRangeAsync(Guid aggregateId, DateTime since, DateTime to)
             => await Events
                 .AsQueryable()
                 .Where(e => e.AggregateId == aggregateId)
                 .Where(e => e.ExecutionTime >= since)
                 .Where(e => e.ExecutionTime <= to)
-                .OrderBy(e => e.ExecutionTime)
+                .OrderBy(e => e.AppliedOnAggregateVersion)
+                .Select(e => e.Content)
+                .ToListAsync();
+
+        public async Task<IEnumerable<IEvent>> GetAggregateEventsVersionRangeAsync(Guid aggregateId, int since, int to)
+            => await Events
+                .AsQueryable()
+                .Where(e => e.AggregateId == aggregateId)
+                .Where(e => e.AppliedOnAggregateVersion >= since)
+                .Where(e => e.AppliedOnAggregateVersion < to)
+                .OrderBy(e => e.AppliedOnAggregateVersion)
                 .Select(e => e.Content)
                 .ToListAsync();
 
         public async Task SaveEventsAsync(Guid aggregateId, IEnumerable<IEvent> events)
-            => await Events
+        {
+            await VerifyAggregateVersionAsync(aggregateId, (int)events.First().AppliedOnAggregateVersion);
+            await Events
                 .InsertManyAsync(
                     events.Select(e => 
-                        new EventEntity(aggregateId, e.GetType().ToString(), DateTime.UtcNow, e)
+                        new EventEntity(aggregateId, DateTime.UtcNow, e)
                     )
                 );
+        }
+
+        public async Task VerifyAggregateVersionAsync(Guid aggregateId, int version)
+        {
+            var currentVersion = await Events
+                .AsQueryable()
+                .Where(e => e.AggregateId == aggregateId)
+                .Select(e => e.AppliedOnAggregateVersion)
+                .MaxAsync();
+            
+            if (currentVersion != version)
+                throw new DXGameException("incorrect_aggregate_version_detected");
+        }
     }
 }

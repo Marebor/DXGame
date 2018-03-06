@@ -7,11 +7,13 @@ namespace DXGame.Messages.Events.Game
     {
         public Guid Playroom { get; }
         public Guid Game { get; }
+        public int? AppliedOnAggregateVersion { get; }
 
-        public GameStartRequestRejected(Guid playroom, Guid game)
+        public GameStartRequestRejected(Guid playroom, Guid game, int? appliedOnAggregateVersion)
         {
             this.Playroom = playroom;
             this.Game = game;
+            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
         }
     }
 }

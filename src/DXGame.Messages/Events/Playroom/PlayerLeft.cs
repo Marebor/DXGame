@@ -7,11 +7,13 @@ namespace DXGame.Messages.Events.Playroom
     {
         public Guid Playroom { get; }
         public Guid Player { get; }
+        public int? AppliedOnAggregateVersion { get; }
 
-        public PlayerLeft(Guid playroom, Guid player) 
+        public PlayerLeft(Guid playroom, Guid player, int? appliedOnAggregateVersion)
         {
             this.Playroom = playroom;
             this.Player = player;
+            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
         }
     }
 }

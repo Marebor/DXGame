@@ -112,7 +112,7 @@ namespace DXGame.Common.Hosting
 
             public CommonSubscribtionBuilder SubscribeToAllDXGameEvents()
             {
-                var messagesAssembly = Assembly.Load(nameof(DXGame.Messages));            
+                var messagesAssembly = typeof(IEvent).Assembly;           
                     
                 var events = messagesAssembly
                     .GetTypes()

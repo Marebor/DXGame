@@ -9,6 +9,8 @@ using DXGame.Common.Communication.Extensions;
 using DXGame.Messages.Commands.Playroom;
 using System.Threading.Tasks;
 using System.Threading;
+using DXGame.Messages.Abstract;
+using DXGame.Common.Hosting;
 
 namespace DXGame.Common.Tests
 {
@@ -31,6 +33,19 @@ namespace DXGame.Common.Tests
             bus.Verify(b 
                 => b.SubscribeAsync(It.IsAny<Func<StartGame, Task>>())
             );
+        }
+
+        [TestMethod]
+        public void Test()
+        {
+            var webHost = new Mock<IWebHost>();
+            var bus = new Mock<IMessageBus>();
+            var eventSubscriber = new Mock<IEventSubscriber>();
+            var builder = new ServiceHost.CommonSubscribtionBuilder(webHost.Object, bus.Object, eventSubscriber.Object);
+
+            builder.SubscribeToAllDXGameEvents();
+
+            eventSubscriber.Verify(es => es.OnEventReceived, Times.AtLeast(20));
         }
     }
 

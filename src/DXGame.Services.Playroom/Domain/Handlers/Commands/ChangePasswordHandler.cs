@@ -34,7 +34,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .Run(aggregate =>
             {
-                (aggregate as Models.Playroom).ChangePassword(command.OldPassword, command.NewPassword, command.Requester);
+                (aggregate as Models.Playroom).ChangePassword(command);
             })
             .OnSuccess(async aggregate =>
             {
@@ -44,11 +44,11 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .OnCustomError<DXGameException>(async ex =>
             {
-                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.ErrorCode, null));
+                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.ErrorCode, command.CommandId));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.GetType().Name, null));
+                await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.GetType().Name, command.CommandId));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

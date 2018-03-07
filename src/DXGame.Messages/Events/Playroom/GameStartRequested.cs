@@ -4,18 +4,18 @@ using DXGame.Messages.Abstract;
 
 namespace DXGame.Messages.Events.Playroom
 {
-    public class GameStartRequested : IEvent
+    public class GameStartRequested : ICommandRelatedEvent
     {
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public IEnumerable<Guid> Players { get; }
-        public int? AppliedOnAggregateVersion { get; }
-
-        public GameStartRequested(Guid playroom, Guid game, int? appliedOnAggregateVersion)
+        public GameStartRequested(Guid playroom, Guid game, Guid relatedCommand)
         {
             this.Playroom = playroom;
             this.Game = game;
-            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
+            this.RelatedCommand = relatedCommand;
+
         }
+        public Guid Playroom { get; }
+        public Guid Game { get; }
+        public IEnumerable<Guid> Players { get; }
+        public Guid RelatedCommand { get; }
     }
 }

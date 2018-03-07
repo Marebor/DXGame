@@ -3,17 +3,17 @@ using DXGame.Messages.Abstract;
 
 namespace DXGame.Messages.Events.Playroom
 {
-    public class PlayroomDeletionFailed : IEvent
+    public class PlayroomDeletionFailed : ICommandRelatedEvent
     {
-        public Guid PlayroomId { get; }
-        public string ReasonCode { get; }
-        public int? AppliedOnAggregateVersion { get; }
-
-        public PlayroomDeletionFailed(Guid playroomId, string reasonCode, int? appliedOnAggregateVersion)
+        public PlayroomDeletionFailed(Guid playroomId, string reasonCode, Guid relatedCommand)
         {
             this.PlayroomId = playroomId;
             this.ReasonCode = reasonCode;
-            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
+            this.RelatedCommand = relatedCommand;
+
         }
+        public Guid PlayroomId { get; }
+        public string ReasonCode { get; }
+        public Guid RelatedCommand { get; }
     }
 }

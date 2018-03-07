@@ -34,7 +34,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .Run(aggregate => 
             {
-                (aggregate as Models.Playroom).NewGame(command.Game);
+                (aggregate as Models.Playroom).NewGame(command);
             })
             .OnSuccess(async aggregate => 
             {
@@ -44,11 +44,11 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             })
             .OnCustomError<DXGameException>(async ex => 
             {
-                await _eventService.PublishEventsAsync(new GameStartFailed(command.Playroom, command.Game, ex.ErrorCode, null));
+                await _eventService.PublishEventsAsync(new GameStartFailed(command.Playroom, command.Game, ex.ErrorCode, command.CommandId));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEventsAsync(new GameStartFailed(command.Playroom, command.Game, ex.GetType().Name, null));
+                await _eventService.PublishEventsAsync(new GameStartFailed(command.Playroom, command.Game, ex.GetType().Name, command.CommandId));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

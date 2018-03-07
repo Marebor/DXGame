@@ -3,19 +3,19 @@ using DXGame.Messages.Abstract;
 
 namespace DXGame.Messages.Events.Playroom
 {
-    public class GameStartFailed : IEvent
+    public class GameStartFailed : ICommandRelatedEvent
     {
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public string ReasonCode { get; }
-        public int? AppliedOnAggregateVersion { get; }
-
-        public GameStartFailed(Guid playroom, Guid game, string reasonCode, int? appliedOnAggregateVersion)
+        public GameStartFailed(Guid playroom, Guid game, string reasonCode, Guid relatedCommand)
         {
             this.Playroom = playroom;
             this.Game = game;
             this.ReasonCode = reasonCode;
-            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
+            this.RelatedCommand = relatedCommand;
+
         }
+        public Guid Playroom { get; }
+        public Guid Game { get; }
+        public string ReasonCode { get; }
+        public Guid RelatedCommand { get; }
     }
 }

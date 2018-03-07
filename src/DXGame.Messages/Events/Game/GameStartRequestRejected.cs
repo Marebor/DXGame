@@ -3,17 +3,17 @@ using DXGame.Messages.Abstract;
 
 namespace DXGame.Messages.Events.Game
 {
-    public class GameStartRequestRejected : IEvent
+    public class GameStartRequestRejected : ICommandRelatedEvent
     {
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public int? AppliedOnAggregateVersion { get; }
-
-        public GameStartRequestRejected(Guid playroom, Guid game, int? appliedOnAggregateVersion)
+        public GameStartRequestRejected(Guid playroom, Guid game, Guid relatedCommand)
         {
             this.Playroom = playroom;
             this.Game = game;
-            this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
+            this.RelatedCommand = relatedCommand;
+
         }
+        public Guid Playroom { get; }
+        public Guid Game { get; }
+        public Guid RelatedCommand { get; }
     }
 }

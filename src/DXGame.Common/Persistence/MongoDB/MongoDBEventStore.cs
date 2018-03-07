@@ -52,7 +52,10 @@ namespace DXGame.Common.Persistence.MongoDB
 
         public async Task SaveEventsAsync(Guid aggregateId, IEnumerable<IEvent> events)
         {
-            await VerifyAggregateVersionAsync(aggregateId, (int)events.First().AppliedOnAggregateVersion);
+            var versionedEvent = events.FirstOrDefault(e => e is IAggregateAppliedEvent);
+            if (versionedEvent != null)
+                await VerifyAggregateVersionAsync(aggregateId, 
+                    (versionedEvent as IAggregateAppliedEvent).AppliedOnAggregateVersion);
             await Events
                 .InsertManyAsync(
                     events.Select(e => 

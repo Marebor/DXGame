@@ -14,8 +14,8 @@ namespace DXGame.Common.Persistence
         public EventEntity(Guid aggregateId, DateTime executionTime, IEvent content)
         {
             this.AggregateId = aggregateId;
-            this.AppliedOnAggregateVersion = content.AppliedOnAggregateVersion != null ? 
-                (int)content.AppliedOnAggregateVersion : -1;
+            this.AppliedOnAggregateVersion = content is IAggregateAppliedEvent ? 
+                (content as IAggregateAppliedEvent).AppliedOnAggregateVersion : -1;
             this.Type = content.GetType().ToString();
             this.ExecutionTime = executionTime;
             this.Content = content;

@@ -5,6 +5,6 @@ namespace DXGame.Api.Models
 {
     public interface IBroadcaster
     {
-        Task BroadcastAsync(IEvent e);
+        Task BroadcastAsync<T>(object data) where T : IEvent;
     }
 }

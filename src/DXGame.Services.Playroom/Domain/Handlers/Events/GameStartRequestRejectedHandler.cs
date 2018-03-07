@@ -20,10 +20,10 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
             _eventService = eventService;
             _handler = handler;
         }
-        public async Task HandleAsync(GameStartRequestRejected @event) => await _handler
+        public async Task HandleAsync(GameStartRequestRejected e) => await _handler
             .LoadAggregate(async () =>
             {
-                var playroomEvents = await _eventService.GetAggregateEventsAsync(@event.Playroom);
+                var playroomEvents = await _eventService.GetAggregateEventsAsync(e.Playroom);
                 return Aggregate.Builder.Build<Models.Playroom>(playroomEvents);
             })
             .Validate(aggregate =>
@@ -33,7 +33,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
             })
             .Run(aggregate =>
             {
-                (aggregate as Models.Playroom).OnGameStartRequestRejected(@event.Game);
+                (aggregate as Models.Playroom).OnGameStartRequestRejected(e.Game);
             })
             .OnSuccess(async aggregate =>
             {
@@ -43,11 +43,11 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
             })
             .OnCustomError<DXGameException>(async ex =>
             {
-                await _eventService.PublishEventsAsync(new GameStartFailed(@event.Playroom, @event.Game, ex.ErrorCode, null));
+                await _eventService.PublishEventsAsync(new GameStartFailed(e.Playroom, e.Game, ex.ErrorCode, null));
             })
             .OnError(async ex => 
             {
-                await _eventService.PublishEventsAsync(new GameStartFailed(@event.Playroom, @event.Game, ex.GetType().Name, null));
+                await _eventService.PublishEventsAsync(new GameStartFailed(e.Playroom, e.Game, ex.GetType().Name, null));
             })
             .DoNotPropagateException()
             .ExecuteAsync();

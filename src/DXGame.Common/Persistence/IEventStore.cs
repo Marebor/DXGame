@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DXGame.Common.Communication;
+using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Persistence
 {

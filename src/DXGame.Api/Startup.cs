@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DXGame.Api.Models;
+using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,6 +28,7 @@ namespace DXGame.Api
         {
             services.AddMvc();
             services.AddRabbitMQ(Configuration);
+            services.AddScoped<IEventSubscriber, EventSubscriber>(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

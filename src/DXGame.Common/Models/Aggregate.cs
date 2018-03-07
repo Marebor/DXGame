@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DXGame.Common.Exceptions;
-using DXGame.Common.Communication;
+using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Models
 {

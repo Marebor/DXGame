@@ -17,4 +17,8 @@
     <PackageReference Include="RawRabbit.Operations.Subscribe" Version="2.0.0-beta8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DXGame.Messages\DXGame.Messages.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,4 @@
-using DXGame.Common.Communication;
+using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Models
 {

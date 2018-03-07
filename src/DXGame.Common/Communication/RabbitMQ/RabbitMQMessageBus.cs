@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DXGame.Messages.Abstract;
 using RawRabbit;
 using RawRabbit.Pipe;
 

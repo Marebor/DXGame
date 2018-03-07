@@ -1,4 +1,4 @@
-namespace DXGame.Common.Communication
+namespace DXGame.Messages.Abstract
 {
     public interface IMessage
     {

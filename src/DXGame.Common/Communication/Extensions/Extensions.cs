@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using DXGame.Common.Helpers;
+using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Communication.Extensions
 {
@@ -17,7 +18,7 @@ namespace DXGame.Common.Communication.Extensions
                     var handler = serviceProvider.GetService(handlerInterface);
                     bus.SubscribeToMessage(messageType, handler);
                 },
-                assembly != null ? assembly : Assembly.GetCallingAssembly()
+                assembly ?? Assembly.GetCallingAssembly()
             );
         }
 
@@ -32,7 +33,7 @@ namespace DXGame.Common.Communication.Extensions
             });
         }
 
-        static MethodInfo MessageBusSubscriptionMethod(Type genericType)
+        public static MethodInfo MessageBusSubscriptionMethod(Type genericType)
             => typeof(IMessageBus)
                 .GetMethod(nameof(IMessageBus.SubscribeAsync))
                 .MakeGenericMethod(genericType);

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DXGame.Common.Communication;
+using DXGame.Messages.Abstract;
 
 namespace DXGame.Messages.Events.Playroom
 {

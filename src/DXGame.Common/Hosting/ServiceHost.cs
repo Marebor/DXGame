@@ -2,10 +2,14 @@ using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using DXGame.Common.Communication.RabbitMQ;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.Extensions;
+using DXGame.Common.Communication.RabbitMQ;
 using System.Reflection;
+using DXGame.Messages.Abstract;
+using System.Threading.Tasks;
+using System.Linq;
+using Autofac;
 
 namespace DXGame.Common.Hosting
 {
@@ -76,6 +80,49 @@ namespace DXGame.Common.Hosting
             public BusBuilder AddAssemblySubscriptions() 
             {
                 _bus.AddAssemblySubscribtions(_webHost.Services, Assembly.GetCallingAssembly());
+
+                return this;
+            }
+
+            public CommonSubscribtionBuilder UseCommonEventSubscriber()
+            {
+                var subscriber = _webHost.Services.GetService(typeof(IEventSubscriber)) as IEventSubscriber;
+
+                return new CommonSubscribtionBuilder(_webHost, _bus, subscriber);
+            }
+
+            public override ServiceHost Build()
+            {
+                return new ServiceHost(_webHost);
+            }
+        }
+
+        public class CommonSubscribtionBuilder : BuilderBase
+        {
+            IWebHost _webHost;
+            IMessageBus _bus;
+            IEventSubscriber _subscriber;
+
+            public CommonSubscribtionBuilder(IWebHost webHost, IMessageBus bus, IEventSubscriber subscriber)
+            {
+                _webHost = webHost;
+                _bus = bus;
+                _subscriber = subscriber;
+            }
+
+            public CommonSubscribtionBuilder SubscribeToAllDXGameEvents()
+            {
+                var messagesAssembly = Assembly.Load(nameof(DXGame.Messages));            
+                    
+                var events = messagesAssembly
+                    .GetTypes()
+                    .Where(t => t.IsAssignableTo<IEvent>());
+
+                foreach (var e in events)
+                {
+                    DXGame.Common.Communication.Extensions.Extensions
+                        .MessageBusSubscriptionMethod(e).Invoke(_bus, new object[] { _subscriber.OnEventReceived });
+                }
 
                 return this;
             }

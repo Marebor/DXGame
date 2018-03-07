@@ -17,6 +17,8 @@ namespace DXGame.Api
         {
             ServiceHost.Create<Startup>(args)
                 .UseMessageBus()
+                .UseCommonEventSubscriber()
+                .SubscribeToAllDXGameEvents()
                 .Build()
                 .Run();
         }

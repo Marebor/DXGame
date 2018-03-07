@@ -8,8 +8,11 @@ namespace DXGame.Common.Helpers
 {
     public static class ForEachMessageHandlerInAssembly
     {
-        public static void Execute(Action<Type, Type, Type> action, Assembly assembly)
+        public static void Execute(Action<Type, Type, Type> action, Assembly assembly = null)
         {
+            if (assembly == null)
+                assembly = Assembly.GetCallingAssembly();
+                
             var handlers = assembly
                 .GetTypes()
                 .Where(t => t

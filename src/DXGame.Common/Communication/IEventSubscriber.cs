@@ -1,10 +1,11 @@
+using System;
 using System.Threading.Tasks;
 using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Communication
 {
-    public interface ICommandHandler<T> where T : ICommand 
+    public interface IEventSubscriber
     {
-        Task HandleAsync(T command); 
+        Func<IEvent, Task> OnEventReceived { get; }
     }
 }

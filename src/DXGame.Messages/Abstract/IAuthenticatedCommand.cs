@@ -1,7 +1,6 @@
 using System;
-using DXGame.Messages.Abstract;
 
-namespace DXGame.Common.Communication
+namespace DXGame.Messages.Abstract
 {
     public interface IAuthenticatedCommand : ICommand
     {

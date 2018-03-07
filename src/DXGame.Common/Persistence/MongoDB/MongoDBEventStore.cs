@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DXGame.Common.Communication;
 using DXGame.Common.Exceptions;
 using DXGame.Common.Helpers;
 using DXGame.Common.Services;
+using DXGame.Messages.Abstract;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 

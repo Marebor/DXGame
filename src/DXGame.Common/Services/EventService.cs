@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DXGame.Common.Persistence;
 using DXGame.Common.Communication;
+using DXGame.Common.Persistence;
+using DXGame.Messages.Abstract;
 using RawRabbit;
 
 namespace DXGame.Common.Services

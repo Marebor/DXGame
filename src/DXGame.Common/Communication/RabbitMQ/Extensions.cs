@@ -28,6 +28,7 @@ namespace DXGame.Common.Communication.RabbitMQ
                 ClientConfiguration = settings
             });
             services.AddSingleton<IBusClient>(_ => client);
+            services.AddScoped<IMessageBus, RabbitMQMessageBus>();
         }
     }
 }

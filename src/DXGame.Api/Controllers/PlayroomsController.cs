@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DXGame.Api.Models;
+using DXGame.Common.Communication;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DXGame.Api.Controllers
@@ -9,6 +11,15 @@ namespace DXGame.Api.Controllers
     [Route("api/[controller]")]
     public class PlayroomsController : Controller
     {
+        ICache _cache;
+        IMessageBus _messageBus;
+
+        public PlayroomsController(ICache cache, IMessageBus messageBus)
+        {
+            _cache = cache;
+            _messageBus = messageBus;
+        }
+        
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()

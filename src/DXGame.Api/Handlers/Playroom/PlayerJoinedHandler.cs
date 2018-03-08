@@ -20,7 +20,7 @@ namespace DXGame.Api.Handlers.Playroom
             _handler = handler;
         }
         public async Task HandleAsync(PlayerJoined e) => await _handler
-            .LoadAggregate(async() =>
+            .LoadAggregate(async () =>
             {
                 return await _cache.GetAsync<PlayroomDto>(e.Playroom);
             })
@@ -31,8 +31,8 @@ namespace DXGame.Api.Handlers.Playroom
             .OnSuccess(async playroom =>
             {
                 await _cache.SetAsync(playroom.Id, playroom);
-                await _broadcaster.BroadcastAsync<GameFinishReceived>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<GameFinishReceived>(e.Playroom, e);
+                await _broadcaster.BroadcastAsync<PlayerJoined>(e.RelatedCommand, e);
+                await _broadcaster.BroadcastAsync<PlayerJoined>(e.Playroom, e);
             })
             .OnError(async ex => 
             {

@@ -21,7 +21,7 @@ namespace DXGame.Api.Handlers.Playroom
             _handler = handler;
         }
         public async Task HandleAsync(GameFinishReceived e) => await _handler
-            .LoadAggregate(async() =>
+            .LoadAggregate(async () =>
             {
                 return await _cache.GetAsync<PlayroomDto>(e.Playroom);
             })

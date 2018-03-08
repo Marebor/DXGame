@@ -27,20 +27,20 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
                 var playroomEvents = await _eventService.GetAggregateEventsAsync(e.Playroom);
                 return Aggregate.Builder.Build<Models.Playroom>(playroomEvents);
             })
-            .Validate(aggregate =>
+            .Validate(playroom =>
             {
-                if (aggregate == null || aggregate.IsDeleted)
-                    throw new DXGameException("aggregate_with_specified_id_does_not_exist");
+                if (playroom == null || playroom.IsDeleted)
+                    throw new DXGameException("playroom_with_specified_id_does_not_exist");
             })
-            .Run(aggregate =>
+            .Run(playroom =>
             {
-                (aggregate as Models.Playroom).OnGameFinished(e);
+                playroom.OnGameFinished(e);
             })
-            .OnSuccess(async aggregate =>
+            .OnSuccess(async playroom =>
             {
-                await _eventService.StoreEventsAsync(aggregate.Id, aggregate.RecentlyAppliedEvents.ToArray());
-                await _eventService.PublishEventsAsync(aggregate.RecentlyAppliedEvents.ToArray());
-                aggregate.MarkRecentlyAppliedEventsAsConfirmed();
+                await _eventService.StoreEventsAsync(playroom.Id, playroom.RecentlyAppliedEvents.ToArray());
+                await _eventService.PublishEventsAsync(playroom.RecentlyAppliedEvents.ToArray());
+                playroom.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex =>
             {

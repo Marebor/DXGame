@@ -9,7 +9,7 @@ namespace DXGame.Common.Helpers
 {
     public class Handler : IHandler
     {
-        private ISet<HandlerTask> _tasks = new HashSet<HandlerTask>();
+        private ISet<HandlerTask<object>> _tasks = new HashSet<HandlerTask<object>>();
 
         public async Task ExecuteAsync()
         {
@@ -21,10 +21,10 @@ namespace DXGame.Common.Helpers
             _tasks.Clear();
         }
 
-        public IHandlerTask LoadAggregate(Func<Task<Aggregate>> func)
+        public IHandlerTask<T> LoadAggregate<T>(Func<Task<T>> func)
         {
-            var task = new HandlerTask(this, func);
-            _tasks.Add(task);
+            var task = new HandlerTask<T>(this, func);
+            _tasks.Add(task as HandlerTask<object>);
 
             return task;
         }

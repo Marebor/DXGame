@@ -7,35 +7,33 @@ using DXGame.Messages.Events.Playroom;
 
 namespace DXGame.Api.Handlers.Playroom
 {
-    public class PlayroomCreatedHandler : IEventHandler<PlayroomCreated>
+    public class GameStartedHandler : IEventHandler<GameStarted>
     {
         IBroadcaster _broadcaster;
         ICache _cache;
         IHandler _handler;
-        IMapper _mapper;
 
-        public PlayroomCreatedHandler(IBroadcaster broadcaster, ICache cache, IHandler handler, IMapper mapper)
+        public GameStartedHandler(IBroadcaster broadcaster, ICache cache, IHandler handler)
         {
             _broadcaster = broadcaster;
             _cache = cache;
             _handler = handler;
-            _mapper = mapper;
         }
-        
-        public async Task HandleAsync(PlayroomCreated e) => await _handler
+
+        public async Task HandleAsync(GameStarted e) => await _handler
             .LoadAggregate(async() =>
             {
-                return await Task.FromResult(_mapper.Map<PlayroomDto>(e));
+                return await _cache.GetAsync<PlayroomDto>(e.Playroom);
             })
             .Run(playroom => 
             {
-
+                playroom.ActiveGame = e.Game;
             })
             .OnSuccess(async playroom =>
             {
                 await _cache.SetAsync(playroom.Id, playroom);
                 await _broadcaster.BroadcastAsync<GameFinishReceived>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<GameFinishReceived>(null, e);
+                await _broadcaster.BroadcastAsync<GameFinishReceived>(e.Playroom, e);
             })
             .OnError(async ex => 
             {

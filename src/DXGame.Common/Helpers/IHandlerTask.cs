@@ -7,17 +7,17 @@ using DXGame.Common.Models;
 
 namespace DXGame.Common.Helpers
 {
-    public interface IHandlerTask
+    public interface IHandlerTask<T>
     {
         Task ExecuteAsync();
-        IHandlerTask Validate(Action<Aggregate> func);
-        IHandlerTask Run(Action<Aggregate> func);
-        IHandlerTask OnSuccess(Func<Aggregate, Task> func);
-        IHandlerTask OnError(Func<Exception, Task> func, bool executeAlsoWithCustomError = true);
-        IHandlerTask OnCustomError<T>(Func<T, Task> func) where T : Exception;
-        IHandlerTask PropagateException();
-        IHandlerTask DoNotPropagateException();
-        IHandlerTask Finally(Func<Task> func);
+        IHandlerTask<T> Validate(Action<T> func);
+        IHandlerTask<T> Run(Action<T> func);
+        IHandlerTask<T> OnSuccess(Func<T, Task> func);
+        IHandlerTask<T> OnError(Func<Exception, Task> func, bool executeAlsoWithCustomError = true);
+        IHandlerTask<T> OnCustomError<TError>(Func<TError, Task> func) where TError : Exception;
+        IHandlerTask<T> PropagateException();
+        IHandlerTask<T> DoNotPropagateException();
+        IHandlerTask<T> Finally(Func<Task> func);
         IHandler Then();
     }
 }

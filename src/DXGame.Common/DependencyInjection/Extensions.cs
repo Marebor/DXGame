@@ -3,6 +3,7 @@ using System.Reflection;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
 using DXGame.Common.Helpers;
+using DXGame.Common.Models;
 using DXGame.Common.Persistence;
 using DXGame.Common.Persistence.MongoDB;
 using DXGame.Common.Services;

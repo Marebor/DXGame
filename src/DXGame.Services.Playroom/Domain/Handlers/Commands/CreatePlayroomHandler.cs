@@ -28,20 +28,20 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
                 var playroomEvents = await _eventService.GetAggregateEventsAsync(command.PlayroomId);
                 return Aggregate.Builder.Build<Models.Playroom>(playroomEvents);
             })
-            .Validate(aggregate =>
+            .Validate(playroom =>
             {
-                if (aggregate != null)
+                if (playroom != null)
                     throw new DXGameException("specified_id_already_in_use");
             })
-            .Run(aggregate => 
+            .Run(playroom => 
             {
-                aggregate = Models.Playroom.Create(command);
+                playroom = Models.Playroom.Create(command);
             })
-            .OnSuccess(async aggregate => 
+            .OnSuccess(async playroom => 
             {
-                await _eventService.StoreEventsAsync(aggregate.Id, aggregate.RecentlyAppliedEvents.ToArray());
-                await _eventService.PublishEventsAsync(aggregate.RecentlyAppliedEvents.ToArray());
-                aggregate.MarkRecentlyAppliedEventsAsConfirmed();
+                await _eventService.StoreEventsAsync(playroom.Id, playroom.RecentlyAppliedEvents.ToArray());
+                await _eventService.PublishEventsAsync(playroom.RecentlyAppliedEvents.ToArray());
+                playroom.MarkRecentlyAppliedEventsAsConfirmed();
             })
             .OnCustomError<DXGameException>(async ex => 
             {

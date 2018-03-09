@@ -36,7 +36,7 @@ namespace DXGame.Api.Handlers.Playroom
             {
                 await _cache.SetAsync(playroom.Id, playroom);
                 await _broadcaster.BroadcastAsync<PlayroomDeleted>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<PlayroomDeleted>(null, e);
+                await _broadcaster.BroadcastAsync<PlayroomDeleted>(e);
             })
             .OnError(ex => 
             {

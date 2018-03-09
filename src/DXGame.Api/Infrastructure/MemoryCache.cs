@@ -14,10 +14,10 @@ namespace DXGame.Api.Infrastructure
             _cache = cache;
         }
 
-        public Task<T> GetAsync<T>(Guid key) 
+        public Task<T> GetAsync<T>(object key) 
             => Task.FromResult(_cache.Get<T>(key));
 
-        public Task SetAsync<T>(Guid key, T value)
+        public Task SetAsync<T>(object key, T value)
             => Task.FromResult(_cache.Set<T>(key, value));
     }
 }

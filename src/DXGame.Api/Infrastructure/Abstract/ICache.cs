@@ -5,7 +5,7 @@ namespace DXGame.Api.Infrastructure.Abstract
 {
     public interface ICache
     {
-        Task<T> GetAsync<T>(Guid key);
-        Task SetAsync<T>(Guid key, T value);
+        Task<T> GetAsync<T>(object key);
+        Task SetAsync<T>(object key, T value);
     }
 }

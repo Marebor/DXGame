@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Api.Models;
@@ -29,10 +31,13 @@ namespace DXGame.Api.Handlers.Playroom
         public async Task HandleAsync(PlayroomCreated e) => await _handler
             .Run(async () => 
             {
+                var playrooms = await _cache.GetAsync<ISet<Guid>>(typeof(PlayroomDto).Name);
                 var playroom = _mapper.Map<PlayroomDto>(e);
+                playrooms.Add(playroom.Id);
                 await _cache.SetAsync(playroom.Id, playroom);
+                await _cache.SetAsync(typeof(PlayroomDto).Name, playrooms);
                 await _broadcaster.BroadcastAsync<PlayroomCreated>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<PlayroomCreated>(null, e);
+                await _broadcaster.BroadcastAsync<PlayroomCreated>(e);
             })
             .OnError(ex => 
             {

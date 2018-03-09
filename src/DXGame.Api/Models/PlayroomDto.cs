@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DXGame.Api.Models.Dto
+namespace DXGame.Api.Models
 {
     public class PlayroomDto
     {

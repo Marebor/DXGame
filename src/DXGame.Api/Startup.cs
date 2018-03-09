@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DXGame.Api.Infrastructure;
+using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Api.Models;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
@@ -28,10 +30,13 @@ namespace DXGame.Api
         {
             services.AddMvc();
             services.AddRabbitMQ(Configuration);
+            services.AddLogging();
+            services.AddMemoryCache();
+            services.AddScoped<ICache, MemoryCache>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -39,6 +44,8 @@ namespace DXGame.Api
             }
 
             app.UseMvc();
+
+            loggerFactory.AddConsole();
         }
     }
 }

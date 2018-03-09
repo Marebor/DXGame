@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DXGame.Api.Models;
+using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;

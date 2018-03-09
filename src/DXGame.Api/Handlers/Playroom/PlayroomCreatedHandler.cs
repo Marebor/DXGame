@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
+using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Api.Models;
-using DXGame.Api.Models.Dto;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
@@ -27,16 +27,9 @@ namespace DXGame.Api.Handlers.Playroom
         }
         
         public async Task HandleAsync(PlayroomCreated e) => await _handler
-            .LoadAggregate(async () =>
+            .Run(async () => 
             {
-                return await Task.FromResult(_mapper.Map<PlayroomDto>(e));
-            })
-            .Run(playroom => 
-            {
-
-            })
-            .OnSuccess(async playroom =>
-            {
+                var playroom = _mapper.Map<PlayroomDto>(e);
                 await _cache.SetAsync(playroom.Id, playroom);
                 await _broadcaster.BroadcastAsync<PlayroomCreated>(e.RelatedCommand, e);
                 await _broadcaster.BroadcastAsync<PlayroomCreated>(null, e);

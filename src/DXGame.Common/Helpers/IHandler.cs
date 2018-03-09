@@ -10,6 +10,7 @@ namespace DXGame.Common.Helpers
     public interface IHandler
     {
         IHandlerTask<T> LoadAggregate<T>(Func<Task<T>> func);
+        IErrorHandler Run(Action action);
         Task ExecuteAsync();
     }
 }

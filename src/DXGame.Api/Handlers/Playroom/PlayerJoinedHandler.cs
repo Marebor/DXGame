@@ -4,6 +4,7 @@ using DXGame.Api.Models.Dto;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
+using Microsoft.Extensions.Logging;
 
 namespace DXGame.Api.Handlers.Playroom
 {
@@ -12,12 +13,15 @@ namespace DXGame.Api.Handlers.Playroom
         IBroadcaster _broadcaster;
         ICache _cache;
         IHandler _handler;
+        ILogger<PlayerJoinedHandler> _logger;
 
-        public PlayerJoinedHandler(IBroadcaster broadcaster, ICache cache, IHandler handler)
+        public PlayerJoinedHandler(IBroadcaster broadcaster, ICache cache, 
+            IHandler handler, ILogger<PlayerJoinedHandler> logger)
         {
             _broadcaster = broadcaster;
             _cache = cache;
             _handler = handler;
+            _logger = logger;
         }
         public async Task HandleAsync(PlayerJoined e) => await _handler
             .LoadAggregate(async () =>
@@ -34,9 +38,10 @@ namespace DXGame.Api.Handlers.Playroom
                 await _broadcaster.BroadcastAsync<PlayerJoined>(e.RelatedCommand, e);
                 await _broadcaster.BroadcastAsync<PlayerJoined>(e.Playroom, e);
             })
-            .OnError(async ex => 
+            .OnError(ex => 
             {
-                
+                _logger.LogError(ex, ex.Message);
+                return Task.CompletedTask;
             })
             .DoNotPropagateException()
             .ExecuteAsync();

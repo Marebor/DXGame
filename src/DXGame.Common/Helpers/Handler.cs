@@ -21,6 +21,11 @@ namespace DXGame.Common.Helpers
             _tasks.Clear();
         }
 
+        public IErrorHandler Run(Action action)
+        {
+            return new HandlerTask<object>(this, action);
+        }
+
         public IHandlerTask<T> LoadAggregate<T>(Func<Task<T>> func)
         {
             var task = new HandlerTask<T>(this, func);

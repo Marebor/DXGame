@@ -1,9 +1,11 @@
+using System.Reflection;
 using System.Threading.Tasks;
 using DXGame.Api.Models;
 using DXGame.Api.Models.Dto;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
+using Microsoft.Extensions.Logging;
 
 namespace DXGame.Api.Handlers.Playroom
 {
@@ -12,12 +14,15 @@ namespace DXGame.Api.Handlers.Playroom
         IBroadcaster _broadcaster;
         ICache _cache;
         IHandler _handler;
+        ILogger<GameStartedHandler> _logger;
 
-        public GameStartedHandler(IBroadcaster broadcaster, ICache cache, IHandler handler)
+        public GameStartedHandler(IBroadcaster broadcaster, ICache cache, 
+            IHandler handler, ILogger<GameStartedHandler> logger)
         {
             _broadcaster = broadcaster;
             _cache = cache;
             _handler = handler;
+            _logger = logger;
         }
 
         public async Task HandleAsync(GameStarted e) => await _handler
@@ -35,9 +40,10 @@ namespace DXGame.Api.Handlers.Playroom
                 await _broadcaster.BroadcastAsync<GameStarted>(e.RelatedCommand, e);
                 await _broadcaster.BroadcastAsync<GameStarted>(e.Playroom, e);
             })
-            .OnError(async ex => 
+            .OnError(ex => 
             {
-                
+                _logger.LogError(ex, ex.Message);
+                return Task.CompletedTask;
             })
             .DoNotPropagateException()
             .ExecuteAsync();

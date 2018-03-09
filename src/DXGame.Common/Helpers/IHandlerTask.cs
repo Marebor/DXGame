@@ -12,12 +12,7 @@ namespace DXGame.Common.Helpers
         Task ExecuteAsync();
         IHandlerTask<T> Validate(Action<T> func);
         IHandlerTask<T> Run(Action<T> func);
-        IHandlerTask<T> OnSuccess(Func<T, Task> func);
-        IHandlerTask<T> OnError(Func<Exception, Task> func, bool executeAlsoWithCustomError = true);
-        IHandlerTask<T> OnCustomError<TError>(Func<TError, Task> func) where TError : Exception;
-        IHandlerTask<T> PropagateException();
-        IHandlerTask<T> DoNotPropagateException();
-        IHandlerTask<T> Finally(Func<Task> func);
+        IErrorHandler OnSuccess(Func<T, Task> func);
         IHandler Then();
     }
 }

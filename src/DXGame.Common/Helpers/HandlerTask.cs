@@ -7,13 +7,14 @@ using DXGame.Common.Models;
 
 namespace DXGame.Common.Helpers
 {
-    public class HandlerTask<T> : IHandlerTask<T>
+    public class HandlerTask<T> : IHandlerTask<T>, IErrorHandler
     {
         private readonly IHandler _handler;
         private readonly Func<Task<T>> _loadAggregate;
         private T _aggregate;
         private Action<T> _validate;
         private Action<T> _run;
+        private Action _runNoResult;
         private Func<T, Task> _onSuccess;
         private Func<Exception, Task> _onError;
         private Func<Task> _finally;
@@ -25,6 +26,12 @@ namespace DXGame.Common.Helpers
         {
             _handler = handler;
             _loadAggregate = loadAggregate;
+        }
+
+        public HandlerTask(IHandler handler, Action runNoResult)
+        {
+            _handler = handler;
+            _runNoResult = runNoResult;
         }
 
         public async Task ExecuteAsync()
@@ -42,6 +49,10 @@ namespace DXGame.Common.Helpers
                 if (_run != null) 
                 {
                     _run(_aggregate);
+                }
+                if (_runNoResult != null) 
+                {
+                    _runNoResult();
                 }
                 if (_onSuccess != null)
                 {
@@ -79,14 +90,14 @@ namespace DXGame.Common.Helpers
             return this;
         }
 
-        public IHandlerTask<T> OnSuccess(Func<T, Task> func)
+        public IErrorHandler OnSuccess(Func<T, Task> func)
         {
             _onSuccess = func;
 
             return this;
         }
 
-        public IHandlerTask<T> OnError(Func<Exception, Task> func, bool executeAlsoWithCustomError = true)
+        public IErrorHandler OnError(Func<Exception, Task> func, bool executeAlsoWithCustomError = true)
         {
             _onError = func;
             _executeOnError = executeAlsoWithCustomError;
@@ -94,7 +105,7 @@ namespace DXGame.Common.Helpers
             return this;
         }
 
-        public IHandlerTask<T> OnCustomError<TError>(Func<TError, Task> func) where TError : Exception
+        public IErrorHandler OnCustomError<TError>(Func<TError, Task> func) where TError : Exception
         {
             var test = _onCustomErrors.Keys.SingleOrDefault(k => k == typeof(TError));
 
@@ -110,21 +121,21 @@ namespace DXGame.Common.Helpers
             return this;
         }
 
-        public IHandlerTask<T> PropagateException()
+        public IErrorHandler PropagateException()
         {
             _propagateException = true;
 
             return this;
         }
 
-        public IHandlerTask<T> DoNotPropagateException()
+        public IErrorHandler DoNotPropagateException()
         {
             _propagateException = false;
 
             return this;
         }
 
-        public IHandlerTask<T> Finally(Func<Task> func)
+        public IErrorHandler Finally(Func<Task> func)
         {
             _finally = func;
 

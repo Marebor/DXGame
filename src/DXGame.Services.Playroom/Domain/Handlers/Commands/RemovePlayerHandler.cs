@@ -46,6 +46,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             {
                 await _eventService.PublishEventsAsync(new PlayerRemovalFailed(command.Playroom, command.Player, ex.ErrorCode, command.CommandId));
             })
+            .DoNotPropagateException()
             .OnError(async ex => 
             {
                 await _eventService.PublishEventsAsync(new PlayerRemovalFailed(command.Playroom, command.Player, ex.GetType().Name, command.CommandId));

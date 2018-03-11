@@ -46,6 +46,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
             {
                 await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.ErrorCode, command.CommandId));
             })
+            .DoNotPropagateException()
             .OnError(async ex => 
             {
                 await _eventService.PublishEventsAsync(new PasswordChangeFailed(command.Playroom, ex.GetType().Name, command.CommandId));

@@ -46,6 +46,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Events
             {
                 await _eventService.PublishEventsAsync(new GameFinishFailed(e.Playroom, e.Game, ex.ErrorCode));
             })
+            .DoNotPropagateException()
             .OnError(async ex => 
             {
                 await _eventService.PublishEventsAsync(new GameFinishFailed(e.Playroom, e.Game, ex.GetType().Name));

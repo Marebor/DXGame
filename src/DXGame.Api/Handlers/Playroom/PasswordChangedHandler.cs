@@ -14,13 +14,25 @@ namespace DXGame.Api.Handlers.Playroom
         IHandler _handler;
         ILogger<PasswordChangedHandler> _logger;
 
-        public PasswordChangedHandler(IBroadcaster broadcaster, ILogger<PasswordChangedHandler> logger)
+        public PasswordChangedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<PasswordChangedHandler> logger)
         {
             _broadcaster = broadcaster;
+            _handler = handler;
             _logger = logger;
         }
 
-        public async Task HandleAsync(PasswordChanged e) 
-            => await _broadcaster.BroadcastAsync<PasswordChanged>(e.RelatedCommand, e.Playroom);
+        public async Task HandleAsync(PasswordChanged e) => await _handler
+            .Run(async () => 
+            {
+                await _broadcaster.BroadcastAsync<OwnerChanged>(e.RelatedCommand, e);
+                await _broadcaster.BroadcastAsync<OwnerChanged>(e.Playroom, e);
+            })
+            .OnError(ex => 
+            {
+                _logger.LogError(ex, ex.Message);
+                return Task.CompletedTask;
+            })
+            .DoNotPropagateException()
+            .ExecuteAsync();
     }
 }

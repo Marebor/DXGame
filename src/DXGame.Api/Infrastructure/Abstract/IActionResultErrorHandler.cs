@@ -7,10 +7,8 @@ namespace DXGame.Api.Infrastructure.Abstract
     public interface IActionResultErrorHandler
     {
         Task<IActionResult> ExecuteAsync();
-        IActionResultErrorHandler OnError(Func<Exception, IActionResult> func, bool executeAlsoWithCustomError = true);
-        IActionResultErrorHandler OnCustomError<TError>(Func<TError, IActionResult> func) where TError : Exception;
-        IActionResultErrorHandler PropagateException();
-        IActionResultErrorHandler DoNotPropagateException();
+        IActionResultErrorPropagator OnError(Func<Exception, IActionResult> func, bool executeAlsoWithCustomError = true);
+        IActionResultErrorPropagator OnCustomError<TError>(Func<TError, IActionResult> func) where TError : Exception;
         IActionResultErrorHandler Finally(Func<Task> func);
     }
 }

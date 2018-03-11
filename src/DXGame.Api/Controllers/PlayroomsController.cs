@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Api.Models;
-using DXGame.Api.Models.Exceptions;
 using DXGame.Common.Communication;
 using DXGame.Messages.Commands.Playroom;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Logging;
 namespace DXGame.Api.Controllers
 {
     [Route("api/[controller]")]
-    public class PlayroomsController : Controller
+    public class PlayroomsController : ExtendedController
     {
         IActionResultHelper _actionResultHelper;
         ICache _cache;
@@ -34,7 +33,7 @@ namespace DXGame.Api.Controllers
             => await _actionResultHelper
                 .Return(async () => 
                 {
-                    var playrooms = await _cache.GetAsync<ISet<Guid>>(typeof(PlayroomDto).Name);
+                    var playrooms = await _cache.BrowseAsync<PlayroomDto>();
                     return Ok(playrooms);
                 })
                 .OnError(ex => NotFound())
@@ -53,7 +52,6 @@ namespace DXGame.Api.Controllers
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
-        // POST api/values
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreatePlayroom command)
             => await _actionResultHelper
@@ -62,11 +60,22 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => NotFound())
+                .OnError(ex => ServiceUnavailable())
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
-        // PUT api/values/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id, [FromBody]DeletePlayroom command)
+            => await _actionResultHelper
+                .Return(async () => 
+                {
+                    await _messageBus.PublishAsync(command);
+                    return Accepted();
+                })
+                .OnError(ex => ServiceUnavailable())
+                .DoNotPropagateException()
+                .ExecuteAsync();
+
         [HttpPut]
         public async Task<IActionResult> AddPlayer([FromBody]AddPlayer command)
             => await _actionResultHelper
@@ -75,22 +84,67 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => NotFound())
+                .OnError(ex => ServiceUnavailable())
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id, [FromBody]DeletePlayroom command)
+        [HttpPut]
+        public async Task<IActionResult> RemovePlayer([FromBody]RemovePlayer command)
             => await _actionResultHelper
-                .Validate(() => command.Playroom == id)
                 .Return(async () => 
                 {
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnCustomError<ValidationException>(ex => BadRequest(ex.ErrorCode))
-                .OnError(ex => NotFound())
+                .OnError(ex => ServiceUnavailable())
+                .DoNotPropagateException()
+                .ExecuteAsync();
+
+        [HttpPut]
+        public async Task<IActionResult> ChangeOwner([FromBody]ChangeOwner command)
+            => await _actionResultHelper
+                .Return(async () => 
+                {
+                    await _messageBus.PublishAsync(command);
+                    return Accepted();
+                })
+                .OnError(ex => ServiceUnavailable())
+                .DoNotPropagateException()
+                .ExecuteAsync();
+
+        [HttpPut]
+        public async Task<IActionResult> ChangePassword([FromBody]ChangePassword command)
+            => await _actionResultHelper
+                .Return(async () => 
+                {
+                    await _messageBus.PublishAsync(command);
+                    return Accepted();
+                })
+                .OnError(ex => ServiceUnavailable())
+                .DoNotPropagateException()
+                .ExecuteAsync();
+
+        [HttpPut]
+        public async Task<IActionResult> ChangePrivacy([FromBody]ChangePrivacy command)
+            => await _actionResultHelper
+                .Return(async () => 
+                {
+                    await _messageBus.PublishAsync(command);
+                    return Accepted();
+                })
+                .OnError(ex => ServiceUnavailable())
+                .DoNotPropagateException()
+                .ExecuteAsync();
+
+        [HttpPut]
+        public async Task<IActionResult> StartGame([FromBody]StartGame command)
+            => await _actionResultHelper
+                .Return(async () => 
+                {
+                    await _messageBus.PublishAsync(command);
+                    return Accepted();
+                })
+                .OnError(ex => ServiceUnavailable())
                 .DoNotPropagateException()
                 .ExecuteAsync();
     }

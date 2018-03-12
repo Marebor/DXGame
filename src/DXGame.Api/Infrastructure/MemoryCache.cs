@@ -42,5 +42,15 @@ namespace DXGame.Api.Infrastructure
             UpdateCollection(collection);
             return Task.CompletedTask;
         }
+
+        public Task RemoveAsync<T>(Guid key)
+        {
+            var collection = GetCollection<T>();
+            if (collection.ContainsKey(key))
+            {
+                collection.Remove(key);
+            }
+            return Task.CompletedTask;
+        }
     }
 }

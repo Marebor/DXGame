@@ -22,6 +22,22 @@ namespace DXGame.Common.Persistence.MongoDB
             _database = database;
         }
 
+        public async Task<IEnumerable<IEvent>> GetAllEventsAsync()
+            => await Events
+                .AsQueryable()
+                .OrderBy(e => e.ExecutionTime)
+                .Select(e => e.Content)
+                .ToListAsync();
+
+        public async Task<IEnumerable<IEvent>> GetAllEventsTimeRangeAsync(DateTime since, DateTime to)
+            => await Events
+                .AsQueryable()
+                .Where(e => e.ExecutionTime >= since)
+                .Where(e => e.ExecutionTime <= to)
+                .OrderBy(e => e.ExecutionTime)
+                .Select(e => e.Content)
+                .ToListAsync();
+
         public async Task<IEnumerable<IEvent>> GetAggregateEventsAsync(Guid aggregateId)
             => await Events
                 .AsQueryable()

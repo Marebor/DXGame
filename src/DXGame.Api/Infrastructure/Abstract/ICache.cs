@@ -9,5 +9,6 @@ namespace DXGame.Api.Infrastructure.Abstract
         Task<IEnumerable<T>> BrowseAsync<T>();
         Task<T> GetAsync<T>(Guid key);
         Task SetAsync<T>(Guid key, T value);
+        Task RemoveAsync<T>(Guid key);
     }
 }

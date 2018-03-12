@@ -24,17 +24,9 @@ namespace DXGame.Api.Handlers.Playroom
             _logger = logger;
         }
         public async Task HandleAsync(PlayroomDeleted e) => await _handler
-            .LoadAggregate(async () =>
+            .Run(async () => 
             {
-                return await _cache.GetAsync<PlayroomDto>(e.Playroom);
-            })
-            .Run(playroom => 
-            {
-                playroom.IsDeleted = true;
-            })
-            .OnSuccess(async playroom =>
-            {
-                await _cache.SetAsync(playroom.Id, playroom);
+                await _cache.RemoveAsync<PlayroomDto>(e.Playroom);
                 await _broadcaster.BroadcastAsync<PlayroomDeleted>(e.RelatedCommand, e);
                 await _broadcaster.BroadcastAsync<PlayroomDeleted>(e);
             })

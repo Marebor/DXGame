@@ -24,8 +24,8 @@ namespace DXGame.Api.Handlers.Playroom
         public async Task HandleAsync(PasswordChanged e) => await _handler
             .Run(async () => 
             {
-                await _broadcaster.BroadcastAsync<OwnerChanged>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<OwnerChanged>(e.Playroom, e);
+                await _broadcaster.BroadcastAsync<PasswordChanged>(e.RelatedCommand, e.Playroom);
+                await _broadcaster.BroadcastAsync<PasswordChanged>(e.Playroom, e.Playroom);
             })
             .OnError(ex => 
             {

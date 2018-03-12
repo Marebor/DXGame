@@ -12,7 +12,5 @@ namespace DXGame.Api.Models
         public ISet<Guid> Players { get; set; }
         public ISet<Guid> CompletedGames { get; set; }
         public Guid? ActiveGame { get; set; }
-        public int Version { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }

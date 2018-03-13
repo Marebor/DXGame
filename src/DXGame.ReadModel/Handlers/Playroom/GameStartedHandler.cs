@@ -1,30 +1,33 @@
+using System;
+using System.Reflection;
 using System.Threading.Tasks;
-using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
+using DXGame.ReadModel.Infrastructure.Abstract;
+using DXGame.ReadModel.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DXGame.Api.Handlers.Playroom
+namespace DXGame.ReadModel.Handlers.Playroom
 {
     public class GameStartedHandler : IEventHandler<GameStarted>
     {
-        IBroadcaster _broadcaster;
         IHandler _handler;
         ILogger<GameStartedHandler> _logger;
+        IProjectionService _projectionService;
 
-        public GameStartedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<GameStartedHandler> logger)
+        public GameStartedHandler(IHandler handler, ILogger<GameStartedHandler> logger, 
+            IProjectionService projectionService)
         {
-            _broadcaster = broadcaster;
             _handler = handler;
             _logger = logger;
+            _projectionService = projectionService;
         }
-
         public async Task HandleAsync(GameStarted e) => await _handler
             .Run(async () => 
             {
-                await _broadcaster.BroadcastAsync<GameStarted>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<GameStarted>(e.Playroom, e);
+                await _projectionService.UpdateAsync<PlayroomProjection>(e.Playroom, 
+                    nameof(PlayroomProjection.ActiveGame), e.Game);
             })
             .OnError(ex => 
             {

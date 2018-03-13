@@ -25,7 +25,6 @@ namespace DXGame.Common.DependencyInjection
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IHandler, Handler>();
         }
-
         public static void AddAssemblyMessageHandlers(this IServiceCollection services, Assembly assembly = null)
         {
             ForEachMessageHandlerInAssembly.Execute(

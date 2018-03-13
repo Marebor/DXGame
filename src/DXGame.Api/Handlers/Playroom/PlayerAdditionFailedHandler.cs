@@ -13,8 +13,7 @@ namespace DXGame.Api.Handlers.Playroom
         IHandler _handler;
         ILogger<PlayerAdditionFailedHandler> _logger;
 
-        public PlayerAdditionFailedHandler(IBroadcaster broadcaster, IHandler handler, 
-            ILogger<PlayerAdditionFailedHandler> logger)
+        public PlayerAdditionFailedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<PlayerAdditionFailedHandler> logger)
         {
             _broadcaster = broadcaster;
             _handler = handler;

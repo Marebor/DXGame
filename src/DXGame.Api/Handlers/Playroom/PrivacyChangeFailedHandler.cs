@@ -13,8 +13,7 @@ namespace DXGame.Api.Handlers.Playroom
         IHandler _handler;
         ILogger<PrivacyChangeFailedHandler> _logger;
 
-        public PrivacyChangeFailedHandler(IBroadcaster broadcaster, IHandler handler, 
-            ILogger<PrivacyChangeFailedHandler> logger)
+        public PrivacyChangeFailedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<PrivacyChangeFailedHandler> logger)
         {
             _broadcaster = broadcaster;
             _handler = handler;

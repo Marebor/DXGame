@@ -6,6 +6,8 @@ using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Api.Models;
 using DXGame.Common.Communication;
 using DXGame.Messages.Commands.Playroom;
+using DXGame.ReadModel.Infrastructure.Abstract;
+using DXGame.ReadModel.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,17 +17,17 @@ namespace DXGame.Api.Controllers
     public class PlayroomsController : ExtendedController
     {
         IActionResultHelper _actionResultHelper;
-        ICache _cache;
         ILogger _logger;
         IMessageBus _messageBus;
+        IProjectionService _projectionService;
 
-        public PlayroomsController(IActionResultHelper actionResultHelper, ICache cache, 
-            ILogger logger, IMessageBus messageBus)
+        public PlayroomsController(IActionResultHelper actionResultHelper, ILogger logger, 
+            IMessageBus messageBus, IProjectionService projectionService)
         {
             _actionResultHelper = actionResultHelper;
-            _cache = cache;
             _logger = logger;
             _messageBus = messageBus;
+            _projectionService = projectionService;
         }
         
         [HttpGet]
@@ -33,10 +35,10 @@ namespace DXGame.Api.Controllers
             => await _actionResultHelper
                 .Return(async () => 
                 {
-                    var playrooms = await _cache.BrowseAsync<PlayroomDto>();
+                    var playrooms = await _projectionService.BrowseAsync<PlayroomProjection>();
                     return Ok(playrooms);
                 })
-                .OnError(ex => NotFound())
+                .OnError(ex => InternalServerError())
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -45,7 +47,7 @@ namespace DXGame.Api.Controllers
             => await _actionResultHelper
                 .Return(async () => 
                 {
-                    var playroom = await _cache.GetAsync<PlayroomDto>(id);
+                    var playroom = await _projectionService.GetAsync<PlayroomProjection>(id);
                     return Ok(playroom);
                 })
                 .OnError(ex => NotFound())
@@ -64,8 +66,8 @@ namespace DXGame.Api.Controllers
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id, [FromBody]DeletePlayroom command)
+        [HttpPut]
+        public async Task<IActionResult> Delete([FromBody]DeletePlayroom command)
             => await _actionResultHelper
                 .Return(async () => 
                 {

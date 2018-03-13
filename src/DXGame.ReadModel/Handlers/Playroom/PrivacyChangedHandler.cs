@@ -1,30 +1,31 @@
 using System.Threading.Tasks;
-using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
+using DXGame.ReadModel.Infrastructure.Abstract;
+using DXGame.ReadModel.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DXGame.Api.Handlers.Playroom
+namespace DXGame.ReadModel.Handlers.Playroom
 {
     public class PrivacyChangedHandler : IEventHandler<PrivacyChanged>
     {
-        IBroadcaster _broadcaster;
         IHandler _handler;
         ILogger<PrivacyChangedHandler> _logger;
+        IProjectionService _projectionService;
 
-        public PrivacyChangedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<PrivacyChangedHandler> logger)
+        public PrivacyChangedHandler(IHandler handler, ILogger<PrivacyChangedHandler> logger, 
+            IProjectionService projectionService)
         {
-            _broadcaster = broadcaster;
             _handler = handler;
             _logger = logger;
+            _projectionService = projectionService;
         }
-
         public async Task HandleAsync(PrivacyChanged e) => await _handler
             .Run(async () => 
             {
-                await _broadcaster.BroadcastAsync<PrivacyChanged>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<PrivacyChanged>(e.Playroom, e);
+                await _projectionService.UpdateAsync<PlayroomProjection>(e.Playroom,
+                    nameof(PlayroomProjection.IsPrivate), e.IsPrivate);
             })
             .OnError(ex => 
             {

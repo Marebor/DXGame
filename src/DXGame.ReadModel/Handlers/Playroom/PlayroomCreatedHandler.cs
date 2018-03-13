@@ -1,31 +1,35 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
+using DXGame.ReadModel.Infrastructure.Abstract;
+using DXGame.ReadModel.Models;
 using Microsoft.Extensions.Logging;
 
-namespace DXGame.Api.Handlers.Playroom
+namespace DXGame.ReadModel.Handlers.Playroom
 {
     public class PlayroomCreatedHandler : IEventHandler<PlayroomCreated>
     {
-        IBroadcaster _broadcaster;
         IHandler _handler;
         ILogger<PlayroomCreatedHandler> _logger;
+        IMapper _mapper;
+        IProjectionService _projectionService;
 
-        public PlayroomCreatedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<PlayroomCreatedHandler> logger)
+        public PlayroomCreatedHandler(IHandler handler, ILogger<PlayroomCreatedHandler> logger, 
+            IMapper mapper, IProjectionService projectionService)
         {
-            _broadcaster = broadcaster;
             _handler = handler;
             _logger = logger;
+            _mapper = mapper;
+            _projectionService = projectionService;
         }
-        
         public async Task HandleAsync(PlayroomCreated e) => await _handler
             .Run(async () => 
             {
-                e.HidePassword();
-                await _broadcaster.BroadcastAsync<PlayroomCreated>(e.RelatedCommand, e);
-                await _broadcaster.BroadcastAsync<PlayroomCreated>(e);
+                var playroom = _mapper.Map<PlayroomProjection>(e);
+                await _projectionService.SaveAsync(playroom);
             })
             .OnError(ex => 
             {

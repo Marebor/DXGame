@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using DXGame.Api.Infrastructure.Abstract;
-using DXGame.Api.Models;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
 using DXGame.Messages.Events.Playroom;
@@ -24,8 +23,9 @@ namespace DXGame.Api.Handlers.Playroom
         public async Task HandleAsync(PasswordChanged e) => await _handler
             .Run(async () => 
             {
-                await _broadcaster.BroadcastAsync<PasswordChanged>(e.RelatedCommand, e.Playroom);
-                await _broadcaster.BroadcastAsync<PasswordChanged>(e.Playroom, e.Playroom);
+                e.HidePassword();
+                await _broadcaster.BroadcastAsync<PasswordChanged>(e.RelatedCommand, e);
+                await _broadcaster.BroadcastAsync<PasswordChanged>(e.Playroom, e);
             })
             .OnError(ex => 
             {

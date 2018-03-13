@@ -14,14 +14,15 @@ namespace DXGame.Messages.Events.Playroom
             this.Password = password;
             this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
             this.RelatedCommand = relatedCommand;
-
         }
         public Guid Id { get; }
         public string Name { get; }
         public bool IsPrivate { get; }
         public Guid Owner { get; }
-        public string Password { get; }
+        public string Password { get; private set; }
         public int AppliedOnAggregateVersion { get; }
         public Guid RelatedCommand { get; }
+
+        public void HidePassword() => Password = new string('*', Password.Length);
     }
 }

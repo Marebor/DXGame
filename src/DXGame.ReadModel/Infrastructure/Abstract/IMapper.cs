@@ -1,4 +1,4 @@
-namespace DXGame.Api.Infrastructure.Abstract
+namespace DXGame.ReadModel.Infrastructure.Abstract
 {
     public interface IMapper
     {

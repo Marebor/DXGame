@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace DXGame.Api.Models
+namespace DXGame.ReadModel.Models
 {
-    public class PlayroomDto
+    public class PlayroomProjection : IProjection
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

@@ -71,7 +71,8 @@ namespace DXGame.Common.Persistence.MongoDB
             var versionedEvent = events.FirstOrDefault(e => e is IAggregateAppliedEvent);
             if (versionedEvent != null)
                 await VerifyAggregateVersionAsync(aggregateId, 
-                    (versionedEvent as IAggregateAppliedEvent).AppliedOnAggregateVersion);
+                    (versionedEvent as IAggregateAppliedEvent).AppliedOnAggregateVersion
+                );
             await Events
                 .InsertManyAsync(
                     events.Select(e => 
@@ -86,10 +87,10 @@ namespace DXGame.Common.Persistence.MongoDB
                 .AsQueryable()
                 .Where(e => e.AggregateId == aggregateId)
                 .Select(e => e.AppliedOnAggregateVersion)
-                .MaxAsync();
+                .MaxAsync() + 1;
             
             if (currentVersion != version)
-                throw new DXGameException("incorrect_aggregate_version_detected");
+                throw new DXGameException("concurrency_error");
         }
     }
 }

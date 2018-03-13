@@ -13,8 +13,7 @@ namespace DXGame.Api.Handlers.Playroom
         IHandler _handler;
         ILogger<OwnerChangeFailedHandler> _logger;
 
-        public OwnerChangeFailedHandler(IBroadcaster broadcaster, IHandler handler, 
-            ILogger<OwnerChangeFailedHandler> logger)
+        public OwnerChangeFailedHandler(IBroadcaster broadcaster, IHandler handler, ILogger<OwnerChangeFailedHandler> logger)
         {
             _broadcaster = broadcaster;
             _handler = handler;

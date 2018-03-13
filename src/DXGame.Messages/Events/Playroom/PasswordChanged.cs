@@ -14,8 +14,10 @@ namespace DXGame.Messages.Events.Playroom
 
         }
         public Guid Playroom { get; }
-        public string Password { get; }
+        public string Password { get; private set; }
         public int AppliedOnAggregateVersion { get; }
         public Guid RelatedCommand { get; }
+
+        public void HidePassword() => Password = new string('*', Password.Length);
     }
 }

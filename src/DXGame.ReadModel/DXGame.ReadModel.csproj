@@ -9,8 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Automapper" Version="6.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.0-preview1-final" />
+    <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,9 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DXGame.Common\DXGame.Common.csproj" />
     <ProjectReference Include="..\DXGame.Messages\DXGame.Messages.csproj" />
-    <ProjectReference Include="..\DXGame.ReadModel\DXGame.ReadModel.csproj" />
+    <ProjectReference Include="..\DXGame.Common\DXGame.Common.csproj" />
   </ItemGroup>
 
 </Project>

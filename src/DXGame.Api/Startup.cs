@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Api.Infrastructure;
 using DXGame.Api.Infrastructure.Abstract;
-using DXGame.Api.Models;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
 using Microsoft.AspNetCore.Builder;

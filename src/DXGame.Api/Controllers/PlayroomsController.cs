@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DXGame.Api.Infrastructure.Abstract;
-using DXGame.Api.Models;
 using DXGame.Common.Communication;
 using DXGame.Messages.Commands.Playroom;
 using DXGame.ReadModel.Infrastructure.Abstract;

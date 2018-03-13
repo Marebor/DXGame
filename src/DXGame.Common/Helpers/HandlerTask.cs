@@ -129,28 +129,14 @@ namespace DXGame.Common.Helpers
 
         public IErrorHandler PropagateException()
         {
-            if (_currentErrorDefinition == _onError)
-            {
-                _onError.Propagate = true;
-            }
-            else
-            {
-                _onCustomErrors[_currentErrorDefinition.ExceptionType].Propagate = true;
-            }
+            _currentErrorDefinition.Propagate = true;
 
             return this;
         }
 
         public IErrorHandler DoNotPropagateException()
         {
-            if (_currentErrorDefinition == _onError)
-            {
-                _onError.Propagate = false;
-            }
-            else
-            {
-                _onCustomErrors[_currentErrorDefinition.ExceptionType].Propagate = false;
-            }
+            _currentErrorDefinition.Propagate = false;
 
             return this;
         }

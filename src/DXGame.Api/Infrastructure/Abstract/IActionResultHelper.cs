@@ -7,7 +7,6 @@ namespace DXGame.Api.Infrastructure.Abstract
 {
     public interface IActionResultHelper
     {
-        IActionResultHelper Validate(Func<bool> func);
-        IActionResultErrorHandler Return<T>(Func<Task<T>> action);
+        IActionResultErrorHandler Return<T>(Func<Task<T>> action) where T : IActionResult;
     }
 }

@@ -6,7 +6,7 @@ namespace DXGame.Api.Infrastructure.Abstract
 {
     public interface IBroadcaster
     {
-        Task BroadcastAsync<T>(object data) where T : IEvent;
-        Task BroadcastAsync<T>(Guid subscriptionId, object data) where T : IEvent;
+        Task BroadcastAsync<T>(T data) where T : IEvent;
+        Task BroadcastAsync<T>(Guid subscriptionId, T data) where T : IEvent;
     }
 }

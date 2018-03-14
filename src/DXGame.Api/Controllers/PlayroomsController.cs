@@ -16,11 +16,11 @@ namespace DXGame.Api.Controllers
     public class PlayroomsController : ExtendedController
     {
         IActionResultHelper _actionResultHelper;
-        ILogger _logger;
+        ILogger<PlayroomsController> _logger;
         IMessageBus _messageBus;
         IProjectionService _projectionService;
 
-        public PlayroomsController(IActionResultHelper actionResultHelper, ILogger logger, 
+        public PlayroomsController(IActionResultHelper actionResultHelper, ILogger<PlayroomsController> logger, 
             IMessageBus messageBus, IProjectionService projectionService)
         {
             _actionResultHelper = actionResultHelper;
@@ -37,8 +37,8 @@ namespace DXGame.Api.Controllers
                     var playrooms = await _projectionService.BrowseAsync<PlayroomProjection>();
                     return Ok(playrooms);
                 })
-                .OnError(ex => InternalServerError())
-                .DoNotPropagateException()
+                .OnError(ex => { _logger.LogError(1, ex, ex.Message); return NotFound(); })
+                .PropagateException()
                 .ExecuteAsync();
 
         [HttpGet("{id}")]

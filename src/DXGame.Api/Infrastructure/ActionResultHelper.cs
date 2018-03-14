@@ -46,9 +46,9 @@ namespace DXGame.Api.Infrastructure
             return new StatusCodeResult(500);
         }
 
-        public IActionResultErrorHandler Return<T>(Func<Task<T>> action) where T : IActionResult
+        public IActionResultErrorHandler Return(Func<Task<IActionResult>> func)
         {
-            _return = action as Func<Task<IActionResult>>;
+            _return = func;
 
             return this;
         }

@@ -15,6 +15,14 @@ services:
       - mongo
     ports:
       - '5000:5000'
+  
+  services.playroom:
+    build: ../src/DXGame.Services.Playroom
+    links:
+      - rabbitmq
+      - mongo
+    ports:
+      - '5050:5050'
 
   mongo:
     image: mongo

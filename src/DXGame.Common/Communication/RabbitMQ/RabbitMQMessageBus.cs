@@ -23,8 +23,7 @@ namespace DXGame.Common.Communication.RabbitMQ
         public async Task SubscribeAsync<T>(Func<T, Task> handler) where T : IMessage
             => await _bus.SubscribeAsync<T>(
                             handler, 
-                            SubscriptionContext(typeof(T), handler.GetType()),
-                            default(CancellationToken)
+                            SubscriptionContext(typeof(T), handler.GetType())
                         );
 
         static Action<IPipeContext> SubscriptionContext(Type msgType, Type handler)

@@ -37,7 +37,11 @@ namespace DXGame.Api.Controllers
                     var playrooms = await _projectionService.BrowseAsync<PlayroomProjection>();
                     return Ok(playrooms);
                 })
-                .OnError(ex => { _logger.LogError(1, ex, ex.Message); return NotFound(); })
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return InternalServerError(); 
+                })
                 .PropagateException()
                 .ExecuteAsync();
 
@@ -49,7 +53,11 @@ namespace DXGame.Api.Controllers
                     var playroom = await _projectionService.GetAsync<PlayroomProjection>(id);
                     return Ok(playroom);
                 })
-                .OnError(ex => NotFound())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return NotFound(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -61,7 +69,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -73,7 +85,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -85,7 +101,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -97,7 +117,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -109,7 +133,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -121,7 +149,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -133,7 +165,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
 
@@ -145,7 +181,11 @@ namespace DXGame.Api.Controllers
                     await _messageBus.PublishAsync(command);
                     return Accepted();
                 })
-                .OnError(ex => ServiceUnavailable())
+                .OnError(ex => 
+                { 
+                    _logger.LogError(ex, ex.Message); 
+                    return ServiceUnavailable(); 
+                })
                 .DoNotPropagateException()
                 .ExecuteAsync();
     }

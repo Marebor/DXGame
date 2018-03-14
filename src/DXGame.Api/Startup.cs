@@ -56,7 +56,8 @@ namespace DXGame.Api
                 routes.MapHub<DXGameHub>("/" + nameof(DXGameHub));  
             });
 
-            loggerFactory.AddConsole();
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
         }
     }
 }

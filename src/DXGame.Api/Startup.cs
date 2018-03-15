@@ -32,7 +32,7 @@ namespace DXGame.Api
         {
             services.AddMvc();
             services.AddSignalR();
-            services.AddRabbitMQ(Configuration);
+            services.AddRawRabbit(Configuration);
             services.AddMongoDB(Configuration);
             services.AddLogging();
             services.AddScoped<IActionResultHelper, ActionResultHelper>();

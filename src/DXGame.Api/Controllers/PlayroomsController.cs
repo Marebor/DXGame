@@ -66,7 +66,9 @@ namespace DXGame.Api.Controllers
             => await _actionResultHelper
                 .Return(async () => 
                 {
+                    _logger.LogWarning("Publishing message...");
                     await _messageBus.PublishAsync(command);
+                    _logger.LogWarning("Message published.");
                     return Accepted();
                 })
                 .OnError(ex => 

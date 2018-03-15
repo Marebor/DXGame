@@ -31,7 +31,7 @@ namespace DXGame.ReadModel
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            services.AddRabbitMQ(Configuration);
+            services.AddRawRabbit(Configuration);
             services.AddMongoDB(Configuration);
             services.AddAssemblyMessageHandlers();
             services.AddLogging();

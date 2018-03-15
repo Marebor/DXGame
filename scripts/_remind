@@ -1,2 +1,19 @@
  
+building and running app:
+
+sudo ./rebuild.sh
+
+or
+
+sudo ./remove-bins.sh
+sudo ./dotnet-publish.sh
+sudo ./docker-compose-build.sh
+ 
+ 
+testing message bus:
+
 curl -d '{ "CommandId": "2cea423f-53b8-46e6-8a88-b21b03a144f2", "PlayroomId": "2b5f47c2-464b-4b08-a6e6-c91e4e2f0754", "Name": "Test", "Owner": "bf50bbc7-a12f-4a0f-8c81-2d5c5e0a6220", "IsPrivate": false, "Password": "" }' -H "Content-Type: application/json" -X POST http://localhost:5000/api/playrooms
+
+
+
+sudo docker logs <container_id>     (list of containers: sudo docker ps)

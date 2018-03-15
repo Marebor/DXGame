@@ -18,9 +18,9 @@ namespace DXGame.Common.DependencyInjection
         {
             var assembly = Assembly.GetCallingAssembly();
             services.AddAssemblyMessageHandlers(assembly);
-            services.AddRabbitMQ(configuration);
+            services.AddRawRabbit(configuration);
             services.AddMongoDB(configuration);
-            services.AddScoped<IMessageBus, RabbitMQMessageBus>();
+            services.AddScoped<IMessageBus, RawRabbitMessageBus>();
             services.AddScoped<IEventStore, MongoDBEventStore>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IHandler, Handler>();

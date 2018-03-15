@@ -11,10 +11,12 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.0.1" />
     <PackageReference Include="RawRabbit" Version="2.0.0-beta8" />
     <PackageReference Include="RawRabbit.DependencyInjection.ServiceCollection" Version="2.0.0-beta8" />
     <PackageReference Include="RawRabbit.Operations.Publish" Version="2.0.0-beta8" />
     <PackageReference Include="RawRabbit.Operations.Subscribe" Version="2.0.0-beta8" />
+    <PackageReference Include="SharpSerializer" Version="3.0.1" />
   </ItemGroup>
 
   <ItemGroup>

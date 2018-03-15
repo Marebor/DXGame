@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using DXGame.Common.Communication;
@@ -16,15 +17,17 @@ namespace DXGame.Common.DependencyInjection
     {
         public static void AddDefaultDXGameDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            var assembly = Assembly.GetCallingAssembly();
-            services.AddAssemblyMessageHandlers(assembly);
+            var assembly = Assembly.GetEntryAssembly();
             services.AddRawRabbit(configuration);
             services.AddMongoDB(configuration);
+            services.AddLogging();
+            services.AddAssemblyMessageHandlers(assembly);
             services.AddScoped<IMessageBus, RawRabbitMessageBus>();
             services.AddScoped<IEventStore, MongoDBEventStore>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IHandler, Handler>();
         }
+
         public static void AddAssemblyMessageHandlers(this IServiceCollection services, Assembly assembly = null)
         {
             ForEachMessageHandlerInAssembly.Execute(

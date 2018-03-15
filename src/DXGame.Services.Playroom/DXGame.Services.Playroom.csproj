@@ -19,9 +19,10 @@
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.2" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="../DXGame.Messages/DXGame.Messages.csproj" />
-    <ProjectReference Include="../DXGame.Common/DXGame.Common.csproj" />
+    <ProjectReference Include="..\DXGame.Messages\DXGame.Messages.csproj" />
+    <ProjectReference Include="..\DXGame.Common\DXGame.Common.csproj" />
   </ItemGroup>
 
 </Project>

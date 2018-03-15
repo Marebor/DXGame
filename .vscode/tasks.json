@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/DXGame.Services.Card/DXGame.Services.Card.csproj"
+                "${workspaceFolder}/src/DXGame.Services.Playroom/DXGame.Services.Playroom.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

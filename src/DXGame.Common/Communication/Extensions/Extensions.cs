@@ -18,19 +18,14 @@ namespace DXGame.Common.Communication.Extensions
                     var handler = serviceProvider.GetService(handlerInterface);
                     bus.SubscribeToMessage(messageType, handler);
                 },
-                assembly ?? Assembly.GetCallingAssembly()
+                assembly ?? Assembly.GetEntryAssembly()
             );
         }
 
         public static void SubscribeToMessage(this IMessageBus bus, Type msgType, object handler)
         {
             var subscribeMethod = MessageBusSubscriptionMethod(msgType);
-            subscribeMethod.Invoke(bus, new object[] 
-            {
-                msgType.IsAssignableTo<ICommand>() ? 
-                    CommandHandlerHandleAsyncMethod(handler) as object 
-                    : EventHandlerHandleAsyncMethod(handler)
-            });
+            subscribeMethod.Invoke(bus, new object[] { handler });
         }
 
         public static MethodInfo MessageBusSubscriptionMethod(Type genericType)

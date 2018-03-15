@@ -34,6 +34,7 @@ namespace DXGame.Common.Helpers
                 var msgType = handlerInterface
                     .GetGenericArguments()
                     .First();
+                handlerInterface = handlerInterface.GetGenericTypeDefinition().MakeGenericType(msgType);
                 
                 action(handlerType, handlerInterface, msgType);
             }

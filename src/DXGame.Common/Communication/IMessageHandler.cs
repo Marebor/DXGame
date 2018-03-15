@@ -3,8 +3,8 @@ using DXGame.Messages.Abstract;
 
 namespace DXGame.Common.Communication
 {
-    public interface ICommandHandler<T> : IMessageHandler<T> where T : ICommand 
+    public interface IMessageHandler<T> where T : IMessage
     {
-    
+        Task HandleAsync(T message);
     }
 }

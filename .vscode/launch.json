@@ -10,9 +10,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/DXGame.Services.Card/bin/Debug/netcoreapp2.0/DXGame.Services.Card.dll",
+            "program": "${workspaceFolder}/src/DXGame.Services.Playroom/bin/Debug/netcoreapp2.0/DXGame.Services.Playroom.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/DXGame.Services.Card",
+            "cwd": "${workspaceFolder}/src/DXGame.Services.Playroom",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart",
             "launchBrowser": {

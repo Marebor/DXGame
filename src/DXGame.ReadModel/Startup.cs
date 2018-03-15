@@ -35,7 +35,7 @@ namespace DXGame.ReadModel
             services.AddMongoDB(Configuration);
             services.AddAssemblyMessageHandlers();
             services.AddLogging();
-            services.AddScoped<IMessageBus, RabbitMQMessageBus>();
+            services.AddScoped<IMessageBus, RawRabbitMessageBus>();
             services.AddScoped<IHandler, Handler>();
             services.AddScoped<IProjectionRepository, MongoDBProjectionRepository>();
             services.AddScoped<IProjectionService, ProjectionService>();

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DXGame.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class PlayroomsController : ExtendedController
     {
         IActionResultHelper _actionResultHelper;
@@ -66,9 +66,7 @@ namespace DXGame.Api.Controllers
             => await _actionResultHelper
                 .Return(async () => 
                 {
-                    _logger.LogWarning("Publishing message...");
                     await _messageBus.PublishAsync(command);
-                    _logger.LogWarning("Message published.");
                     return Accepted();
                 })
                 .OnError(ex => 

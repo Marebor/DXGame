@@ -6,6 +6,8 @@ using DXGame.Api.Infrastructure;
 using DXGame.Api.Infrastructure.Abstract;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
+using DXGame.Common.DependencyInjection;
+using DXGame.Common.Helpers;
 using DXGame.Common.Persistence.MongoDB;
 using DXGame.ReadModel.Infrastructure;
 using DXGame.ReadModel.Infrastructure.Abstract;
@@ -35,6 +37,8 @@ namespace DXGame.Api
             services.AddRawRabbit(Configuration);
             services.AddMongoDB(Configuration);
             services.AddLogging();
+            services.AddAssemblyMessageHandlers();
+            services.AddScoped<IHandler, Handler>();
             services.AddScoped<IActionResultHelper, ActionResultHelper>();
             services.AddScoped<IBroadcaster, SignalRBroadcaster>();
             services.AddScoped<IProjectionService, ProjectionService>();

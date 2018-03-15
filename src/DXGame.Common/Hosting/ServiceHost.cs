@@ -33,7 +33,8 @@ namespace DXGame.Common.Hosting
                 .Build();
             var webHostBuilder = WebHost.CreateDefaultBuilder(args)
                 .UseConfiguration(config)
-                .UseStartup<TStartup>();
+                .UseStartup<TStartup>()
+                .UseDefaultServiceProvider(options => options.ValidateScopes = false);
 
             return new HostBuilder(webHostBuilder.Build());
         }
@@ -79,7 +80,7 @@ namespace DXGame.Common.Hosting
 
             public BusBuilder AddAssemblySubscriptions() 
             {
-                _bus.AddAssemblySubscribtions(_webHost.Services, Assembly.GetCallingAssembly());
+                _bus.AddAssemblySubscribtions(_webHost.Services, Assembly.GetEntryAssembly());
 
                 return this;
             }

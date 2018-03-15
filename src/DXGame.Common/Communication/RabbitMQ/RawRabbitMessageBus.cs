@@ -20,9 +20,9 @@ namespace DXGame.Common.Communication.RabbitMQ
         public async Task PublishAsync<T>(T message) where T : IMessage
             => await _bus.PublishAsync(message);
 
-        public async Task SubscribeAsync<T>(Func<T, Task> handler) where T : IMessage
+        public async Task SubscribeAsync<T>(IMessageHandler<T> handler) where T : IMessage
             => await _bus.SubscribeAsync<T>(
-                            handler, 
+                            t => handler.HandleAsync(t), 
                             SubscriptionContext(typeof(T), handler.GetType())
                         );
 
@@ -34,6 +34,6 @@ namespace DXGame.Common.Communication.RabbitMQ
                         );
 
         static string QueueName(Type msgType, Type handler)
-            => $"{Assembly.GetEntryAssembly().GetName()}/{msgType.Name}/{handler.FullName}";
+            => $"{Assembly.GetEntryAssembly().GetName()}/{msgType.Name}/{handler.Name}";
     }
 }

@@ -13,9 +13,9 @@ namespace DXGame.Messages.Events.Playroom
             this.RelatedCommand = relatedCommand;
 
         }
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public IEnumerable<Guid> Players { get; }
-        public Guid RelatedCommand { get; }
+        public Guid Playroom { get; protected set; }
+        public Guid Game { get; protected set; }
+        public IEnumerable<Guid> Players { get; protected set; }
+        public Guid RelatedCommand { get; protected set; }
     }
 }

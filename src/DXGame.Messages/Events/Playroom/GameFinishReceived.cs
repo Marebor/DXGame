@@ -12,8 +12,8 @@ namespace DXGame.Messages.Events.Playroom
             this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
 
         }
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public int AppliedOnAggregateVersion { get; }
+        public Guid Playroom { get; protected set; }
+        public Guid Game { get; protected set; }
+        public int AppliedOnAggregateVersion { get; protected set; }
     }
 }

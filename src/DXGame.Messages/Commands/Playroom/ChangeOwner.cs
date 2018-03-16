@@ -14,10 +14,10 @@ namespace DXGame.Messages.Commands.Playroom
             this.NewOwner = newOwner;
 
         }
-        public Guid CommandId { get; }
-        public Guid Playroom { get; }
-        public Guid Requester { get; }
-        public string Password { get; }
-        public Guid NewOwner { get; }
+        public Guid CommandId { get; protected set; }
+        public Guid Playroom { get; protected set; }
+        public Guid Requester { get; protected set; }
+        public string Password { get; protected set; }
+        public Guid NewOwner { get; protected set; }
     }
 }

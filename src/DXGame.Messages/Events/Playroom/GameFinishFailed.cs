@@ -12,8 +12,8 @@ namespace DXGame.Messages.Events.Playroom
             this.ReasonCode = reasonCode;
 
         }
-        public Guid Playroom { get; }
-        public Guid Game { get; }
-        public string ReasonCode { get; }
+        public Guid Playroom { get; protected set; }
+        public Guid Game { get; protected set; }
+        public string ReasonCode { get; protected set; }
     }
 }

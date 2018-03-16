@@ -15,11 +15,11 @@ namespace DXGame.Messages.Commands.Playroom
             this.Password = password;
 
         }
-        public Guid CommandId { get; }
-        public Guid PlayroomId { get; }
-        public string Name { get; }
-        public Guid Owner { get; }
-        public bool IsPrivate { get; }
-        public string Password { get; }
+        public Guid CommandId { get; protected set; }
+        public Guid PlayroomId { get; protected set; }
+        public string Name { get; protected set; }
+        public Guid Owner { get; protected set; }
+        public bool IsPrivate { get; protected set; }
+        public string Password { get; protected set; }
     }
 }

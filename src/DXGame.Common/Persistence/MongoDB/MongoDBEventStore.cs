@@ -15,7 +15,7 @@ namespace DXGame.Common.Persistence.MongoDB
     {
         IMongoDatabase _database;
         IMongoCollection<EventEntity> Events
-            => _database.GetCollection<EventEntity>("Events");
+            => _database.GetCollection<EventEntity>(nameof(MongoDBEventStore.Events));
             
         public MongoDBEventStore(IMongoDatabase database)
         {

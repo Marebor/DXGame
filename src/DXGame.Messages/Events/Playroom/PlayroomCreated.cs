@@ -15,13 +15,13 @@ namespace DXGame.Messages.Events.Playroom
             this.AppliedOnAggregateVersion = appliedOnAggregateVersion;
             this.RelatedCommand = relatedCommand;
         }
-        public Guid Id { get; }
-        public string Name { get; }
-        public bool IsPrivate { get; }
-        public Guid Owner { get; }
-        public string Password { get; private set; }
-        public int AppliedOnAggregateVersion { get; }
-        public Guid RelatedCommand { get; }
+        public Guid Id { get; protected set; }
+        public string Name { get; protected set; }
+        public bool IsPrivate { get; protected set; }
+        public Guid Owner { get; protected set; }
+        public string Password { get; protected set; }
+        public int AppliedOnAggregateVersion { get; protected set; }
+        public Guid RelatedCommand { get; protected set; }
 
         public void HidePassword() => Password = new string('*', Password.Length);
     }

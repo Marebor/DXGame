@@ -13,9 +13,9 @@ namespace DXGame.Messages.Commands.Playroom
             this.Requester = requester;
 
         }
-        public Guid CommandId { get; }
-        public Guid Playroom { get; }
-        public Guid Player { get; }
-        public Guid Requester { get; }
+        public Guid CommandId { get; protected set; }
+        public Guid Playroom { get; protected set; }
+        public Guid Player { get; protected set; }
+        public Guid Requester { get; protected set; }
     }
 }

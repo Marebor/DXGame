@@ -12,9 +12,9 @@ namespace DXGame.Messages.Events.Playroom
             this.RelatedCommand = relatedCommand;
 
         }
-        public Guid PlayroomId { get; }
-        public string ReasonCode { get; }
-        public int? AppliedOnAggregateVersion { get; }
-        public Guid RelatedCommand { get; }
+        public Guid PlayroomId { get; protected set; }
+        public string ReasonCode { get; protected set; }
+        public int? AppliedOnAggregateVersion { get; protected set; }
+        public Guid RelatedCommand { get; protected set; }
     }
 }

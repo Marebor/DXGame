@@ -14,7 +14,8 @@ namespace DXGame.Common.Helpers
         private T _aggregate;
         private Action<T> _validate;
         private Action<T> _run;
-        private Action _runNoResult;
+        private ActionOnAggegateReference<T> _runRef;
+        private Action _runNoArgument;
         private Func<T, Task> _onSuccess;
         private ErrorHandling _onError;
         private Func<Task> _finally;
@@ -28,10 +29,10 @@ namespace DXGame.Common.Helpers
             _loadAggregate = loadAggregate;
         }
 
-        public HandlerTask(IHandler handler, Action runNoResult)
+        public HandlerTask(IHandler handler, Action runNoArgument)
         {
             _handler = handler;
-            _runNoResult = runNoResult;
+            _runNoArgument = runNoArgument;
         }
 
         public async Task ExecuteAsync()
@@ -50,9 +51,13 @@ namespace DXGame.Common.Helpers
                 {
                     _run(_aggregate);
                 }
-                if (_runNoResult != null) 
+                if (_runRef != null) 
                 {
-                    _runNoResult();
+                    _runRef(ref _aggregate);
+                }
+                if (_runNoArgument != null) 
+                {
+                    _runNoArgument();
                 }
                 if (_onSuccess != null)
                 {
@@ -88,6 +93,13 @@ namespace DXGame.Common.Helpers
         public IHandlerTask<T> Run(Action<T> func)
         {
             _run = func;
+
+            return this;
+        }
+
+        public IHandlerTask<T> Run(ActionOnAggegateReference<T> func)
+        {
+            _runRef = func;
 
             return this;
         }

@@ -17,7 +17,7 @@ namespace DXGame.Common.Models
         private ISet<IEvent> _recentlyAppliedEvents = new HashSet<IEvent>();
         public IEnumerable<IEvent> RecentlyAppliedEvents 
         { 
-            get { return _recentlyAppliedEvents.ToArray(); }
+            get { return _recentlyAppliedEvents; }
             protected set { _recentlyAppliedEvents = new HashSet<IEvent>(value); }
         }
         private Dictionary<Type, Action<IEvent>> _eventAppliers =  new Dictionary<Type, Action<IEvent>>();

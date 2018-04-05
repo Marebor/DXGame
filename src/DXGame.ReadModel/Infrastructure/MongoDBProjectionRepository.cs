@@ -12,7 +12,7 @@ namespace DXGame.ReadModel.Infrastructure
     {
         IMongoDatabase _database;
         IMongoCollection<T> Collection<T>() where T : IProjection
-            => _database.GetCollection<T>(nameof(T));
+            => _database.GetCollection<T>(typeof(T).FullName);
 
         public MongoDBProjectionRepository(IMongoDatabase database)
         {

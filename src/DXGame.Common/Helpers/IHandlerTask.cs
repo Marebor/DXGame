@@ -12,7 +12,10 @@ namespace DXGame.Common.Helpers
         Task ExecuteAsync();
         IHandlerTask<T> Validate(Action<T> func);
         IHandlerTask<T> Run(Action<T> func);
+        IHandlerTask<T> Run(ActionOnAggegateReference<T> func);
         IErrorHandler OnSuccess(Func<T, Task> func);
         IHandler Then();
     }
+
+    public delegate void ActionOnAggegateReference<T>(ref T aggregate);
 }

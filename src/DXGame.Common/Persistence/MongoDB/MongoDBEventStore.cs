@@ -67,30 +67,16 @@ namespace DXGame.Common.Persistence.MongoDB
                 .ToListAsync();
 
         public async Task SaveEventsAsync(Guid aggregateId, IEnumerable<IEvent> events)
-        {
-            var versionedEvent = events.FirstOrDefault(e => e is IAggregateAppliedEvent);
-            if (versionedEvent != null)
-                await VerifyAggregateVersionAsync(aggregateId, 
-                    (versionedEvent as IAggregateAppliedEvent).AppliedOnAggregateVersion
-                );
-            await Events
+            => await Events
                 .InsertManyAsync(
                     events.Select(e => 
                         new EventEntity(aggregateId, DateTime.UtcNow, e)
                     )
                 );
-        }
 
-        public async Task VerifyAggregateVersionAsync(Guid aggregateId, int version)
+        public Task VerifyAggregateVersionAsync(Guid aggregateId, int version)
         {
-            var currentVersion = await Events
-                .AsQueryable()
-                .Where(e => e.AggregateId == aggregateId)
-                .Select(e => e.AppliedOnAggregateVersion)
-                .MaxAsync() + 1;
-            
-            if (currentVersion != version)
-                throw new DXGameException("concurrency_error");
+            throw new NotImplementedException();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
                 if (playroom != null)
                     throw new DXGameException("specified_id_already_in_use");
             })
-            .Run(playroom => 
+            .Run((ref Models.Playroom playroom) => 
             {
                 playroom = Models.Playroom.Create(command);
             })

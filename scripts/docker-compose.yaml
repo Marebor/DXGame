@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  start-dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - mongo
+      - rabbitmq
+    command: rabbitmq:5672
+
+  api:
+    build: ../src/DXGame.Api
+    links:
+      - rabbitmq
+      - mongo
+    ports:
+      - '5000:5000'
+  
+  services.playroom:
+    build: ../src/DXGame.Services.Playroom
+    links:
+      - rabbitmq
+      - mongo
+    ports:
+      - '5050:5050'
+
+  mongo:
+    image: mongo
+    volumes:
+      - ../data/db:/data/db
+    ports:
+      - '27017:27017'
+
+  rabbitmq:
+    image: rabbitmq:3.6.5-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'

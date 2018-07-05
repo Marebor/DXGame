@@ -17,6 +17,7 @@ namespace DXGame.Api.Controllers
     {
         IProjectionService _projectionService;
 
+
         public PlayroomsController(IActionResultHelper actionResultHelper, ILogger<PlayroomsController> logger, 
             IMessageBus messageBus, IProjectionService projectionService) 
             : base(actionResultHelper, logger, messageBus)

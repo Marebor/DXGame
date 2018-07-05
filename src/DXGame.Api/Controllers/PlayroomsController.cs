@@ -15,178 +15,53 @@ namespace DXGame.Api.Controllers
     [Route("[controller]")]
     public class PlayroomsController : ExtendedController
     {
-        IActionResultHelper _actionResultHelper;
-        ILogger<PlayroomsController> _logger;
-        IMessageBus _messageBus;
         IProjectionService _projectionService;
 
         public PlayroomsController(IActionResultHelper actionResultHelper, ILogger<PlayroomsController> logger, 
-            IMessageBus messageBus, IProjectionService projectionService)
+            IMessageBus messageBus, IProjectionService projectionService) 
+            : base(actionResultHelper, logger, messageBus)
         {
-            _actionResultHelper = actionResultHelper;
-            _logger = logger;
-            _messageBus = messageBus;
             _projectionService = projectionService;
         }
         
         [HttpGet]
         public async Task<IActionResult> Get()
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    var playrooms = await _projectionService.BrowseAsync<PlayroomProjection>();
-                    return Ok(playrooms);
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return InternalServerError(); 
-                })
-                .PropagateException()
-                .ExecuteAsync();
+            => await Return(async () => await _projectionService.BrowseAsync<PlayroomProjection>());
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    var playroom = await _projectionService.GetAsync<PlayroomProjection>(id);
-                    return Ok(playroom);
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return NotFound(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await Return(async () => await _projectionService.GetAsync<PlayroomProjection>(id));
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CreatePlayroom command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> Delete([FromBody]DeletePlayroom command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> AddPlayer([FromBody]AddPlayer command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> RemovePlayer([FromBody]RemovePlayer command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> ChangeOwner([FromBody]ChangeOwner command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePassword command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> ChangePrivacy([FromBody]ChangePrivacy command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
 
         [HttpPut]
         public async Task<IActionResult> StartGame([FromBody]StartGame command)
-            => await _actionResultHelper
-                .Return(async () => 
-                {
-                    await _messageBus.PublishAsync(command);
-                    return Accepted();
-                })
-                .OnError(ex => 
-                { 
-                    _logger.LogError(ex, ex.Message); 
-                    return ServiceUnavailable(); 
-                })
-                .DoNotPropagateException()
-                .ExecuteAsync();
+            => await ProcessCommand(command);
     }
 }

@@ -22,3 +22,7 @@ sudo docker logs <container_id>     (list of containers: sudo docker ps)
 DELETING CONTAINERS AND IMAGES OF TYPE <NONE>:
 
 sudo docker rmi $(sudo docker images -q -f dangling=true) --force
+
+
+DELETE data folder:
+sudo rm -rf ../data

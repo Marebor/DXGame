@@ -20,6 +20,7 @@ namespace DXGame.Api.Controllers
 
         public TestController(IActionResultHelper actionResultHelper, ILogger<TestController> logger, 
             IMessageBus messageBus, IProjectionRepository projectionRepository)
+            : base(actionResultHelper, logger, messageBus)
         {
             _actionResultHelper = actionResultHelper;
             _logger = logger;

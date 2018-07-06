@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using DXGame.Common.Communication;
 using DXGame.Common.Communication.RabbitMQ;
 using DXGame.Common.DependencyInjection;
@@ -33,14 +34,13 @@ namespace DXGame.ReadModel
             services.AddMvc();
             services.AddRawRabbit(Configuration);
             services.AddMongoDB(Configuration);
+            services.AddAutoMapper();
             services.AddAssemblyMessageHandlers();
             services.AddLogging();
-            services.AddScoped<IMessageBus, RawRabbitMessageBus>();
             services.AddScoped<IHandler, Handler>();
             services.AddScoped<IProjectionRepository, MongoDBProjectionRepository>();
             services.AddScoped<IProjectionService, ProjectionService>();
-            services.AddScoped<AutoMapper.IMapper, AutoMapper.Mapper>();
-            services.AddScoped<IMapper, Mapper>();
+            services.AddScoped<Infrastructure.Abstract.IMapper, Infrastructure.Mapper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

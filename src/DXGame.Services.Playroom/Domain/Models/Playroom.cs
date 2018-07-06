@@ -14,17 +14,17 @@ namespace DXGame.Services.Playroom.Domain.Models
     {
         protected override void RegisterAppliers()
         {
-            RegisterApplier<PlayroomCreated>(this.ApplyEvent);
-            RegisterApplier<PlayerJoined>(this.ApplyEvent);
-            RegisterApplier<PlayerLeft>(this.ApplyEvent);
-            RegisterApplier<GameStartRequested>(this.ApplyEvent);
-            RegisterApplier<GameStarted>(this.ApplyEvent);
-            RegisterApplier<GameStartFailed>(this.ApplyEvent);
-            RegisterApplier<GameFinishReceived>(this.ApplyEvent);
-            RegisterApplier<PrivacyChanged>(this.ApplyEvent);
-            RegisterApplier<PasswordChanged>(this.ApplyEvent);
-            RegisterApplier<OwnerChanged>(this.ApplyEvent);
-            RegisterApplier<PlayroomDeleted>(this.ApplyEvent);
+            RegisterApplier<PlayroomCreated>(this.Apply);
+            RegisterApplier<PlayerJoined>(this.Apply);
+            RegisterApplier<PlayerLeft>(this.Apply);
+            RegisterApplier<GameStartRequested>(this.Apply);
+            RegisterApplier<GameStarted>(this.Apply);
+            RegisterApplier<GameStartFailed>(this.Apply);
+            RegisterApplier<GameFinishReceived>(this.Apply);
+            RegisterApplier<PrivacyChanged>(this.Apply);
+            RegisterApplier<PasswordChanged>(this.Apply);
+            RegisterApplier<OwnerChanged>(this.Apply);
+            RegisterApplier<PlayroomDeleted>(this.Apply);
         }
         private ISet<Guid> _players { get; set; } = new HashSet<Guid>();
         private ISet<Game> _completedGames { get; set; } = new HashSet<Game>();
@@ -59,7 +59,7 @@ namespace DXGame.Services.Playroom.Domain.Models
                     command.Password,
                     playroom.Version,
                     command.CommandId
-                ) as IEvent
+                )
             );
 
             return playroom;
@@ -72,7 +72,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (_players.Any(p => p == command.Player))
                 throw new DXGameException("playroom_already_contains_specified_player");
                 
-            ApplyEvent(new PlayerJoined(this.Id, command.Player, Version, command.CommandId) as IEvent);
+            ApplyEvent(new PlayerJoined(this.Id, command.Player, Version, command.CommandId));
         }
 
         public void RemovePlayer(RemovePlayer command) 
@@ -82,7 +82,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Any(p => p == command.Player))
                 throw new DXGameException("playroom_does_not_contain_specified_player");
 
-            ApplyEvent(new PlayerLeft(this.Id, command.Player, Version, command.CommandId) as IEvent);
+            ApplyEvent(new PlayerLeft(this.Id, command.Player, Version, command.CommandId));
         }
 
         public void NewGame(StartGame command) 
@@ -96,7 +96,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Contains(command.Requester))
                 throw new DXGameException("unathorized_request");
 
-            ApplyEvent(new GameStartRequested(this.Id, command.Game, command.CommandId) as IEvent);
+            ApplyEvent(new GameStartRequested(this.Id, command.Game, command.CommandId));
         }
 
         public void ChangePrivacy(ChangePrivacy command)
@@ -106,7 +106,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (command.Password != Password)
                 throw new DXGameException("invalid_password");
 
-            ApplyEvent(new PrivacyChanged(Id, command.Private, Version, command.CommandId) as IEvent);
+            ApplyEvent(new PrivacyChanged(Id, command.Private, Version, command.CommandId));
         }
 
         public void ChangePassword(ChangePassword command) 
@@ -118,7 +118,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (command.NewPassword == command.OldPassword)
                 throw new DXGameException("new_password_equal_to_current");
 
-            ApplyEvent(new PasswordChanged(this.Id, command.NewPassword, Version, command.CommandId) as IEvent);
+            ApplyEvent(new PasswordChanged(this.Id, command.NewPassword, Version, command.CommandId));
         }
 
         public void ChangeOwner(ChangeOwner command)
@@ -130,7 +130,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (!_players.Contains(command.NewOwner))
                 throw new DXGameException("specified_player_is_not_a_member_of_playroom");
 
-            ApplyEvent(new OwnerChanged(Id, command.NewOwner, Version, command.CommandId) as IEvent);
+            ApplyEvent(new OwnerChanged(Id, command.NewOwner, Version, command.CommandId));
         }
 
         public void Delete(DeletePlayroom command)
@@ -140,7 +140,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (command.Password != Password)
                 throw new DXGameException("invalid_password");
 
-            ApplyEvent(new PlayroomDeleted(Id, Version, command.CommandId) as IEvent);
+            ApplyEvent(new PlayroomDeleted(Id, Version, command.CommandId));
         }
 #endregion Handling Commands
 
@@ -152,7 +152,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != e.Game)
                 throw new DXGameException("another_game_is_requested_to_start");
 
-            ApplyEvent(new GameStarted(Id, e.Game, Version, e.RelatedCommand) as IEvent);
+            ApplyEvent(new GameStarted(Id, e.Game, Version, e.RelatedCommand));
         }
 
         public void OnGameStartRequestRejected(GameStartRequestRejected e)
@@ -162,7 +162,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != e.Game)
                 throw new DXGameException("another_game_is_requested_to_start");
 
-            ApplyEvent(new GameStartFailed(Id, e.Game, "start_request_rejected", e.RelatedCommand) as IEvent);
+            ApplyEvent(new GameStartFailed(Id, e.Game, "start_request_rejected", e.RelatedCommand));
         }
 
         public void OnGameFinished(GameFinished e)
@@ -172,12 +172,12 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (ActiveGame.Id != e.Game)
                 throw new DXGameException("another_game_is_currently_active");
 
-            ApplyEvent(new GameFinishReceived(Id, e.Game, Version) as IEvent);
+            ApplyEvent(new GameFinishReceived(Id, e.Game, Version));
         }
 #endregion Handling External Events
 
 #region Event Appliers
-        public void ApplyEvent(PlayroomCreated e) 
+        public void Apply(PlayroomCreated e) 
         {
             Id = e.Id;
             Name = e.Name;
@@ -189,53 +189,53 @@ namespace DXGame.Services.Playroom.Domain.Models
             ActiveGame = null;
         }
 
-        public void ApplyEvent(PlayerJoined e)
+        public void Apply(PlayerJoined e)
         {
             _players.Add(e.Player);
         }
 
-        public void ApplyEvent(PlayerLeft e) 
+        public void Apply(PlayerLeft e) 
         {
             _players.Remove(e.Player);
         }
 
-        public void ApplyEvent(GameStartRequested e) 
+        public void Apply(GameStartRequested e) 
         {
             ActiveGame = new Game(e.Game, GameState.StartRequested);
         }
 
-        public void ApplyEvent(GameStarted e)
+        public void Apply(GameStarted e)
         {
             ActiveGame.State = GameState.InProgress;
         }
 
-        public void ApplyEvent(GameStartFailed e)
+        public void Apply(GameStartFailed e)
         {
             ActiveGame = null;
         }
 
-        public void ApplyEvent(GameFinishReceived e)
+        public void Apply(GameFinishReceived e)
         {
             _completedGames.Add(ActiveGame);
             ActiveGame = null;
         }
 
-        public void ApplyEvent(PrivacyChanged e) 
+        public void Apply(PrivacyChanged e) 
         {
             IsPrivate = e.IsPrivate;
         }
 
-        public void ApplyEvent(PasswordChanged e) 
+        public void Apply(PasswordChanged e) 
         {
             Password = e.Password;
         }
 
-        public void ApplyEvent(OwnerChanged e)
+        public void Apply(OwnerChanged e)
         {
             Owner = e.Owner;
         }
 
-        public void ApplyEvent(PlayroomDeleted e)
+        public void Apply(PlayroomDeleted e)
         {
             IsDeleted = true;
         }

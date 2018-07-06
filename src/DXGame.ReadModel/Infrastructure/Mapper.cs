@@ -1,16 +1,20 @@
 using AutoMapper;
+using DXGame.Messages.Events.Playroom;
+using DXGame.ReadModel.Models;
 
 namespace DXGame.ReadModel.Infrastructure
 {
     public class Mapper : Abstract.IMapper
     {
-        IMapper _mapper;
-
-        public Mapper(IMapper mapper)
-        {
-            _mapper = mapper;
-        }
         public T Map<T>(object from)
-            => _mapper.Map<T>(from);
+            => AutoMapper.Mapper.Map<T>(from);
+    }
+
+    public class MappingProfile : Profile
+    {
+        public MappingProfile()
+        {
+            CreateMap<PlayroomCreated, PlayroomProjection>();
+        }
     }
 }

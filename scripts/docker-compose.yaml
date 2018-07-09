@@ -31,6 +31,14 @@ services:
       - mongo
     ports:
       - '5050:5050'
+  
+  services.player:
+    build: ../src/DXGame.Services.Player
+    links:
+      - rabbitmq
+      - mongo
+    ports:
+      - '5051:5051'
 
   mongo:
     image: mongo

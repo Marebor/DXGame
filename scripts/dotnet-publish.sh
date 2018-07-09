@@ -5,3 +5,5 @@ dotnet clean ./DXGame.ReadModel -c Release
 dotnet publish ./DXGame.ReadModel -c Release -o ./bin/Docker --force
 dotnet clean ./DXGame.Services.Playroom -c Release
 dotnet publish ./DXGame.Services.Playroom -c Release -o ./bin/Docker --force
+dotnet clean ./DXGame.Services.Player -c Release
+dotnet publish ./DXGame.Services.Player -c Release -o ./bin/Docker --force

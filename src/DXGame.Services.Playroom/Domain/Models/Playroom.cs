@@ -6,6 +6,7 @@ using DXGame.Common.Models;
 using DXGame.Messages.Abstract;
 using DXGame.Messages.Commands.Playroom;
 using DXGame.Messages.Events.Game;
+using DXGame.Messages.Events.Player;
 using DXGame.Messages.Events.Playroom;
 
 namespace DXGame.Services.Playroom.Domain.Models
@@ -14,6 +15,8 @@ namespace DXGame.Services.Playroom.Domain.Models
     {
         protected override void RegisterAppliers()
         {
+            RegisterApplier<PlayroomCreationRequested>(this.Apply);
+            RegisterApplier<PlayroomCreationRequestRejected>(this.Apply);
             RegisterApplier<PlayroomCreated>(this.Apply);
             RegisterApplier<PlayerJoined>(this.Apply);
             RegisterApplier<PlayerLeft>(this.Apply);
@@ -22,7 +25,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             RegisterApplier<GameStartFailed>(this.Apply);
             RegisterApplier<GameFinishReceived>(this.Apply);
             RegisterApplier<PrivacyChanged>(this.Apply);
-            RegisterApplier<PasswordChanged>(this.Apply);
+            RegisterApplier<Messages.Events.Playroom.PasswordChanged>(this.Apply);
             RegisterApplier<OwnerChanged>(this.Apply);
             RegisterApplier<PlayroomDeleted>(this.Apply);
         }
@@ -30,6 +33,7 @@ namespace DXGame.Services.Playroom.Domain.Models
         private ISet<Game> _completedGames { get; set; } = new HashSet<Game>();
         public string Name { get; protected set; }
         public bool IsPrivate { get; protected set; }
+        public PlayroomCreationState CreationState { get; protected set; }
         public Guid Owner { get; protected set; }
         public string Password { get; protected set; }
         public IEnumerable<Guid> Players 
@@ -51,7 +55,7 @@ namespace DXGame.Services.Playroom.Domain.Models
         {
             var playroom = new Playroom();
             playroom.ApplyEvent(
-                new PlayroomCreated(
+                new PlayroomCreationRequested(
                     command.PlayroomId, 
                     command.Name,
                     command.IsPrivate,
@@ -118,7 +122,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             if (command.NewPassword == command.OldPassword)
                 throw new DXGameException("new_password_equal_to_current");
 
-            ApplyEvent(new PasswordChanged(this.Id, command.NewPassword, Version, command.CommandId));
+            ApplyEvent(new Messages.Events.Playroom.PasswordChanged(this.Id, command.NewPassword, Version, command.CommandId));
         }
 
         public void ChangeOwner(ChangeOwner command)
@@ -145,6 +149,22 @@ namespace DXGame.Services.Playroom.Domain.Models
 #endregion Handling Commands
 
 #region Handling External Events
+        public void OnPlayroomCreationRequestAcceptedByPlayerService(PlayroomCreationRequestAccepted e)
+        {
+            if (CreationState != PlayroomCreationState.CreationPending)
+                throw new DXGameException("playroom_is_not_pending_to_be_created");
+
+            ApplyEvent(new PlayroomCreated(e.PlayroomId, this.Name, this.IsPrivate, this.Owner, this.Version, e.RelatedCommand));
+        }
+
+        public void OnPlayroomCreationRequestRejectedByPlayerService(PlayroomCreationRequestRejected e)
+        {
+            if (CreationState != PlayroomCreationState.CreationPending)
+                throw new DXGameException("playroom_is_not_pending_to_be_created");
+
+            ApplyEvent(e);
+        }
+
         public void OnGameStartRequestAccepted(GameStartRequestAccepted e)
         {
             if (ActiveGame.State != GameState.StartRequested)
@@ -177,7 +197,7 @@ namespace DXGame.Services.Playroom.Domain.Models
 #endregion Handling External Events
 
 #region Event Appliers
-        public void Apply(PlayroomCreated e) 
+        public void Apply(PlayroomCreationRequested e)
         {
             Id = e.Id;
             Name = e.Name;
@@ -187,6 +207,17 @@ namespace DXGame.Services.Playroom.Domain.Models
             Players = new HashSet<Guid>() { Owner };
             CompletedGames = new HashSet<Game>();
             ActiveGame = null;
+            CreationState = PlayroomCreationState.CreationPending;
+        }
+
+        public void Apply(PlayroomCreated e) 
+        {
+            CreationState = PlayroomCreationState.Created;
+        }
+        
+        public void Apply(PlayroomCreationRequestRejected e) 
+        {
+            CreationState = PlayroomCreationState.CreationRejected;
         }
 
         public void Apply(PlayerJoined e)
@@ -225,7 +256,7 @@ namespace DXGame.Services.Playroom.Domain.Models
             IsPrivate = e.IsPrivate;
         }
 
-        public void Apply(PasswordChanged e) 
+        public void Apply(Messages.Events.Playroom.PasswordChanged e) 
         {
             Password = e.Password;
         }
@@ -240,5 +271,13 @@ namespace DXGame.Services.Playroom.Domain.Models
             IsDeleted = true;
         }
         #endregion Event Appliers
+    }
+
+    public enum PlayroomCreationState
+    {
+        None,
+        CreationPending,
+        CreationRejected,
+        Created
     }
 }

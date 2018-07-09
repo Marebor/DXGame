@@ -23,7 +23,6 @@ namespace DXGame.Api.Handlers.Playroom
         public async Task HandleAsync(PlayroomCreated e) => await _handler
             .Run(async () => 
             {
-                e.HidePassword();
                 await _broadcaster.BroadcastAsync<PlayroomCreated>(e.RelatedCommand, e);
                 await _broadcaster.BroadcastAsync<PlayroomCreated>(e);
             })

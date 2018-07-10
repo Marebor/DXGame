@@ -20,15 +20,16 @@ namespace DXGame.Services.Playroom.Tests
             var owner = Guid.NewGuid();
             var events = new List<IEvent> 
             {
-                new PlayroomCreated(playroomId, "Test", false, owner, null, 0, Guid.NewGuid()),
-                new PlayerJoined(playroomId, Guid.NewGuid(), 1, Guid.NewGuid()),
+                new PlayroomCreationRequested(playroomId, "Test", false, owner, null, 0, Guid.NewGuid()),
+                new PlayroomCreated(playroomId, "Test", false, owner, 1, Guid.NewGuid()),
+                new PlayerJoined(playroomId, Guid.NewGuid(), 2, Guid.NewGuid()),
             };
             var playroom = Aggregate.Builder.Build<Domain.Models.Playroom>(events);
 
             Assert.AreEqual(playroomId, playroom.Id);
             Assert.AreEqual(2, playroom.Players.Count());
             Assert.AreEqual(0, playroom.RecentlyAppliedEvents.Count());
-            Assert.AreEqual(2, playroom.Version);
+            Assert.AreEqual(3, playroom.Version);
         }
 
         [TestMethod]
@@ -40,13 +41,13 @@ namespace DXGame.Services.Playroom.Tests
                 "Test",
                 Guid.NewGuid(),
                 false,
-                null
+                "secret"
             );
             var playroom = Domain.Models.Playroom.Create(command);
             playroom.MarkRecentlyAppliedEventsAsConfirmed();
 
-            playroom.AddPlayer(new AddPlayer(Guid.NewGuid(),Guid.NewGuid(), Guid.NewGuid(), null));
-            playroom.AddPlayer(new AddPlayer(Guid.NewGuid(),Guid.NewGuid(), Guid.NewGuid(), null));
+            playroom.ChangePassword(new ChangePassword(Guid.NewGuid(), playroom.Id, "secret", "secret1", playroom.Owner));
+            playroom.ChangePassword(new ChangePassword(Guid.NewGuid(), playroom.Id, "secret1", "secret2", playroom.Owner));
             playroom.NewGame(new StartGame(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), playroom.Players.First()));
 
             Assert.AreEqual(3, playroom.RecentlyAppliedEvents.Count());

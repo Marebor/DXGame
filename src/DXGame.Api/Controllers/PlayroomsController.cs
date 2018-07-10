@@ -36,31 +36,31 @@ namespace DXGame.Api.Controllers
         public async Task<IActionResult> Post([FromBody]CreatePlayroom command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("delete")]
         public async Task<IActionResult> Delete([FromBody]DeletePlayroom command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("addplayer")]
         public async Task<IActionResult> AddPlayer([FromBody]AddPlayer command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("removeplayer")]
         public async Task<IActionResult> RemovePlayer([FromBody]RemovePlayer command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("changeowner")]
         public async Task<IActionResult> ChangeOwner([FromBody]ChangeOwner command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("changepassword")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePassword command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("changeprivacy")]
         public async Task<IActionResult> ChangePrivacy([FromBody]ChangePrivacy command)
             => await ProcessCommand(command);
 
-        [HttpPut]
+        [HttpPut("startgame")]
         public async Task<IActionResult> StartGame([FromBody]StartGame command)
             => await ProcessCommand(command);
     }

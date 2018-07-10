@@ -1,4 +1,5 @@
 using AutoMapper;
+using DXGame.Messages.Events.Player;
 using DXGame.Messages.Events.Playroom;
 using DXGame.ReadModel.Models;
 
@@ -15,6 +16,7 @@ namespace DXGame.ReadModel.Infrastructure
         public MappingProfile()
         {
             CreateMap<PlayroomCreated, PlayroomProjection>();
+            CreateMap<PlayerCreated, PlayerProjection>();
         }
     }
 }

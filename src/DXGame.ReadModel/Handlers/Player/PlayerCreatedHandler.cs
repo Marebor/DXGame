@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DXGame.Common.Communication;
 using DXGame.Common.Helpers;
-using DXGame.Messages.Events.Playroom;
+using DXGame.Messages.Events.Player;
 using DXGame.ReadModel.Infrastructure.Abstract;
 using DXGame.ReadModel.Models;
 using Microsoft.Extensions.Logging;
 
 namespace DXGame.ReadModel.Handlers.Playroom
 {
-    public class PlayroomCreatedHandler : IEventHandler<PlayroomCreated>
+    public class PlayerCreatedHandler : IEventHandler<PlayerCreated>
     {
         IHandler _handler;
-        ILogger<PlayroomCreatedHandler> _logger;
+        ILogger<PlayerCreatedHandler> _logger;
         IMapper _mapper;
         IProjectionService _projectionService;
 
-        public PlayroomCreatedHandler(IHandler handler, ILogger<PlayroomCreatedHandler> logger, 
+        public PlayerCreatedHandler(IHandler handler, ILogger<PlayerCreatedHandler> logger, 
             IMapper mapper, IProjectionService projectionService)
         {
             _handler = handler;
@@ -25,13 +25,11 @@ namespace DXGame.ReadModel.Handlers.Playroom
             _mapper = mapper;
             _projectionService = projectionService;
         }
-        public async Task HandleAsync(PlayroomCreated e) => await _handler
+        public async Task HandleAsync(PlayerCreated e) => await _handler
             .Run(async () => 
             {
-                var playroom = _mapper.Map<PlayroomProjection>(e);
-                playroom.Players = new HashSet<Guid>() { playroom.Owner };
-                playroom.CompletedGames = new HashSet<Guid>();
-                await _projectionService.SaveAsync(playroom);
+                var projection = _mapper.Map<PlayerProjection>(e);
+                await _projectionService.SaveAsync(projection);
             })
             .OnError(ex => 
             {

@@ -6,7 +6,7 @@ namespace DXGame.Common.Exceptions
     {
         public string ErrorCode { get; protected set; }
 
-        public DXGameException(string errorCode, string message = null) : base(message)
+        public DXGameException(string errorCode, string message = null) : base(message != null ? message : errorCode)
         {
             ErrorCode = errorCode;
         }

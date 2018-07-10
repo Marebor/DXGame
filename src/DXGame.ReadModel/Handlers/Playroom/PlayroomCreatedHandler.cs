@@ -29,6 +29,8 @@ namespace DXGame.ReadModel.Handlers.Playroom
             .Run(async () => 
             {
                 var playroom = _mapper.Map<PlayroomProjection>(e);
+                playroom.Players = new HashSet<Guid>() { playroom.Owner };
+                playroom.CompletedGames = new HashSet<Guid>();
                 await _projectionService.SaveAsync(playroom);
             })
             .OnError(ex => 

@@ -41,13 +41,13 @@ namespace DXGame.Services.Playroom.Tests
                 "Test",
                 Guid.NewGuid(),
                 false,
-                null
+                "secret"
             );
             var playroom = Domain.Models.Playroom.Create(command);
             playroom.MarkRecentlyAppliedEventsAsConfirmed();
 
-            playroom.AddPlayer(new AddPlayer(Guid.NewGuid(),Guid.NewGuid(), Guid.NewGuid(), null));
-            playroom.AddPlayer(new AddPlayer(Guid.NewGuid(),Guid.NewGuid(), Guid.NewGuid(), null));
+            playroom.ChangePassword(new ChangePassword(Guid.NewGuid(), playroom.Id, "secret", "secret1", playroom.Owner));
+            playroom.ChangePassword(new ChangePassword(Guid.NewGuid(), playroom.Id, "secret1", "secret2", playroom.Owner));
             playroom.NewGame(new StartGame(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), playroom.Players.First()));
 
             Assert.AreEqual(3, playroom.RecentlyAppliedEvents.Count());

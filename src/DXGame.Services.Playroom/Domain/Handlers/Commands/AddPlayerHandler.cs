@@ -23,23 +23,21 @@ namespace DXGame.Services.Playroom.Domain.Handlers.Commands
         public async Task HandleAsync(AddPlayer command) => await _handler
             .LoadAggregate(async () =>
             {
-                var playroomEvents = await _eventService.GetAggregateEventsAsync(command.Playroom);
-                return Aggregate.Builder.Build<Models.Playroom>(playroomEvents);
+                var events = await _eventService.GetAggregateEventsAsync(command.Playroom);
+                return Aggregate.Builder.Build<Models.Playroom>(events);
             })
-            .Validate(playroom =>
+            .Validate(aggregate =>
             {
-                if (playroom == null || playroom.IsDeleted)
-                    throw new DXGameException("playroom_with_specified_id_does_not_exist");
-            })
-            .Run(playroom =>
-            {
-                playroom.AddPlayer(command);
+                if (aggregate == null || aggregate.IsDeleted)
+                    throw new DXGameException("aggregate_with_specified_id_does_not_exist");
+                if (command.Password != aggregate.Password)
+                    throw new DXGameException("invalid_password");
+                if (aggregate.Players.Any(p => p == command.Player))
+                    throw new DXGameException("playroom_already_contains_specified_player");
             })
             .OnSuccess(async playroom =>
             {
-                await _eventService.StoreEventsAsync(playroom.Id, playroom.RecentlyAppliedEvents.ToArray());
-                await _eventService.PublishEventsAsync(playroom.RecentlyAppliedEvents.ToArray());
-                playroom.MarkRecentlyAppliedEventsAsConfirmed();
+                await _eventService.PublishEventsAsync(new PlayerAdditionRequested(command.Playroom, command.Player, command.CommandId));
             })
             .OnCustomError<DXGameException>(async ex =>
             {

@@ -69,16 +69,6 @@ namespace DXGame.Services.Playroom.Domain.Models
             return playroom;
         }
 
-        public void AddPlayer(AddPlayer command) 
-        {
-            if (command.Password != Password)
-                throw new DXGameException("invalid_password");
-            if (_players.Any(p => p == command.Player))
-                throw new DXGameException("playroom_already_contains_specified_player");
-                
-            ApplyEvent(new PlayerJoined(this.Id, command.Player, Version, command.CommandId));
-        }
-
         public void RemovePlayer(RemovePlayer command) 
         {
             if (Owner != default(Guid) && command.Requester != Owner)
@@ -163,6 +153,11 @@ namespace DXGame.Services.Playroom.Domain.Models
                 throw new DXGameException("playroom_is_not_pending_to_be_created");
 
             ApplyEvent(e);
+        }
+
+        public void OnPlayerAdditionRequestAcceptedByPlayerService(PlayerAdditionRequestAccepted e)
+        {
+            ApplyEvent(new PlayerJoined(this.Id, e.PlayerId, Version, e.RelatedCommand));
         }
 
         public void OnGameStartRequestAccepted(GameStartRequestAccepted e)

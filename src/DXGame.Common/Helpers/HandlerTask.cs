@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using DXGame.Common.Models;
+using Microsoft.Extensions.Logging;
 
 namespace DXGame.Common.Helpers
 {
     public class HandlerTask<T> : IHandlerTask<T>, IErrorHandler, IErrorPropagator
     {
+        private readonly ILogger _logger;
         private readonly IHandler _handler;
         private readonly Func<Task<T>> _loadAggregate;
         private T _aggregate;
@@ -23,10 +25,11 @@ namespace DXGame.Common.Helpers
         private IDictionary<Type, ErrorHandling> _onCustomErrors = new Dictionary<Type, ErrorHandling>();
         private ErrorHandling _currentErrorDefinition;
 
-        public HandlerTask(IHandler handler, Func<Task<T>> loadAggregate)
+        public HandlerTask(IHandler handler, Func<Task<T>> loadAggregate, ILogger logger)
         {
             _handler = handler;
             _loadAggregate = loadAggregate;
+            _logger = logger;
         }
 
         public HandlerTask(IHandler handler, Action runNoArgument)
@@ -66,6 +69,7 @@ namespace DXGame.Common.Helpers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, ex.Message);
                 await HandleExceptionAsync(ex);
                 var propagate = _onCustomErrors.ContainsKey(ex.GetType()) ?
                     _onCustomErrors[ex.GetType()].Propagate : _onError.Propagate;

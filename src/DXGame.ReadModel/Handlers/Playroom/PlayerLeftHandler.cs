@@ -11,7 +11,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class PlayerLeftHandler : IEventHandler<PlayerLeft>
     {
         IHandler _handler;
-        ILogger<PlayerLeftHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public PlayerLeftHandler(IHandler handler, ILogger<PlayerLeftHandler> logger, 

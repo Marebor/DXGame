@@ -11,7 +11,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class OwnerChangedHandler : IEventHandler<OwnerChanged>
     {
         IHandler _handler;
-        ILogger<OwnerChangedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public OwnerChangedHandler(IHandler handler, ILogger<OwnerChangedHandler> logger, 

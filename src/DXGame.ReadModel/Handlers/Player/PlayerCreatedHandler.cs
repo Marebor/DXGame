@@ -13,7 +13,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class PlayerCreatedHandler : IEventHandler<PlayerCreated>
     {
         IHandler _handler;
-        ILogger<PlayerCreatedHandler> _logger;
+        ILogger _logger;
         IMapper _mapper;
         IProjectionService _projectionService;
 

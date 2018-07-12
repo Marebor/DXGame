@@ -12,7 +12,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class GameFinishReceivedHandler : IEventHandler<GameFinishReceived>
     {
         IHandler _handler;
-        ILogger<GameFinishReceivedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public GameFinishReceivedHandler(IHandler handler, ILogger<GameFinishReceivedHandler> logger, 

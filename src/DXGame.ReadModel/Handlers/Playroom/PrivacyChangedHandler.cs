@@ -11,7 +11,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class PrivacyChangedHandler : IEventHandler<PrivacyChanged>
     {
         IHandler _handler;
-        ILogger<PrivacyChangedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public PrivacyChangedHandler(IHandler handler, ILogger<PrivacyChangedHandler> logger, 

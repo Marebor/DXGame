@@ -11,7 +11,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class PlayerJoinedHandler : IEventHandler<PlayerJoined>
     {
         IHandler _handler;
-        ILogger<PlayerJoinedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public PlayerJoinedHandler(IHandler handler, ILogger<PlayerJoinedHandler> logger, 

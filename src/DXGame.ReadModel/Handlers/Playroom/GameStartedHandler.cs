@@ -13,7 +13,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class GameStartedHandler : IEventHandler<GameStarted>
     {
         IHandler _handler;
-        ILogger<GameStartedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public GameStartedHandler(IHandler handler, ILogger<GameStartedHandler> logger, 

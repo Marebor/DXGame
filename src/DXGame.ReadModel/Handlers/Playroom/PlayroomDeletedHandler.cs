@@ -11,7 +11,7 @@ namespace DXGame.ReadModel.Handlers.Playroom
     public class PlayroomDeletedHandler : IEventHandler<PlayroomDeleted>
     {
         IHandler _handler;
-        ILogger<PlayroomDeletedHandler> _logger;
+        ILogger _logger;
         IProjectionService _projectionService;
 
         public PlayroomDeletedHandler(IHandler handler, ILogger<PlayroomDeletedHandler> logger, 

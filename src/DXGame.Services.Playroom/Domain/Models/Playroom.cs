@@ -71,7 +71,7 @@ namespace DXGame.Services.Playroom.Domain.Models
 
         public void RemovePlayer(RemovePlayer command) 
         {
-            if (Owner != default(Guid) && command.Requester != Owner)
+            if (Owner != default(Guid) && command.Requester != Owner && command.Requester != command.Player)
                 throw new DXGameException("unathorized_request");
             if (!_players.Any(p => p == command.Player))
                 throw new DXGameException("playroom_does_not_contain_specified_player");

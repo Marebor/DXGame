@@ -9,7 +9,6 @@ import { PlayerService } from './player.service';
     CommonModule,
     PlayerRoutingModule
   ],
-  declarations: [PlayerCreationComponent],
-  providers: [PlayerService]
+  declarations: [PlayerCreationComponent]
 })
 export class PlayerModule { }

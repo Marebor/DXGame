@@ -1,3 +1,21 @@
-<p>
-  game-center works!
-</p>
+<div>
+  <h3>Players</h3>
+  <h5>Current player:</h5> {{gameContext.activePlayer.name}}
+  <h5>All players:</h5>
+  <ul>
+    <li *ngFor="let player of players; trackBy: trackPlayerById">
+      {{player.name}}
+    </li>
+  </ul>
+</div>
+<div>
+  <h3>Playrooms</h3>
+  <h5>Current playroom:</h5>
+  <p *ngIf="gameContext.activePlayer.activePlayroom">{{gameContext.activePlayer.activePlayroom.name}}</p>
+  <h5>All playrooms:</h5>
+  <ul>
+    <li *ngFor="let playroom of gameContext.activePlayer.playrooms; trackBy: trackPlayroomById">
+      {{playroom.name}}
+    </li>
+  </ul>
+</div>

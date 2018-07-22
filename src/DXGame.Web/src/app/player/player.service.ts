@@ -1,4 +1,5 @@
-import { Observable, of, throwError, never } from 'rxjs';
+import { Player } from './player';
+import { Observable, of, throwError, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -6,17 +7,24 @@ import { Injectable } from '@angular/core';
 })
 export class PlayerService {
 
-  existingPlayers: string[] = [];
+  private existingPlayers: Player[] = [];
+  private localPlayersSubject$: Subject<Player[]> = new Subject<Player[]>();
+  public localPlayers$: Observable<Player[]> = of(this.existingPlayers);
 
   constructor() { }
 
-  createPlayer(name: string) : Observable<any> {
-    if (this.existingPlayers.find(el => el == name)) {
+  browsePlayers() {
+    return of(this.existingPlayers);
+  }
+
+  createPlayer(name: string) : Observable<Player> {
+    if (this.existingPlayers.find(p => p.name == name)) {
       return throwError(new Error("Player already exists"));
     }
     else {
-      this.existingPlayers.push(name);
-      return of(name);
+      let player = new Player(name);
+      this.existingPlayers.push(player);
+      return of(player);
     }
   }
 }

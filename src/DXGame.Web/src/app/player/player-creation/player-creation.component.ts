@@ -1,4 +1,5 @@
-import { PlayerService } from './../player.service';
+import { GameContextService } from './../../game-center/game-context.service';
+import { PlayerService } from '../player.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,14 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlayerCreationComponent implements OnInit {
 
-  constructor(private playerService: PlayerService) { }
+  constructor(private playerService: PlayerService, private gameContext: GameContextService) { }
 
   ngOnInit() {
   }
 
   createPlayer(name: string) {
     this.playerService.createPlayer(name).subscribe(
-      response => console.log(`Created user: ${name}`),
+      response => this.gameContext.switchPlayer(response),
       error => console.log(error)
     )
   }

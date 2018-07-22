@@ -13,8 +13,13 @@ const ROUTES: Routes = [
     loadChildren: './game-center/game-center.module#GameCenterModule'
   },
   {
-    path: 'players',
-    loadChildren: './player/player.module#PlayerModule'
+    path: 'player',
+    loadChildren: './player/player.module#PlayerModule',
+    data: { preload: true }
+  },
+  {
+    path: 'playroom',
+    loadChildren: './playroom/playroom.module#PlayroomModule'
   },
   {
     path: '',

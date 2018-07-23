@@ -12,16 +12,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class GameCenterComponent implements OnInit {
 
-  players: Player[] = [];
-
   constructor(private playerService: PlayerService, private playroomService: PlayroomService, 
     private gameContext: GameContextService) { }
 
   ngOnInit() {
-    this.playerService.localPlayers$.subscribe(
-      next => this.players = next,
-      error => console.log(error)
-    )
+    
   }
 
   trackPlayroomById(index: number, playroom: Playroom) {

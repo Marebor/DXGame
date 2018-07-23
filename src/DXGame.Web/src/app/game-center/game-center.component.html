@@ -1,20 +1,28 @@
 <div>
   <h3>Players</h3>
   <h5>Current player:</h5> {{gameContext.activePlayer.name}}
+  <h5>Current playroom:</h5> {{gameContext.activePlayer.activePlayroom?.name}}
+  <h5>All playrooms:</h5> 
+  <ul>
+    <li *ngFor="let playroom of gameContext.activePlayer.playrooms; trackBy: trackPlayroomById"
+      (click)="gameContext.switchPlayroom(playroom)">
+      {{playroom.name}}
+    </li>
+  </ul>
   <h5>All players:</h5>
   <ul>
-    <li *ngFor="let player of players; trackBy: trackPlayerById">
+    <li *ngFor="let player of playerService.localPlayers$ | async; trackBy: trackPlayerById"
+      (click)="gameContext.switchPlayer(player)">
       {{player.name}}
     </li>
   </ul>
 </div>
 <div>
   <h3>Playrooms</h3>
-  <h5>Current playroom:</h5>
-  <p *ngIf="gameContext.activePlayer.activePlayroom">{{gameContext.activePlayer.activePlayroom.name}}</p>
   <h5>All playrooms:</h5>
   <ul>
-    <li *ngFor="let playroom of gameContext.activePlayer.playrooms; trackBy: trackPlayroomById">
+    <li *ngFor="let playroom of playroomService.localPlayrooms$ | async; trackBy: trackPlayroomById"
+      (click)="gameContext.switchPlayroom(playroom)">
       {{playroom.name}}
     </li>
   </ul>

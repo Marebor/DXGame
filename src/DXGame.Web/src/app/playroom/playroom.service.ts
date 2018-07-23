@@ -1,21 +1,23 @@
+import { GameContextService } from './../game-center/game-context.service';
 import { Injectable } from '@angular/core';
 import { Playroom } from './playroom';
-import { throwError, of } from 'rxjs';
+import { throwError, of, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayroomService {
-  existingPlayrooms: Playroom[] = [];
+  private localPlayrooms: Playroom[] = [];
+  public localPlayrooms$: Observable<Playroom[]> = of(this.localPlayrooms);
 
   constructor() { }
 
   browsePlayrooms() {
-    return of(this.existingPlayrooms);
+    return of(this.localPlayrooms);
   }
 
   findPlayroomByName(name: string) {
-    return of(this.existingPlayrooms.filter(p => p.name.indexOf(name) !== -1));
+    return of(this.localPlayrooms.filter(p => p.name.indexOf(name) !== -1));
   }
 
   createPlayroom(name: string, owner: string, isPrivate: boolean, password: string) {
@@ -24,11 +26,12 @@ export class PlayroomService {
     }
     else {
       let playroom = new Playroom(name, owner, isPrivate, password);
+      this.localPlayrooms.push(playroom);
       return of(playroom);
     }
   }
 
   getPlayroom(name: string) {
-    return this.existingPlayrooms.find(p => p.name == name);
+    return this.localPlayrooms.find(p => p.name == name);
   }
 }

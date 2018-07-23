@@ -7,23 +7,18 @@ import { Injectable } from '@angular/core';
 })
 export class PlayerService {
 
-  private existingPlayers: Player[] = [];
-  private localPlayersSubject$: Subject<Player[]> = new Subject<Player[]>();
-  public localPlayers$: Observable<Player[]> = of(this.existingPlayers);
+  private localPlayers: Player[] = [];
+  public localPlayers$: Observable<Player[]> = of(this.localPlayers);
 
   constructor() { }
 
-  browsePlayers() {
-    return of(this.existingPlayers);
-  }
-
   createPlayer(name: string) : Observable<Player> {
-    if (this.existingPlayers.find(p => p.name == name)) {
+    if (this.localPlayers.find(p => p.name == name)) {
       return throwError(new Error("Player already exists"));
     }
     else {
       let player = new Player(name);
-      this.existingPlayers.push(player);
+      this.localPlayers.push(player);
       return of(player);
     }
   }

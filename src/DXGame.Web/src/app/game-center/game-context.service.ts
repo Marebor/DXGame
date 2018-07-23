@@ -3,21 +3,16 @@ import { PlayerService } from '../player/player.service';
 import { Playroom } from '../playroom/playroom';
 import { Injectable } from '@angular/core';
 import { Player } from '../player/player';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GameContextService {
-  private activePlayerSubject$: Subject<Player>;
   private playersCache = [];
   public activePlayer: Player;
-  public activePlayer$: Observable<Player>;
 
-  constructor(private playerService: PlayerService, private playroomService: PlayroomService) {
-    this.activePlayerSubject$ = new Subject<Player>();
-    this.activePlayer$ = this.activePlayerSubject$;
-  }
+  constructor(private playerService: PlayerService, private playroomService: PlayroomService) { }
 
   private cachePlayer() {
     let val = JSON.stringify(this.activePlayer);
@@ -36,10 +31,13 @@ export class GameContextService {
       this.cachePlayer();
     }
     this.activePlayer = player;
-    this.activePlayerSubject$.next(this.activePlayer);
   }
 
   switchPlayroom(playroom: Playroom) {
+    console.log("Switching playroom to: " + JSON.stringify(playroom))
+    if (this.activePlayer && !this.activePlayer.playrooms.find(p => p.id == playroom.id)) {
+      this.activePlayer.playrooms.push(playroom);
+    }
     this.activePlayer.activePlayroom = playroom;
   }
 }

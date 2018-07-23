@@ -1,2 +1,20 @@
-<input #name type="text">
-<button (click)="createPlayroom(name.value)">CREATE PLAYROOM</button>
+<form #playroomForm="ngForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name"
+            [(ngModel)]="model.name" #name="ngModel" required>
+    </div>
+    <div>
+        <label for="isPrivate">Protect with password</label>
+        <input type="checkbox" id="isPrivate" name="isPrivate" 
+            [(ngModel)]="model.isPrivate" #isPrivate="ngModel">
+    </div>
+    <div *ngIf="isPrivate.value">
+        <div>
+            <label for="pass">Password</label>
+            <input type="password" id="pass" name="pass" 
+                [(ngModel)]="password" #pass="ngModel" required minlength="4">
+        </div>
+    </div>
+    <button type="submit" [disabled]="!playroomForm.form.valid">CREATE PLAYROOM</button>
+</form>

@@ -7,17 +7,19 @@ import { Injectable } from '@angular/core';
 })
 export class PlayerService {
 
-  private localPlayers: Player[] = [];
-  public localPlayers$: Observable<Player[]> = of(this.localPlayers);
+  public localPlayers: Player[] = [];
 
   constructor() { }
 
-  createPlayer(name: string) : Observable<Player> {
+  createPlayer(name: string, protectedWithPassword: boolean, password?: string) : Observable<Player> {
     if (this.localPlayers.find(p => p.name == name)) {
       return throwError(new Error("Player already exists"));
     }
+    if (protectedWithPassword && !password) {
+      return throwError(new Error("Invalid password"))
+    }
     else {
-      let player = new Player(name);
+      let player = new Player(name, protectedWithPassword);
       this.localPlayers.push(player);
       return of(player);
     }

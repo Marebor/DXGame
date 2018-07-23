@@ -6,10 +6,12 @@ export class Player {
     public name: string;
     public playrooms: Playroom[];
     public activePlayroom: Playroom;
+    public protectedWithPassword: boolean;
 
-    constructor(name: string) {
+    constructor(name: string, protectedWithPassword: boolean) {
         this.id = Guid.newGuid();
         this.name = name;
         this.playrooms = [];
+        this.protectedWithPassword = protectedWithPassword;
     }
 }

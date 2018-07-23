@@ -8,7 +8,6 @@ import { throwError, of, Observable } from 'rxjs';
 })
 export class PlayroomService {
   private localPlayrooms: Playroom[] = [];
-  public localPlayrooms$: Observable<Playroom[]> = of(this.localPlayrooms);
 
   constructor() { }
 

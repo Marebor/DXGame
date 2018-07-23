@@ -1,2 +1,20 @@
-<input #name type="text">
-<button (click)="createPlayer(name.value)">CREATE PLAYER</button>
+<form #playerForm="ngForm" (ngSubmit)="onSubmit()">
+    <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name"
+            [(ngModel)]="model.name" #name="ngModel" required>
+    </div>
+    <div>
+        <label for="protect">Protect with password</label>
+        <input type="checkbox" id="protect" name="protect" 
+            [(ngModel)]="protectedWithPassword" #protect="ngModel">
+    </div>
+    <div *ngIf="protectedWithPassword">
+        <div>
+            <label for="pass">Password</label>
+            <input type="password" id="pass" name="pass" 
+                [(ngModel)]="password" #pass="ngModel" required minlength="4">
+        </div>
+    </div>
+    <button type="submit" [disabled]="!playerForm.form.valid">CREATE PLAYER</button>
+</form>

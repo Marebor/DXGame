@@ -15,6 +15,12 @@
             <input type="password" id="pass" name="pass" 
                 [(ngModel)]="password" #pass="ngModel" required minlength="4">
         </div>
+        <div>
+            <label for="repeatPass">Password</label>
+            <input type="password" id="repeatPass" name="repeatPass" 
+                [(ngModel)]="repeatPassword" #repeatPass="ngModel" required minlength="4" 
+                [appMatchValue]="password">
+        </div>
     </div>
     <button type="submit" [disabled]="!playerForm.form.valid">CREATE PLAYER</button>
 </form>

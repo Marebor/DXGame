@@ -1,5 +1,5 @@
-import { Player } from './../player';
-import { GameContextService } from './../../game-center/game-context.service';
+import { Player } from '../player';
+import { GameContextService } from '../../game-center/game-context.service';
 import { PlayerService } from '../player.service';
 import { Component, OnInit } from '@angular/core';
 
@@ -12,6 +12,7 @@ export class PlayerCreationComponent {
   private model: Player = new Player(null, false);
   private protectedWithPassword: boolean;
   private password: string;
+  private repeatPassword: string;
 
   constructor(private playerService: PlayerService, private gameContext: GameContextService) { }
 
@@ -23,5 +24,6 @@ export class PlayerCreationComponent {
     this.model = new Player(null, false);
     this.protectedWithPassword = false;
     this.password = null;
+    this.repeatPassword = null;
   }
 }

@@ -1,5 +1,5 @@
-import { Player } from './../player/player';
-import { Playroom } from './../playroom/playroom';
+import { Player } from '../player/player';
+import { Playroom } from '../playroom/playroom';
 import { GameContextService } from './game-context.service';
 import { PlayroomService } from '../playroom/playroom.service';
 import { PlayerService } from '../player/player.service';

@@ -1,4 +1,4 @@
-import { Player } from './../../player/player';
+import { Player } from '../../player/player';
 import { GameContextService } from '../../game-center/game-context.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PlayroomService } from '../playroom.service';

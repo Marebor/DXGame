@@ -1,3 +1,4 @@
+import { MatchValueValidator } from '../common/validation/match-value.directive';
 import { FormsModule } from '@angular/forms';
 import { PlayerRoutingModule } from './player-routing.module';
 import { NgModule } from '@angular/core';
@@ -10,6 +11,6 @@ import { PlayerCreationComponent } from './player-creation/player-creation.compo
     FormsModule,
     PlayerRoutingModule
   ],
-  declarations: [PlayerCreationComponent]
+  declarations: [PlayerCreationComponent, MatchValueValidator]
 })
 export class PlayerModule { }

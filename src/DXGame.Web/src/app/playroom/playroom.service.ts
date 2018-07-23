@@ -1,4 +1,4 @@
-import { GameContextService } from './../game-center/game-context.service';
+import { GameContextService } from '../game-center/game-context.service';
 import { Injectable } from '@angular/core';
 import { Playroom } from './playroom';
 import { throwError, of, Observable } from 'rxjs';

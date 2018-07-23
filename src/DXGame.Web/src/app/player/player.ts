@@ -1,4 +1,4 @@
-import { Playroom } from './../playroom/playroom';
+import { Playroom } from '../playroom/playroom';
 import { Guid } from "../common/guid";
 
 export class Player {

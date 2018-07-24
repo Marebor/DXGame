@@ -1,6 +1,7 @@
 import { PlayerCreationComponent } from './player-creation/player-creation.component';
 import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
+import { PlayersListComponent } from './players-list/players-list.component';
 
 const ROUTES: Routes = [
   { 
@@ -9,8 +10,7 @@ const ROUTES: Routes = [
   },
   {
     path: '',
-    redirectTo: '/create-player',
-    pathMatch: 'full'
+    component: PlayersListComponent
   }
 ];
 

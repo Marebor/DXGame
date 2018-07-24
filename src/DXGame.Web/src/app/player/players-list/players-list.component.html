@@ -1,0 +1,12 @@
+<mat-nav-list *ngIf="gameContext.localPlayers.length > 0">
+  <mat-list-item *ngFor="let player of gameContext.localPlayers">
+      <p>{{ player.name }}</p>
+      <button mat-icon-button>
+        <mat-icon>info</mat-icon>
+      </button>
+  </mat-list-item>
+</mat-nav-list>
+<div *ngIf="gameContext.localPlayers.length == 0">
+  <p>No player found! Do you want to create one?</p>
+  <button mat-raised-button color="primary" routerLink="./create-player">CREATE</button>
+</div>

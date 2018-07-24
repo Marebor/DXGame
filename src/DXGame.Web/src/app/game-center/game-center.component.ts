@@ -2,7 +2,6 @@ import { Player } from '../player/player';
 import { Playroom } from '../playroom/playroom';
 import { GameContextService } from './game-context.service';
 import { PlayroomService } from '../playroom/playroom.service';
-import { PlayerService } from '../player/player.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -10,14 +9,9 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './game-center.component.html',
   styleUrls: ['./game-center.component.css']
 })
-export class GameCenterComponent implements OnInit {
+export class GameCenterComponent {
 
-  constructor(private playerService: PlayerService, private playroomService: PlayroomService, 
-    private gameContext: GameContextService) { }
-
-  ngOnInit() {
-    
-  }
+  constructor(private playroomService: PlayroomService, private gameContext: GameContextService) { }
 
   trackPlayroomById(index: number, playroom: Playroom) {
     return playroom.id;

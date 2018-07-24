@@ -11,7 +11,7 @@
   </ul>
   <h5>All players:</h5>
   <ul>
-    <li *ngFor="let player of playerService.localPlayers; trackBy: trackPlayerById"
+    <li *ngFor="let player of gameContext.localPlayers; trackBy: trackPlayerById"
       (click)="gameContext.switchPlayer(player)">
       {{player.name}}
     </li>

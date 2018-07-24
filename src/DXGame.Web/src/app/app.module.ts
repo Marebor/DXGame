@@ -1,3 +1,4 @@
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { GameContextService } from './game-center/game-context.service';
 import { PlayerService } from './player/player.service';
 import { AppPreloadingStrategy } from './app-preloading-strategy';
@@ -16,6 +17,7 @@ import { PlayroomService } from './playroom/playroom.service';
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule
   ],
   providers: [

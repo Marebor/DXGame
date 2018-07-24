@@ -1,5 +1,12 @@
 import { FormsModule } from '@angular/forms';
-import { MatListModule, MatButtonModule, MatIconModule } from '@angular/material';
+import { 
+  MatListModule, 
+  MatButtonModule, 
+  MatIconModule, 
+  MatFormFieldModule, 
+  MatInputModule, 
+  MatCheckboxModule 
+} from '@angular/material';
 import { PlayerRoutingModule } from './player-routing.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,6 +20,9 @@ import { PlayersListComponent } from './players-list/players-list.component';
     MatListModule,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCheckboxModule,
     PlayerRoutingModule
   ],
   declarations: [PlayerCreationComponent, PlayersListComponent]

@@ -10,20 +10,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlayerCreationComponent {
   private model: Player = new Player(null, false);
-  private protectedWithPassword: boolean;
   private password: string;
-  private repeatPassword: string;
 
   constructor(private playerService: PlayerService, private gameContext: GameContextService) { }
 
   onSubmit() {
-    this.playerService.createPlayer(this.model.name, this.protectedWithPassword, this.password).subscribe(
+    this.playerService.createPlayer(this.model.name, this.model.protectedWithPassword, this.password).subscribe(
       response => this.gameContext.switchPlayer(response),
       error => console.log(error)
     )
-    this.model = new Player(null, false);
-    this.protectedWithPassword = false;
-    this.password = null;
-    this.repeatPassword = null;
   }
 }

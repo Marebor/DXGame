@@ -1,20 +1,25 @@
-<form #playerForm="ngForm" (ngSubmit)="onSubmit()">
+<form #playerForm="ngForm" 
+    (ngSubmit)="onSubmit(); playerForm.form.reset();">
     <div>
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name"
-            [(ngModel)]="model.name" #name="ngModel" required>
+        <mat-form-field>
+            <input type="text" id="name" name="name" matInput placeholder="Name"
+                [(ngModel)]="model.name" #name="ngModel" required>
+        </mat-form-field>
     </div>
     <div>
-        <label for="protect">Protect with password</label>
-        <input type="checkbox" id="protect" name="protect" 
-            [(ngModel)]="protectedWithPassword" #protect="ngModel">
+        <mat-checkbox id="protect" name="protect" color="primary"
+            [(ngModel)]="model.protectedWithPassword" #protect="ngModel">
+            Protect with password
+        </mat-checkbox>
     </div>
-    <div *ngIf="protectedWithPassword">
-        <div>
-            <label for="pass">Password</label>
-            <input type="password" id="pass" name="pass" 
+    <div *ngIf="model.protectedWithPassword">
+        <mat-form-field>
+            <input type="password" id="pass" name="pass" matInput placeholder="Password"
                 [(ngModel)]="password" #pass="ngModel" required minlength="4">
-        </div>
+        </mat-form-field>
     </div>
-    <button type="submit" [disabled]="!playerForm.form.valid">CREATE PLAYER</button>
+    <button mat-raised-button color="primary" type="submit" 
+        [disabled]="!playerForm.form.valid">
+        CREATE PLAYER
+    </button>
 </form>
